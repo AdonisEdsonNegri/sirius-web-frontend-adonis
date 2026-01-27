@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIRIUS WEB - Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            background: #f9fafb;
+        }
+
+        /* Header */
+        .header {
+            background: #2563eb;
+            color: white;
+            padding: 16px 24px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            font-size: 24px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .btn-logout {
+            padding: 8px 16px;
+            background: rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .btn-logout:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        /* Navigation */
+        .nav {
+            background: white;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .nav-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            gap: 8px;
+            padding: 0 24px;
+        }
+
+        .nav a {
+            padding: 16px 20px;
+            color: #6b7280;
+            text-decoration: none;
+            font-weight: 500;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .nav a:hover {
+            color: #2563eb;
+            background: #f9fafb;
+        }
+
+        .nav a.active {
+            color: #2563eb;
+            border-bottom-color: #2563eb;
+        }
+
+        /* Dropdown Navigation */
+        .nav-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .nav-dropdown-btn {
+            padding: 16px 20px;
+            color: #6b7280;
+            text-decoration: none;
+            font-weight: 500;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: inherit;
+            font-family: inherit;
+        }
+
+        .nav-dropdown-btn:hover {
+            color: #2563eb;
+            background: #f9fafb;
+        }
+
+        .nav-dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: white;
+            min-width: 200px;
+            box-shadow: 0px 8px 16px rgba(0,0,0,0.2);
+            z-index: 1;
+            border-radius: 8px;
+            overflow: hidden;
+            top: 100%;
+            left: 0;
+        }
+
+        .nav-dropdown-content a {
+            color: #374151;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            transition: background 0.2s;
+            border-bottom: none;
+        }
+
+        .nav-dropdown-content a:hover {
+            background-color: #f3f4f6;
+            color: #2563eb;
+        }
+
+        .nav-dropdown:hover .nav-dropdown-content {
+            display: block;
+        }
+
+        /* Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 32px 24px;
+        }
+
+        /* Cards */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .card h3 {
+            font-size: 14px;
+            color: #6b7280;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .card-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 8px;
+        }
+
+        .card-info {
+            font-size: 14px;
+            color: #6b7280;
+        }
+
+        /* Empresa Info */
+        .empresa-info {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .empresa-info h2 {
+            font-size: 20px;
+            margin-bottom: 16px;
+            color: #1f2937;
+        }
+
+        .info-row {
+            display: flex;
+            padding: 12px 0;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: #6b7280;
+            width: 150px;
+        }
+
+        .info-value {
+            color: #1f2937;
+            flex: 1;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge-success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        /* Loading */
+        .loading {
+            text-align: center;
+            padding: 48px;
+            color: #6b7280;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="header-content">
+            <h1>SIRIUS WEB</h1>
+            <div class="user-info">
+                <span id="userName">Carregando...</span>
+                <button class="btn-logout" onclick="logout()">Sair</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="nav">
+        <div class="nav-content">
+            <a href="dashboard.html" class="active">Dashboard</a>
+            <a href="produtos.html">Produtos</a>
+            <a href="clientes.html">Clientes</a>
+            <a href="#" onclick="alert('Em desenvolvimento!')">Fornecedores</a>
+            <a href="#" onclick="alert('Em desenvolvimento!')">PDV</a>
+            
+            <!-- Dropdown Configurações -->
+            <div class="nav-dropdown">
+                <button class="nav-dropdown-btn">⚙️ Configurações ▼</button>
+                <div class="nav-dropdown-content">
+                    <a href="vendedores.html">👨‍💼 Vendedores</a>
+                    <a href="#" onclick="alert('Em desenvolvimento!'); return false;">💳 Formas de Pagamento</a>
+                    <a href="#" onclick="alert('Em desenvolvimento!'); return false;">📋 Regimes Tributários</a>
+                    <a href="#" onclick="alert('Em desenvolvimento!'); return false;">💰 Caixas Cadastradas</a>
+                    <a href="#" onclick="alert('Em desenvolvimento!'); return false;">👥 Usuários</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Container -->
+    <div class="container">
+        <!-- Cards de Estatísticas -->
+        <div class="cards-grid">
+            <div class="card">
+                <h3>Plano Atual</h3>
+                <div class="card-value" id="plano">-</div>
+                <div class="card-info">Gratuito com limites</div>
+            </div>
+
+            <div class="card">
+                <h3>NFCe Disponíveis</h3>
+                <div class="card-value" id="nfce">-</div>
+                <div class="card-info">Limite mensal</div>
+            </div>
+
+            <div class="card">
+                <h3>Acessos Rápidos</h3>
+                <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 16px;">
+                    <a href="produtos.html" style="display: block; padding: 8px 16px; background: #2563eb; color: white; text-decoration: none; border-radius: 6px; text-align: center; font-weight: 500; transition: background 0.2s;" onmouseover="this.style.background='#1e40af'" onmouseout="this.style.background='#2563eb'">
+                        📦 Produtos
+                    </a>
+                    <a href="#" onclick="alert('Em desenvolvimento!'); return false;" style="display: block; padding: 8px 16px; background: #10b981; color: white; text-decoration: none; border-radius: 6px; text-align: center; font-weight: 500; transition: background 0.2s;" onmouseover="this.style.background='#059669'" onmouseout="this.style.background='#10b981'">
+                        🛒 PDV
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Informações da Empresa -->
+        <div class="empresa-info">
+            <h2>Dados da Empresa</h2>
+            <div id="empresaContent" class="loading">
+                Carregando informações...
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configuração
+        const API_URL = 'https://sirius-web-api-adonis.vercel.app';
+
+        // Verificar autenticação
+        function checkAuth() {
+            const token = localStorage.getItem('sirius_token');
+            if (!token) {
+                window.location.href = 'index.html';
+                return null;
+            }
+            return token;
+        }
+
+        // Logout
+        function logout() {
+            localStorage.removeItem('sirius_token');
+            localStorage.removeItem('sirius_usuario');
+            localStorage.removeItem('sirius_empresas');
+            window.location.href = 'index.html';
+        }
+
+        // Carregar dados
+        async function loadData() {
+            const token = checkAuth();
+            if (!token) return;
+
+            // Dados do usuário
+            const usuario = JSON.parse(localStorage.getItem('sirius_usuario'));
+            const empresas = JSON.parse(localStorage.getItem('sirius_empresas'));
+
+            // Atualizar nome
+            document.getElementById('userName').textContent = usuario.nome;
+
+            // Pegar primeira empresa
+            const empresa = empresas[0];
+
+            // Atualizar plano
+            document.getElementById('plano').textContent = empresa.plano;
+            document.getElementById('nfce').textContent = '200';
+
+            // Buscar dados completos da empresa
+            try {
+                const response = await fetch(`${API_URL}/empresas/${empresa.id}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    const emp = data.data;
+                    
+                    document.getElementById('empresaContent').innerHTML = `
+                        <div class="info-row">
+                            <span class="info-label">Razão Social:</span>
+                            <span class="info-value">${emp.razao_social}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Nome Fantasia:</span>
+                            <span class="info-value">${emp.nome_fantasia}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">CNPJ:</span>
+                            <span class="info-value">${emp.cnpj}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">E-mail:</span>
+                            <span class="info-value">${emp.email || 'Não informado'}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Telefone:</span>
+                            <span class="info-value">${emp.telefone || 'Não informado'}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Plano:</span>
+                            <span class="info-value">
+                                <span class="badge badge-success">${emp.plano}</span>
+                            </span>
+                        </div>
+                    `;
+                } else {
+                    throw new Error('Erro ao carregar dados');
+                }
+
+            } catch (error) {
+                console.error('Erro:', error);
+                document.getElementById('empresaContent').innerHTML = `
+                    <p style="color: #ef4444;">Erro ao carregar dados da empresa.</p>
+                `;
+            }
+        }
+
+        // Inicializar
+        loadData();
+        
+        console.log('🚀 Dashboard carregado');
+    </script>
+</body>
+</html>

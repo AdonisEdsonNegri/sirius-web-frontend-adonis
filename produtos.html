@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIRIUS WEB - Produtos</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 20px; }
+        .container { max-width: 1400px; margin: 0 auto; background: white; border-radius: 15px; padding: 30px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        h1 { color: #667eea; text-align: center; margin-bottom: 10px; font-size: 2.5em; }
+        .subtitle { text-align: center; color: #666; margin-bottom: 30px; font-size: 1.2em; }
+        
+        /* Remover spinner dos inputs numéricos */
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        input[type="number"] {
+            -moz-appearance: textfield;
+        }
+        
+        /* Toolbar */
+        .btn-toolbar { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+        .btn { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold; transition: all 0.3s; }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+        .btn-filtros { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+        .btn-relatorio { background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); }
+        
+        /* Dropdown */
+        .dropdown { position: relative; display: inline-block; }
+        .dropdown-content { display: none; position: absolute; background-color: white; min-width: 220px; box-shadow: 0px 8px 16px rgba(0,0,0,0.2); z-index: 1; border-radius: 8px; overflow: hidden; }
+        .dropdown-content a { color: black; padding: 12px 16px; text-decoration: none; display: block; transition: background 0.3s; }
+        .dropdown-content a:hover { background-color: #f093fb; color: white; }
+        .dropdown:hover .dropdown-content { display: block; }
+        
+        /* Filtro Ativo */
+        .filtro-ativo { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; padding: 12px 20px; border-radius: 8px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
+        .btn-limpar-filtro { background: white; color: #f5576c; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        
+        /* Tabela */
+        table { width: 100%; border-collapse: collapse; margin-bottom: 20px; background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        thead { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
+        th, td { padding: 15px 10px; text-align: left; font-size: 14px; }
+        tbody tr { border-bottom: 1px solid #eee; transition: background 0.3s; }
+        tbody tr:hover { background-color: #f9f9f9; }
+        tbody tr.estoque-baixo { background-color: #fff3cd !important; }
+        tbody tr.estoque-baixo:hover { background-color: #ffe69c !important; }
+        
+        .btn-small { padding: 6px 12px; font-size: 12px; margin: 2px; border-radius: 5px; border: none; cursor: pointer; transition: all 0.3s; white-space: nowrap; }
+        .btn-edit { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; }
+        .btn-delete { background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); color: white; }
+        .btn-ficha { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; }
+        .btn-movimentacoes { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); color: white; }
+        .btn-small:hover { transform: translateY(-2px); box-shadow: 0 3px 10px rgba(0,0,0,0.2); }
+        
+        /* Modal */
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.5); }
+        .modal-content { background-color: white; margin: 2% auto; padding: 0; border-radius: 15px; width: 90%; max-width: 900px; box-shadow: 0 10px 40px rgba(0,0,0,0.3); max-height: 90vh; overflow: hidden; display: flex; flex-direction: column; }
+        
+        .modal-header { padding: 20px 30px; border-bottom: 2px solid #eee; display: flex; justify-content: space-between; align-items: center; }
+        .form-title { color: #667eea; font-size: 1.8em; margin: 0; }
+        .close { color: #aaa; font-size: 28px; font-weight: bold; cursor: pointer; line-height: 1; }
+        .close:hover { color: #000; }
+        
+        /* Sistema de Abas */
+        .tabs { display: flex; background: #f9f9f9; border-bottom: 2px solid #ddd; padding: 0 30px; }
+        .tab-button { padding: 15px 20px; background: transparent; border: none; color: #666; cursor: pointer; font-size: 15px; font-weight: 600; border-bottom: 3px solid transparent; margin-bottom: -2px; transition: all 0.3s; }
+        .tab-button:hover { color: #667eea; background: rgba(102, 126, 234, 0.1); }
+        .tab-button.active { color: #667eea; border-bottom-color: #667eea; background: white; }
+        
+        .modal-body { padding: 30px; overflow-y: auto; flex: 1; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: fadeIn 0.3s; }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .modal-footer { padding: 20px 30px; border-top: 2px solid #eee; display: flex; justify-content: flex-end; gap: 10px; }
+        
+        /* Form */
+        .form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 15px; }
+        .form-group { display: flex; flex-direction: column; }
+        .form-group label { margin-bottom: 5px; font-weight: 600; color: #333; font-size: 14px; }
+        .form-group input, .form-group select, .form-group textarea { padding: 10px; border: 2px solid #ddd; border-radius: 6px; font-size: 14px; transition: border 0.3s; }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: #667eea; }
+        
+        .section-subtitle { color: #667eea; font-size: 1.1em; margin: 20px 0 15px 0; padding-bottom: 8px; border-bottom: 2px solid #e0e0e0; }
+        
+        .btn-cancel { background: #6c757d; }
+        
+        /* Loading */
+        .loading { text-align: center; padding: 40px; font-size: 1.2em; color: #667eea; }
+        
+        /* Mensagem */
+        .mensagem { padding: 15px; border-radius: 8px; margin-bottom: 20px; font-weight: bold; display: none; position: relative; z-index: 2000; }
+        .mensagem.success { background-color: #d4edda; color: #155724; border: 2px solid #c3e6cb; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+        .mensagem.error { background-color: #f8d7da; color: #721c24; border: 2px solid #f5c6cb; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+        
+        /* Paginação */
+        .pagination { display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 20px; }
+        .pagination button { padding: 8px 16px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 6px; cursor: pointer; }
+        .pagination button:disabled { opacity: 0.5; cursor: not-allowed; }
+        .pagination span { font-weight: bold; }
+        
+        /* Menu Hamburger (Mobile) */
+        .menu-toggle { display: none; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-size: 16px; margin-bottom: 10px; }
+        .btn-toolbar.collapsed { display: none; }
+        
+        /* Responsivo */
+        @media (max-width: 768px) {
+            .container { padding: 15px; }
+            h1 { font-size: 1.8em; }
+            .menu-toggle { display: block; }
+            .btn-toolbar { flex-direction: column; }
+            .dropdown-content { position: static; display: none; box-shadow: none; border: 1px solid #ddd; margin-top: 5px; }
+            .dropdown.active .dropdown-content { display: block; }
+            table { font-size: 12px; }
+            th, td { padding: 8px 5px; }
+            .btn-small { padding: 4px 8px; font-size: 11px; }
+            .modal-content { width: 95%; margin: 5% auto; }
+            .modal-header { padding: 15px 20px; }
+            .form-title { font-size: 1.5em; }
+            .tabs { padding: 0 15px; overflow-x: auto; }
+            .tab-button { padding: 12px 15px; font-size: 13px; }
+            .modal-body { padding: 20px 15px; }
+            .modal-footer { padding: 15px; }
+            .form-row { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🏢 SIRIUS WEB</h1>
+        <div class="subtitle">Gestão de Produtos</div>
+        
+        <button class="menu-toggle" onclick="toggleMenu()">☰ Menu</button>
+        
+        <div class="btn-toolbar" id="toolbar">
+            <button class="btn" onclick="abrirModal()">➕ Novo Produto</button>
+
+            <div class="dropdown" onclick="toggleDropdown(event, this)">
+                <button class="btn" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">🔤 Ordenação</button>
+                <div class="dropdown-content">
+                    <a href="#" onclick="aplicarOrdenacao('codigo')">🔢 Por Código</a>
+                    <a href="#" onclick="aplicarOrdenacao('descricao')">📝 Por Descrição</a>
+                    <a href="#" onclick="aplicarOrdenacao('data_criacao')">📅 Ordem de Inserção</a>
+                    <a href="#" onclick="aplicarOrdenacao('ultimos')">⏱️ Últimos Lançamentos</a>
+                </div>
+            </div>
+            
+            <div class="dropdown" onclick="toggleDropdown(event, this)">
+                <button class="btn btn-filtros">🔍 Filtros</button>
+                <div class="dropdown-content">
+                    <a href="#" onclick="aplicarFiltro('codigo')">🔢 Por Código</a>
+                    <a href="#" onclick="aplicarFiltro('descricao')">📝 Por Descrição</a>
+                    <a href="#" onclick="aplicarFiltro('ean')">📊 Por EAN/Barras</a>
+                    <a href="#" onclick="aplicarFiltro('estoque_zero')">⚠️ Estoque Zero</a>
+                    <a href="#" onclick="aplicarFiltro('estoque_baixo')">📉 Estoque Abaixo do Mínimo</a>
+                </div>
+            </div>
+
+            <div class="dropdown" onclick="toggleDropdown(event, this)">
+                <button class="btn btn-relatorio">📄 Relatórios</button>
+                <div class="dropdown-content">
+                    <a href="#" onclick="gerarRelatorio()">📊 Produtos sob Filtro</a>
+                </div>
+            </div>
+        </div>
+        
+        <div id="filtroAtivo" class="filtro-ativo" style="display:none;">
+            <div><strong>Filtro ativo:</strong> <span id="textoFiltro"></span></div>
+            <button class="btn-limpar-filtro" onclick="limparFiltro()">✖ Limpar</button>
+        </div>
+        
+        <div id="mensagem" class="mensagem"></div>
+        <div id="loading" class="loading" style="display:none;">Carregando produtos...</div>
+        
+        <div id="tabelaContainer">
+            <table id="tabelaProdutos">
+                <thead>
+                    <tr>
+                        <th>Código</th>
+                        <th>Descrição</th>
+                        <th>Unidade</th>
+                        <th>Estoque</th>
+                        <th>Preço Custo</th>
+                        <th>Preço Venda</th>
+                        <th>Status</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="tbody"></tbody>
+            </table>
+        </div>
+        
+        <div class="pagination">
+            <button id="btnPrev" onclick="mudarPagina(-1)" disabled>← Anterior</button>
+            <span id="pageInfo">Página 1</span>
+            <button id="btnNext" onclick="mudarPagina(1)">Próxima →</button>
+        </div>
+    </div>
+
+    <!-- Modal com Abas -->
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="form-title" id="modalTitle">Novo Produto</h2>
+                <span class="close" onclick="fecharModal()">&times;</span>
+            </div>
+            
+            <!-- Abas -->
+            <div class="tabs">
+                <button class="tab-button active" data-tab="basico" onclick="mudarAba('basico')">📦 Dados Básicos</button>
+                <button class="tab-button" data-tab="estoque" onclick="mudarAba('estoque')">📊 Estoque</button>
+                <button class="tab-button" data-tab="fiscais" onclick="mudarAba('fiscais')">📋 Dados Fiscais</button>
+                <button class="tab-button" data-tab="config" onclick="mudarAba('config')">⚙️ Configurações</button>
+            </div>
+            
+            <div class="modal-body">
+                <form id="produtoForm" onsubmit="salvarProduto(event)">
+                    <!-- Aba: Dados Básicos -->
+                    <div id="tab-basico" class="tab-content active">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Código *</label>
+                                <input type="text" id="codigo" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Código de Barras (EAN)</label>
+                                <input type="text" id="ean" maxlength="14">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Descrição *</label>
+                            <input type="text" id="descricao" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Descrição Complementar</label>
+                            <input type="text" id="descricao_complemento">
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Unidade *</label>
+                                <input type="text" id="unidade_comercial" placeholder="Ex: UN, KG, LT" maxlength="10" required>
+                                <small style="color: #666; font-size: 12px;">Ex: UN, KG, LT, CX, PC, etc.</small>
+                            </div>
+                            <div class="form-group">
+                                <label>Preço Custo (R$)</label>
+                                <input type="number" id="custo" step="0.01" min="0" placeholder="0,00">
+                            </div>
+                            <div class="form-group">
+                                <label>Preço Venda (R$) *</label>
+                                <input type="number" id="valor_venda" step="0.01" min="0" placeholder="0,00" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Aba: Estoque -->
+                    <div id="tab-estoque" class="tab-content">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Estoque Atual</label>
+                                <input type="number" id="saldo" step="0.001" min="0" placeholder="0,000">
+                            </div>
+                            <div class="form-group">
+                                <label>Estoque Mínimo</label>
+                                <input type="number" id="estoque_minimo" step="0.001" min="0" placeholder="0,000">
+                            </div>
+                            <div class="form-group">
+                                <label>Estoque Máximo</label>
+                                <input type="number" id="estoque_maximo" step="0.001" min="0" placeholder="0,000">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Aba: Dados Fiscais -->
+                    <div id="tab-fiscais" class="tab-content">
+                        <h3 class="section-subtitle">Identificação Fiscal</h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>NCM (8 dígitos)</label>
+                                <input type="text" id="ncm" maxlength="8" placeholder="00000000">
+                            </div>
+                            <div class="form-group">
+                                <label>CEST (7 dígitos)</label>
+                                <input type="text" id="cest" maxlength="7" placeholder="0000000">
+                            </div>
+                            <div class="form-group">
+                                <label>CFOP (4 dígitos)</label>
+                                <input type="text" id="cfop" maxlength="4" placeholder="0000">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Origem da Mercadoria</label>
+                            <select id="origem">
+                                <option value="">Selecione...</option>
+                                <option value="0">0 - Nacional</option>
+                                <option value="1">1 - Estrangeira - Importação direta</option>
+                                <option value="2">2 - Estrangeira - Adquirida mercado interno</option>
+                            </select>
+                        </div>
+
+                        <h3 class="section-subtitle">ICMS</h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>CST ICMS</label>
+                                <input type="text" id="cst_icms" maxlength="3" placeholder="000">
+                            </div>
+                            <div class="form-group">
+                                <label>Alíquota ICMS (%)</label>
+                                <input type="number" id="aliq_icms" step="0.01" min="0" max="100" placeholder="0,00">
+                            </div>
+                        </div>
+
+                        <h3 class="section-subtitle">PIS / COFINS</h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>CST PIS</label>
+                                <input type="text" id="cst_pis" maxlength="2" placeholder="00">
+                            </div>
+                            <div class="form-group">
+                                <label>Alíquota PIS (%)</label>
+                                <input type="number" id="aliq_pis" step="0.01" min="0" max="100" placeholder="0,00">
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>CST COFINS</label>
+                                <input type="text" id="cst_cofins" maxlength="2" placeholder="00">
+                            </div>
+                            <div class="form-group">
+                                <label>Alíquota COFINS (%)</label>
+                                <input type="number" id="aliq_cofins" step="0.01" min="0" max="100" placeholder="0,00">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Aba: Configurações -->
+                    <div id="tab-config" class="tab-content">
+                        <div class="form-group" style="margin-bottom: 20px;">
+                            <label style="display: flex; align-items: center; cursor: pointer;">
+                                <input type="checkbox" id="ativo" checked style="margin-right: 10px; width: 18px; height: 18px; cursor: pointer;">
+                                <span style="font-size: 16px;">Produto Ativo</span>
+                            </label>
+                        </div>
+
+                        <div class="form-group" style="margin-bottom: 20px;">
+                            <label style="display: flex; align-items: center; cursor: pointer;">
+                                <input type="checkbox" id="ativo_pdv" checked style="margin-right: 10px; width: 18px; height: 18px; cursor: pointer;">
+                                <span style="font-size: 16px;">Disponível no PDV</span>
+                            </label>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Observações</label>
+                            <textarea id="observacoes" rows="5" placeholder="Observações sobre o produto..."></textarea>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            
+            <div class="modal-footer">
+                <button type="button" class="btn btn-cancel" onclick="fecharModal()">Cancelar</button>
+                <button type="submit" class="btn" form="produtoForm">💾 Salvar</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/produtos.js"></script>
+</body>
+</html>
