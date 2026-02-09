@@ -150,62 +150,63 @@
         .container {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 32px 24px;
+            padding: 24px;
         }
 
-        /* Cards */
+        /* Cards Grid */
         .cards-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 24px;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
             margin-bottom: 32px;
         }
 
         .card {
             background: white;
-            border-radius: 12px;
             padding: 24px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
 
         .card h3 {
-            font-size: 14px;
-            color: #6b7280;
-            margin-bottom: 8px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+            color: #374151;
+            font-size: 16px;
+            margin-bottom: 12px;
         }
 
         .card-value {
             font-size: 32px;
-            font-weight: 700;
-            color: #1f2937;
-            margin-bottom: 8px;
+            font-weight: bold;
+            color: #2563eb;
+            margin: 12px 0;
         }
 
         .card-info {
-            font-size: 14px;
             color: #6b7280;
+            font-size: 14px;
         }
 
         /* Empresa Info */
         .empresa-info {
             background: white;
-            border-radius: 12px;
             padding: 24px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
 
         .empresa-info h2 {
+            color: #374151;
             font-size: 20px;
-            margin-bottom: 16px;
-            color: #1f2937;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #e5e7eb;
         }
 
         .info-row {
             display: flex;
+            justify-content: space-between;
             padding: 12px 0;
-            border-bottom: 1px solid #e5e7eb;
+            border-bottom: 1px solid #f3f4f6;
         }
 
         .info-row:last-child {
@@ -213,14 +214,13 @@
         }
 
         .info-label {
-            font-weight: 600;
             color: #6b7280;
-            width: 150px;
+            font-weight: 500;
         }
 
         .info-value {
-            color: #1f2937;
-            flex: 1;
+            color: #374151;
+            font-weight: 600;
         }
 
         .badge {
@@ -236,10 +236,9 @@
             color: #065f46;
         }
 
-        /* Loading */
         .loading {
             text-align: center;
-            padding: 48px;
+            padding: 20px;
             color: #6b7280;
         }
     </style>
@@ -262,18 +261,19 @@
             <a href="dashboard.html" class="active">Dashboard</a>
             <a href="produtos.html">Produtos</a>
             <a href="clientes.html">Clientes</a>
-            <a href="#" onclick="alert('Em desenvolvimento!')">Fornecedores</a>
-            <a href="#" onclick="alert('Em desenvolvimento!')">PDV</a>
+            <a href="#" onclick="showMessage('Módulo Fornecedores em desenvolvimento!'); return false;">Fornecedores</a>
+            <a href="pdv.html">PDV</a>
+            <a href="pedidos.html">Pedidos</a>
             
             <!-- Dropdown Configurações -->
             <div class="nav-dropdown">
                 <button class="nav-dropdown-btn">⚙️ Configurações ▼</button>
                 <div class="nav-dropdown-content">
                     <a href="vendedores.html">👨‍💼 Vendedores</a>
-                    <a href="#" onclick="alert('Em desenvolvimento!'); return false;">💳 Formas de Pagamento</a>
-                    <a href="#" onclick="alert('Em desenvolvimento!'); return false;">📋 Regimes Tributários</a>
-                    <a href="#" onclick="alert('Em desenvolvimento!'); return false;">💰 Caixas Cadastradas</a>
-                    <a href="#" onclick="alert('Em desenvolvimento!'); return false;">👥 Usuários</a>
+                    <a href="formas-pagamento.html">💳 Formas de Pagamento</a>
+                    <a href="regimes-tributarios.html">📋 Regimes Tributários</a>
+                    <a href="#" onclick="showMessage('Módulo Caixas Cadastradas em desenvolvimento!'); return false;">💰 Caixas Cadastradas</a>
+                    <a href="#" onclick="showMessage('Módulo Usuários em desenvolvimento!'); return false;">👥 Usuários</a>
                 </div>
             </div>
         </div>
@@ -301,8 +301,11 @@
                     <a href="produtos.html" style="display: block; padding: 8px 16px; background: #2563eb; color: white; text-decoration: none; border-radius: 6px; text-align: center; font-weight: 500; transition: background 0.2s;" onmouseover="this.style.background='#1e40af'" onmouseout="this.style.background='#2563eb'">
                         📦 Produtos
                     </a>
-                    <a href="#" onclick="alert('Em desenvolvimento!'); return false;" style="display: block; padding: 8px 16px; background: #10b981; color: white; text-decoration: none; border-radius: 6px; text-align: center; font-weight: 500; transition: background 0.2s;" onmouseover="this.style.background='#059669'" onmouseout="this.style.background='#10b981'">
+                    <a href="pdv.html" style="display: block; padding: 8px 16px; background: #10b981; color: white; text-decoration: none; border-radius: 6px; text-align: center; font-weight: 500; transition: background 0.2s;" onmouseover="this.style.background='#059669'" onmouseout="this.style.background='#10b981'">
                         🛒 PDV
+                    </a>
+                    <a href="pedidos.html" style="display: block; padding: 8px 16px; background: #8b5cf6; color: white; text-decoration: none; border-radius: 6px; text-align: center; font-weight: 500; transition: background 0.2s;" onmouseover="this.style.background='#7c3aed'" onmouseout="this.style.background='#8b5cf6'">
+                        📋 Pedidos
                     </a>
                 </div>
             </div>
@@ -317,9 +320,47 @@
         </div>
     </div>
 
+    <!-- Modal de Aviso Personalizado -->
+    <div id="modalAviso" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9999; align-items: center; justify-content: center;">
+        <div style="background: white; border-radius: 12px; padding: 24px; max-width: 400px; margin: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                <h3 style="color: #2563eb; margin: 0;">ℹ️ Informação</h3>
+                <span onclick="closeMessage()" style="cursor: pointer; font-size: 24px; color: #6b7280;">&times;</span>
+            </div>
+            <p id="mensagemAviso" style="color: #374151; margin-bottom: 20px;"></p>
+            <button onclick="closeMessage()" style="background: #2563eb; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; width: 100%; font-size: 16px; font-weight: 500;">OK</button>
+        </div>
+    </div>
+
     <script>
-        // Configuração
-        const API_URL = 'https://sirius-web-api-adonis.vercel.app';
+        // Funções do modal de aviso
+        function showMessage(mensagem) {
+            document.getElementById('mensagemAviso').textContent = mensagem;
+            document.getElementById('modalAviso').style.display = 'flex';
+        }
+
+        function closeMessage() {
+            document.getElementById('modalAviso').style.display = 'none';
+        }
+
+        // Fechar modal ao clicar fora
+        document.getElementById('modalAviso')?.addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeMessage();
+            }
+        });
+
+        // Detecta se está em desenvolvimento (local) ou produção (Vercel)
+        const isDev = window.location.hostname === 'localhost' 
+                   || window.location.hostname === '127.0.0.1'
+                   || window.location.hostname === ''
+                   || window.location.protocol === 'file:';
+
+        // Configuração da API (automática: local em dev, Vercel em produção)
+        const API_URL = isDev ? 'http://localhost:3000' : 'https://sirius-web-api-adonis.vercel.app';
+        
+        console.log('🔍 Ambiente:', isDev ? 'DESENVOLVIMENTO' : 'PRODUÇÃO');
+        console.log('📡 API URL:', API_URL);
 
         // Verificar autenticação
         function checkAuth() {

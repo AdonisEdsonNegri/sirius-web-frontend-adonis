@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIRIUS WEB - Pedidos</title>
+    <link rel="stylesheet" href="css/pedidos.css">
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="header-content">
+            <h1>SIRIUS WEB - Pedidos</h1>
+            <div class="user-info">
+                <span id="userName">Carregando...</span>
+                <button class="btn-logout" onclick="logout()">Sair</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="nav">
+        <div class="nav-content">
+            <a href="dashboard.html">Dashboard</a>
+            <a href="produtos.html">Produtos</a>
+            <a href="clientes.html">Clientes</a>
+            <a href="#" onclick="showMessage('Módulo Fornecedores em desenvolvimento!'); return false;">Fornecedores</a>
+            <a href="pdv.html">PDV</a>
+            <a href="pedidos.html" class="active">Pedidos</a>
+            
+            <!-- Dropdown Configurações -->
+            <div class="nav-dropdown">
+                <button class="nav-dropdown-btn">⚙️ Configurações ▼</button>
+                <div class="nav-dropdown-content">
+                    <a href="vendedores.html">👨‍💼 Vendedores</a>
+                    <a href="formas-pagamento.html">💳 Formas de Pagamento</a>
+                    <a href="regimes-tributarios.html">📋 Regimes Tributários</a>
+                    <a href="#" onclick="showMessage('Módulo Caixas Cadastradas em desenvolvimento!'); return false;">💰 Caixas Cadastradas</a>
+                    <a href="#" onclick="showMessage('Módulo Usuários em desenvolvimento!'); return false;">👥 Usuários</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>📋 Pedidos de Venda</h2>
+        <p class="subtitle">Visualização e controle de pedidos</p>
+
+        <!-- Mensagem de feedback -->
+        <div id="mensagem" class="mensagem"></div>
+
+        <!-- Toolbar -->
+        <div class="btn-toolbar">
+            <!-- Dropdown Ordenação -->
+            <div class="dropdown">
+                <button class="btn">📊 Ordenação</button>
+                <div class="dropdown-content">
+                    <a href="#" onclick="aplicarOrdenacao('numero_asc'); return false;">📈 Número Crescente</a>
+                    <a href="#" onclick="aplicarOrdenacao('numero_desc'); return false;">📉 Número Decrescente</a>
+                </div>
+            </div>
+
+            <!-- Dropdown Filtros -->
+            <div class="dropdown">
+                <button class="btn btn-filtros">🔍 Filtros</button>
+                <div class="dropdown-content">
+                    <a href="#" onclick="abrirFiltroNumero(); return false;">🔢 Por Número</a>
+                    <a href="#" onclick="aplicarFiltroHoje(); return false;">📅 Hoje</a>
+                    <a href="#" onclick="abrirFiltroData(); return false;">📆 A partir de...</a>
+                    <a href="#" onclick="abrirFiltroCliente(); return false;">👤 Por Cliente</a>
+                </div>
+            </div>
+
+            <!-- Dropdown Relatórios -->
+            <div class="dropdown">
+                <button class="btn btn-relatorio">📄 Relatórios</button>
+                <div class="dropdown-content">
+                    <a href="#" onclick="gerarRelatorioPedidos(); return false;">📊 Pedidos sob Filtro Atual</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filtro Ativo -->
+        <div id="filtroAtivo" class="filtro-ativo" style="display: none;">
+            <span id="filtroTexto"></span>
+            <button class="btn-limpar-filtro" onclick="limparFiltros()">❌ Limpar Filtro</button>
+        </div>
+
+        <!-- Tabela de Pedidos -->
+        <div id="tabelaContainer">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Número</th>
+                        <th>Data</th>
+                        <th>Cliente</th>
+                        <th>Documento</th>
+                        <th>Valor</th>
+                        <th>Status</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="tabelaPedidos">
+                    <tr>
+                        <td colspan="7" class="loading">Carregando pedidos...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Paginação -->
+        <div id="paginacao" class="paginacao" style="display: none;"></div>
+    </div>
+
+    <!-- Modais -->
+    <!-- Modal de Filtro por Número -->
+    <div id="modalFiltroNumero" class="modal">
+        <div class="modal-content modal-small">
+            <div class="modal-header">
+                <h3>🔢 Filtrar por Número</h3>
+                <span class="modal-close" onclick="fecharModal('modalFiltroNumero')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Número do Pedido:</label>
+                    <input type="number" id="filtroNumeroPedido" placeholder="Digite o número do pedido">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-cancel" onclick="fecharModal('modalFiltroNumero')">Cancelar</button>
+                <button class="btn" onclick="aplicarFiltroNumero()">Aplicar Filtro</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Filtro por Data -->
+    <div id="modalFiltroData" class="modal">
+        <div class="modal-content modal-small">
+            <div class="modal-header">
+                <h3>📆 Filtrar a partir de...</h3>
+                <span class="modal-close" onclick="fecharModal('modalFiltroData')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Data Inicial:</label>
+                    <input type="date" id="filtroDataInicial">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-cancel" onclick="fecharModal('modalFiltroData')">Cancelar</button>
+                <button class="btn" onclick="aplicarFiltroData()">Aplicar Filtro</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Filtro por Cliente -->
+    <div id="modalFiltroCliente" class="modal">
+        <div class="modal-content modal-small">
+            <div class="modal-header">
+                <h3>👤 Filtrar por Cliente</h3>
+                <span class="modal-close" onclick="fecharModal('modalFiltroCliente')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Buscar Cliente:</label>
+                    <input type="text" id="buscaCliente" placeholder="Digite o nome ou documento do cliente">
+                </div>
+                <div id="resultadosBuscaCliente" class="resultados-busca"></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-cancel" onclick="fecharModal('modalFiltroCliente')">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Visualização do Pedido -->
+    <div id="modalVisualizarPedido" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>📋 Detalhes do Pedido</h3>
+                <span class="modal-close" onclick="fecharModal('modalVisualizarPedido')">&times;</span>
+            </div>
+            <div class="modal-body" id="conteudoPedido">
+                <!-- Conteúdo será preenchido dinamicamente -->
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-cancel" onclick="fecharModal('modalVisualizarPedido')">Fechar</button>
+                <button class="btn btn-relatorio" onclick="imprimirPedidoAtual()">🖨️ Reimprimir Pedido</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/auth.js"></script>
+    <script src="js/pedidos.js"></script>
+</body>
+</html>

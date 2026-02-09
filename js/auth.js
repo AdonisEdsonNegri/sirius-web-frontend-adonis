@@ -3,13 +3,15 @@
 // =====================================================
 
 // Configuração da API
-const API_URL = 'https://sirius-web-api-adonis.vercel.app';
+const isDev = window.location.hostname === 'localhost' 
+           || window.location.hostname === '127.0.0.1'
+           || window.location.hostname === ''
+           || window.location.protocol === 'file:';
 
-// Elementos do DOM
-const loginForm = document.getElementById('loginForm');
-const btnLogin = document.getElementById('btnLogin');
-const messageEl = document.getElementById('message');
-const linkEsqueceuSenha = document.getElementById('linkEsqueceuSenha');
+const API_URL = isDev ? 'http://localhost:3000' : 'https://sirius-web-api-adonis.vercel.app';
+
+console.log('🚀 SIRIUS WEB - Sistema iniciado');
+console.log('📡 API:', API_URL);
 
 // =====================================================
 // FUNÇÕES AUXILIARES
@@ -17,19 +19,28 @@ const linkEsqueceuSenha = document.getElementById('linkEsqueceuSenha');
 
 // Mostrar mensagem
 function showMessage(text, type = 'error') {
-    messageEl.textContent = text;
-    messageEl.className = `message ${type}`;
-    messageEl.classList.remove('hidden');
-    
-    // Auto-ocultar após 5 segundos
-    setTimeout(() => {
-        messageEl.classList.add('hidden');
-    }, 5000);
+    const messageEl = document.getElementById('message');
+    if (messageEl) {
+        messageEl.textContent = text;
+        messageEl.className = `message ${type}`;
+        messageEl.classList.remove('hidden');
+        
+        // Auto-ocultar após 5 segundos
+        setTimeout(() => {
+            messageEl.classList.add('hidden');
+        }, 5000);
+    } else {
+        // Fallback para páginas sem elemento message
+        alert(text);
+    }
 }
 
 // Desabilitar/habilitar botão
 function setLoading(loading) {
-    btnLogin.disabled = loading;
+    const btnLogin = document.getElementById('btnLogin');
+    if (btnLogin) {
+        btnLogin.disabled = loading;
+    }
 }
 
 // Salvar dados de autenticação
@@ -39,13 +50,21 @@ function saveAuth(token, usuario, empresas) {
     localStorage.setItem('sirius_empresas', JSON.stringify(empresas));
 }
 
-// Verificar se já está logado
+// Verificar se já está logado (apenas para página de login)
 function checkAuth() {
     const token = localStorage.getItem('sirius_token');
-    if (token) {
-        // Já está logado, redireciona para dashboard
+    if (token && window.location.pathname.includes('index.html')) {
+        // Já está logado e está na página de login, redireciona para dashboard
         window.location.href = 'dashboard.html';
     }
+}
+
+// Logout
+function logout() {
+    localStorage.removeItem('sirius_token');
+    localStorage.removeItem('sirius_usuario');
+    localStorage.removeItem('sirius_empresas');
+    window.location.href = 'index.html';
 }
 
 // =====================================================
@@ -92,46 +111,50 @@ async function login(email, senha) {
 }
 
 // =====================================================
-// EVENTOS
+// EVENTOS (apenas se os elementos existirem)
 // =====================================================
 
-// Submit do formulário
-loginForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
+document.addEventListener('DOMContentLoaded', () => {
+    // Elementos do DOM (apenas para página de login)
+    const loginForm = document.getElementById('loginForm');
+    const linkEsqueceuSenha = document.getElementById('linkEsqueceuSenha');
+    const emailInput = document.getElementById('email');
     
-    const email = document.getElementById('email').value.trim();
-    const senha = document.getElementById('senha').value;
+    // Verificar se já está logado (apenas na página de login)
+    checkAuth();
     
-    // Validações básicas
-    if (!email || !senha) {
-        showMessage('Preencha todos os campos!');
-        return;
+    // Configurar eventos apenas se os elementos existirem
+    if (loginForm) {
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value.trim();
+            const senha = document.getElementById('senha').value;
+            
+            // Validações básicas
+            if (!email || !senha) {
+                showMessage('Preencha todos os campos!');
+                return;
+            }
+            
+            if (!email.includes('@')) {
+                showMessage('E-mail inválido!');
+                return;
+            }
+            
+            // Fazer login
+            await login(email, senha);
+        });
     }
     
-    if (!email.includes('@')) {
-        showMessage('E-mail inválido!');
-        return;
+    if (linkEsqueceuSenha) {
+        linkEsqueceuSenha.addEventListener('click', (e) => {
+            e.preventDefault();
+            alert('Funcionalidade em desenvolvimento!');
+        });
     }
     
-    // Fazer login
-    await login(email, senha);
+    if (emailInput) {
+        emailInput.focus();
+    }
 });
-
-// Links (implementar depois)
-linkEsqueceuSenha.addEventListener('click', (e) => {
-    e.preventDefault();
-    alert('Funcionalidade em desenvolvimento!');
-});
-
-// =====================================================
-// INICIALIZAÇÃO
-// =====================================================
-
-// Verificar se já está logado ao carregar a página
-checkAuth();
-
-// Focar no campo de email
-document.getElementById('email').focus();
-
-console.log('🚀 SIRIUS WEB - Sistema iniciado');
-console.log('📡 API:', API_URL);

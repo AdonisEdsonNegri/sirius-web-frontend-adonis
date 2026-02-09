@@ -2,8 +2,17 @@
 // SIRIUS WEB - Vendedores
 // =====================================================
 
-// Configuração da API
-const API_URL = 'https://sirius-web-api-adonis.vercel.app';
+// Detecta se está em desenvolvimento (local) ou produção (Vercel)
+const isDev = window.location.hostname === 'localhost' 
+           || window.location.hostname === '127.0.0.1'
+           || window.location.hostname === ''
+           || window.location.protocol === 'file:';
+
+// Configuração da API (automática: local em dev, Vercel em produção)
+const API_URL = isDev ? 'http://localhost:3000' : 'https://sirius-web-api-adonis.vercel.app';
+
+console.log('🔍 Ambiente:', isDev ? 'DESENVOLVIMENTO' : 'PRODUÇÃO');
+console.log('📡 API URL:', API_URL);
 
 // Estado da aplicação
 let vendedores = [];
@@ -404,9 +413,71 @@ function confirmarExclusao(id) {
         return;
     }
     
-    if (confirm(`Confirma a exclusão do vendedor "${vendedor.nome}"?`)) {
-        excluirVendedor(id);
-    }
+    // Modal personalizado de confirmação
+    const modalHTML = `
+        <div id="modalConfirmar" style="
+            display: flex;
+            position: fixed;
+            z-index: 10000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            align-items: center;
+            justify-content: center;
+        ">
+            <div style="
+                background: white;
+                padding: 30px;
+                border-radius: 15px;
+                box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+                min-width: 400px;
+                max-width: 500px;
+            ">
+                <h3 style="color: #667eea; margin-bottom: 20px; text-align: center;">
+                    ⚠️ Confirmar Exclusão
+                </h3>
+                <p style="font-size: 16px; margin-bottom: 30px; text-align: center; color: #333;">
+                    Tem certeza que deseja excluir o vendedor<br><strong>"${vendedor.nome}"</strong>?
+                </p>
+                <div style="display: flex; gap: 10px; justify-content: center;">
+                    <button onclick="fecharModalConfirmar()" style="
+                        background: #6c757d;
+                        color: white;
+                        border: none;
+                        padding: 12px 24px;
+                        border-radius: 8px;
+                        cursor: pointer;
+                        font-size: 16px;
+                        font-weight: bold;
+                    ">Cancelar</button>
+                    <button onclick="confirmarExclusaoFinal(${id})" style="
+                        background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+                        color: white;
+                        border: none;
+                        padding: 12px 24px;
+                        border-radius: 8px;
+                        cursor: pointer;
+                        font-size: 16px;
+                        font-weight: bold;
+                    ">🗑️ Excluir</button>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+}
+
+function fecharModalConfirmar() {
+    const modal = document.getElementById('modalConfirmar');
+    if (modal) modal.remove();
+}
+
+function confirmarExclusaoFinal(id) {
+    fecharModalConfirmar();
+    excluirVendedor(id);
 }
 
 async function excluirVendedor(id) {
@@ -442,26 +513,103 @@ async function excluirVendedor(id) {
 // =====================================================
 
 function aplicarFiltro(tipo) {
-    let valorFiltro = '';
+    // Criar modal personalizado para input
+    const modalHTML = `
+        <div id="modalFiltro" style="
+            display: flex;
+            position: fixed;
+            z-index: 10000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            align-items: center;
+            justify-content: center;
+        ">
+            <div style="
+                background: white;
+                padding: 30px;
+                border-radius: 15px;
+                box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+                min-width: 400px;
+            ">
+                <h3 style="color: #667eea; margin-bottom: 20px; text-align: center;">
+                    🔍 ${tipo === 'nome' ? 'Filtrar por Nome' : 'Filtrar por ID'}
+                </h3>
+                <input 
+                    type="text" 
+                    id="inputFiltro" 
+                    placeholder="${tipo === 'nome' ? 'Digite o nome do vendedor' : 'Digite o ID do vendedor'}"
+                    style="
+                        width: 100%;
+                        padding: 12px;
+                        border: 2px solid #ddd;
+                        border-radius: 8px;
+                        font-size: 16px;
+                        margin-bottom: 20px;
+                    "
+                />
+                <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                    <button onclick="fecharModalFiltro()" style="
+                        background: #6c757d;
+                        color: white;
+                        border: none;
+                        padding: 12px 24px;
+                        border-radius: 8px;
+                        cursor: pointer;
+                        font-size: 16px;
+                        font-weight: bold;
+                    ">Cancelar</button>
+                    <button onclick="confirmarFiltro('${tipo}')" style="
+                        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                        color: white;
+                        border: none;
+                        padding: 12px 24px;
+                        border-radius: 8px;
+                        cursor: pointer;
+                        font-size: 16px;
+                        font-weight: bold;
+                    ">Filtrar</button>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+    document.getElementById('inputFiltro').focus();
+    
+    // Enter para confirmar
+    document.getElementById('inputFiltro').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            confirmarFiltro(tipo);
+        }
+    });
+}
+
+function fecharModalFiltro() {
+    const modal = document.getElementById('modalFiltro');
+    if (modal) modal.remove();
+}
+
+function confirmarFiltro(tipo) {
+    const valorFiltro = document.getElementById('inputFiltro').value.trim();
+    
+    if (!valorFiltro) {
+        fecharModalFiltro();
+        return;
+    }
     
     if (tipo === 'nome') {
-        valorFiltro = prompt('Digite o nome do vendedor:');
-        if (!valorFiltro) return;
-        
         vendedoresFiltrados = vendedores.filter(v => 
             v.nome.toLowerCase().includes(valorFiltro.toLowerCase())
         );
-        
         document.getElementById('textoFiltro').textContent = `Nome contém "${valorFiltro}"`;
         
     } else if (tipo === 'id') {
-        valorFiltro = prompt('Digite o ID do vendedor:');
-        if (!valorFiltro) return;
-        
         vendedoresFiltrados = vendedores.filter(v => 
             v.id_vendedor.toString() === valorFiltro
         );
-        
         document.getElementById('textoFiltro').textContent = `ID = ${valorFiltro}`;
     }
     
@@ -469,6 +617,8 @@ function aplicarFiltro(tipo) {
     document.getElementById('filtroAtivo').style.display = 'flex';
     paginaAtual = 1;
     renderizarTabela();
+    
+    fecharModalFiltro();
 }
 
 function limparFiltro() {

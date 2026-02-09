@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIRIUS WEB - PDV</title>
+    <link rel="stylesheet" href="css/pdv.css">
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="header-content">
+            <h1>SIRIUS WEB - PDV</h1>
+            <div class="user-info">
+                <span id="userName">Carregando...</span>
+                <button class="btn-logout" onclick="logout()">Sair</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="nav">
+        <div class="nav-content">
+            <a href="dashboard.html">Dashboard</a>
+            <a href="produtos.html">Produtos</a>
+            <a href="clientes.html">Clientes</a>
+            <a href="#" onclick="showMessage('Módulo Fornecedores em desenvolvimento!'); return false;">Fornecedores</a>
+            <a href="pdv.html" class="active">PDV</a>
+            
+            <!-- Dropdown Configurações -->
+            <div class="nav-dropdown">
+                <button class="nav-dropdown-btn">⚙️ Configurações ▼</button>
+                <div class="nav-dropdown-content">
+                    <a href="vendedores.html">👨‍💼 Vendedores</a>
+                    <a href="formas-pagamento.html">💳 Formas de Pagamento</a>
+                    <a href="regimes-tributarios.html">📋 Regimes Tributários</a>
+                    <a href="#" onclick="showMessage('Módulo Caixas Cadastradas em desenvolvimento!'); return false;">💰 Caixas Cadastradas</a>
+                    <a href="#" onclick="showMessage('Módulo Usuários em desenvolvimento!'); return false;">👥 Usuários</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Container Principal -->
+    <div class="container">
+        
+        <!-- Cabeçalho do Pedido -->
+        <div class="pedido-header">
+            <div class="pedido-info">
+                <h2>Pedido Nº <span id="numeroPedido">-</span></h2>
+                <span class="pedido-data" id="dataPedido">-</span>
+            </div>
+            <div class="pedido-actions">
+                <button class="btn btn-secondary" onclick="novoPedido()">🔄 Novo Pedido</button>
+            </div>
+        </div>
+
+        <!-- Área Principal do PDV -->
+        <div class="pdv-grid">
+            
+            <!-- Coluna Esquerda: Produtos e Itens -->
+            <div class="pdv-left">
+                
+                <!-- Cliente Selecionado -->
+                <div class="card cliente-card">
+                    <div class="card-header">
+                        <h3>👤 Cliente</h3>
+                        <button class="btn-icon" onclick="abrirBuscaCliente()" title="Buscar Cliente">
+                            🔍
+                        </button>
+                    </div>
+                    <div class="cliente-info" id="clienteInfo">
+                        <div class="loading">Carregando cliente padrão...</div>
+                    </div>
+                </div>
+
+                <!-- Busca de Produto -->
+                <div class="card produto-busca-card">
+                    <div class="card-header">
+                        <h3>🔍 Buscar Produto</h3>
+                    </div>
+                    <div class="busca-produto">
+                        <input 
+                            type="text" 
+                            id="buscaProduto" 
+                            placeholder="Digite código, EAN ou descrição..."
+                            autocomplete="off"
+                        >
+                        <div id="resultadosBusca" class="busca-resultados"></div>
+                    </div>
+                </div>
+
+                <!-- Grade de Itens -->
+                <div class="card itens-card">
+                    <div class="card-header">
+                        <h3>🛒 Itens do Pedido</h3>
+                        <span class="badge" id="quantidadeItens">0 itens</span>
+                    </div>
+                    <div class="itens-grid">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 50px;">#</th>
+                                    <th>Produto</th>
+                                    <th style="width: 80px;">Qtd</th>
+                                    <th style="width: 100px;">Unit.</th>
+                                    <th style="width: 120px;">Total</th>
+                                    <th style="width: 60px;">Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="itensTabela">
+                                <tr class="empty-state">
+                                    <td colspan="6">
+                                        <div class="empty-message">
+                                            Nenhum item adicionado
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Coluna Direita: Totalizadores e Pagamento -->
+            <div class="pdv-right">
+                
+                <!-- Totalizadores -->
+                <div class="card totalizadores-card">
+                    <div class="card-header">
+                        <h3>💰 Totais</h3>
+                    </div>
+                    <div class="totalizadores">
+                        <div class="total-row">
+                            <span class="total-label">Subtotal:</span>
+                            <span class="total-value" id="subtotal">R$ 0,00</span>
+                        </div>
+                        <div class="total-row">
+                            <span class="total-label">Desconto:</span>
+                            <span class="total-value desconto" id="desconto">R$ 0,00</span>
+                        </div>
+                        <div class="total-row">
+                            <span class="total-label">Acréscimo:</span>
+                            <span class="total-value acrescimo" id="acrescimo">R$ 0,00</span>
+                        </div>
+                        <div class="total-row total-final">
+                            <span class="total-label">TOTAL:</span>
+                            <span class="total-value" id="totalGeral">R$ 0,00</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pagamentos -->
+                <div class="card pagamentos-card">
+                    <div class="card-header">
+                        <h3>💳 Pagamento</h3>
+                    </div>
+                    <div class="pagamentos-content">
+                        <div class="pagamento-status">
+                            <div class="status-row">
+                                <span>Total Pago:</span>
+                                <span id="totalPago" class="valor-pago">R$ 0,00</span>
+                            </div>
+                            <div class="status-row">
+                                <span>Faltam:</span>
+                                <span id="valorFaltante" class="valor-faltante">R$ 0,00</span>
+                            </div>
+                        </div>
+                        <div class="pagamentos-lista" id="pagamentosLista">
+                            <div class="empty-message">Nenhum pagamento adicionado</div>
+                        </div>
+                        <button class="btn btn-primary btn-block" onclick="abrirModalPagamento()">
+                            + Adicionar Pagamento
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Observações -->
+                <div class="card observacoes-card">
+                    <div class="card-header">
+                        <h3>📝 Observações</h3>
+                    </div>
+                    <textarea 
+                        id="observacoes" 
+                        placeholder="Observações sobre o pedido..."
+                        rows="3"
+                    ></textarea>
+                </div>
+
+                <!-- Botão Finalizar -->
+                <button class="btn btn-success btn-block btn-lg" onclick="finalizarPedido()" id="btnFinalizar">
+                    ✅ Finalizar Pedido
+                </button>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Busca de Cliente -->
+    <div id="modalBuscaCliente" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Buscar Cliente</h3>
+                <span class="modal-close" onclick="fecharModalCliente()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <input 
+                    type="text" 
+                    id="inputBuscaCliente" 
+                    placeholder="Digite razão social ou CNPJ/CPF..."
+                    autocomplete="off"
+                >
+                <div id="resultadosBuscaCliente" class="busca-resultados"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Adicionar Pagamento -->
+    <div id="modalPagamento" class="modal">
+        <div class="modal-content modal-sm">
+            <div class="modal-header">
+                <h3>Adicionar Pagamento</h3>
+                <span class="modal-close" onclick="fecharModalPagamento()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Forma de Pagamento</label>
+                    <select id="formaPagamento">
+                        <option value="">Carregando...</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Valor</label>
+                    <input 
+                        type="text" 
+                        id="valorPagamento" 
+                        placeholder="R$ 0,00"
+                    >
+                </div>
+                <div class="form-group" id="trocoGroup" style="display: none;">
+                    <label>Troco</label>
+                    <input 
+                        type="text" 
+                        id="valorTroco" 
+                        placeholder="R$ 0,00"
+                        readonly
+                    >
+                </div>
+                <div class="modal-actions">
+                    <button class="btn btn-secondary" onclick="fecharModalPagamento()">Cancelar</button>
+                    <button class="btn btn-primary" onclick="adicionarPagamento()">Adicionar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Editar Quantidade -->
+    <div id="modalQuantidade" class="modal">
+        <div class="modal-content modal-sm">
+            <div class="modal-header">
+                <h3>Editar Quantidade</h3>
+                <span class="modal-close" onclick="fecharModalQuantidade()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="produto-info-modal">
+                    <strong id="nomeProdutoModal">-</strong>
+                    <p id="estoqueProdutoModal">Estoque: -</p>
+                </div>
+                <div class="form-group">
+                    <label>Quantidade</label>
+                    <input 
+                        type="number" 
+                        id="novaQuantidade" 
+                        min="0.001" 
+                        step="0.001"
+                        placeholder="0"
+                    >
+                </div>
+                <div class="modal-actions">
+                    <button class="btn btn-secondary" onclick="fecharModalQuantidade()">Cancelar</button>
+                    <button class="btn btn-primary" onclick="confirmarQuantidade()">Confirmar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Mensagem -->
+    <div id="modalMensagem" class="modal">
+        <div class="modal-content modal-sm">
+            <div class="modal-header">
+                <h3 id="mensagemTitulo">Informação</h3>
+                <span class="modal-close" onclick="fecharModalMensagem()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <p id="mensagemTexto"></p>
+                <div class="modal-actions">
+                    <button class="btn btn-primary btn-block" onclick="fecharModalMensagem()">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Relatório do Pedido -->
+    <div id="modalRelatorioPedido" class="modal">
+        <div class="modal-content" style="max-width: 800px;">
+            <div class="modal-header" style="background: #10b981;">
+                <h3>✅ Pedido Finalizado com Sucesso!</h3>
+                <span class="modal-close" onclick="fecharRelatorioPedido()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <!-- Cabeçalho do Relatório -->
+                <div style="text-align: center; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 2px solid #e5e7eb;">
+                    <h2 style="color: #2563eb; margin-bottom: 8px;">SIRIUS WEB - PDV</h2>
+                    <div style="font-size: 24px; font-weight: 700; color: #10b981;">
+                        Pedido Nº <span id="relatorioNumero">-</span>
+                    </div>
+                    <div style="color: #6b7280; margin-top: 4px;">
+                        <span id="relatorioData">-</span>
+                    </div>
+                </div>
+
+                <!-- Cliente -->
+                <div style="background: #f9fafb; padding: 16px; border-radius: 8px; margin-bottom: 20px;">
+                    <div style="font-weight: 600; color: #374151; margin-bottom: 4px;">Cliente:</div>
+                    <div style="font-size: 18px; color: #1f2937;">
+                        <span id="relatorioCliente">-</span>
+                        <span id="relatorioClienteDoc" style="color: #6b7280; font-size: 14px;"></span>
+                    </div>
+                </div>
+
+                <!-- Itens -->
+                <div style="margin-bottom: 20px;">
+                    <h4 style="color: #374151; margin-bottom: 12px;">🛒 Itens do Pedido</h4>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Produto</th>
+                                <th style="width: 100px; text-align: center;">Quantidade</th>
+                                <th style="width: 120px; text-align: right;">Valor Unit.</th>
+                                <th style="width: 120px; text-align: right;">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody id="relatorioItens">
+                            <tr>
+                                <td colspan="4" style="text-align: center;">Carregando...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Totais -->
+                <div style="background: #f9fafb; padding: 16px; border-radius: 8px; margin-bottom: 20px;">
+                    <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #e5e7eb;">
+                        <span>Subtotal:</span>
+                        <span id="relatorioSubtotal">R$ 0,00</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #e5e7eb;">
+                        <span>Desconto:</span>
+                        <span id="relatorioDesconto" style="color: #ef4444;">R$ 0,00</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 2px solid #2563eb;">
+                        <span>Acréscimo:</span>
+                        <span id="relatorioAcrescimo" style="color: #10b981;">R$ 0,00</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 12px 0; font-size: 20px; font-weight: 700; color: #2563eb;">
+                        <span>TOTAL:</span>
+                        <span id="relatorioTotal">R$ 0,00</span>
+                    </div>
+                </div>
+
+                <!-- Pagamentos -->
+                <div style="margin-bottom: 20px;">
+                    <h4 style="color: #374151; margin-bottom: 12px;">💳 Formas de Pagamento</h4>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Forma de Pagamento</th>
+                                <th style="width: 150px; text-align: right;">Valor</th>
+                                <th style="width: 150px; text-align: right;">Troco</th>
+                            </tr>
+                        </thead>
+                        <tbody id="relatorioPagamentos">
+                            <tr>
+                                <td colspan="3" style="text-align: center;">Carregando...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Observações -->
+                <div style="background: #fef3c7; padding: 16px; border-radius: 8px; border-left: 4px solid #f59e0b;">
+                    <div style="font-weight: 600; color: #92400e; margin-bottom: 4px;">📝 Observações:</div>
+                    <div id="relatorioObservacoes" style="color: #78350f;">Nenhuma observação</div>
+                </div>
+
+                <!-- Ações -->
+                <div class="modal-actions" style="margin-top: 24px;">
+                    <button class="btn btn-primary" onclick="imprimirRelatorioPedido()">🖨️ Imprimir</button>
+                    <button class="btn btn-secondary" onclick="fecharRelatorioPedido()">Fechar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/pdv.js"></script>
+</body>
+</html>

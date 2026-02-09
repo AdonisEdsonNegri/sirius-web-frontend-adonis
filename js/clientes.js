@@ -2,7 +2,14 @@
 // SIRIUS WEB - Clientes JavaScript
 // =====================================================
 
-const API_URL = 'http://localhost:3000'; // Trocar para Vercel depois
+//const API_URL = 'http://localhost:3000'; // Trocar para Vercel depois
+
+const isDev = window.location.hostname === 'localhost' 
+           || window.location.hostname === '127.0.0.1'
+           || window.location.hostname === ''
+           || window.location.protocol === 'file:';
+
+const API_URL = isDev ? 'http://localhost:3000' : 'https://sirius-web-api-adonis.vercel.app';
 
 let token = null;
 let empresaId = null;
