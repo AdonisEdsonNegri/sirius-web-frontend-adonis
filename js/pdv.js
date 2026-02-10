@@ -186,9 +186,10 @@ function configurarEventos() {
         }, 300);
     });
     
-    // Fechar modais ao clicar fora
+    // CORREÇÃO 1: Fechar modais ao clicar fora - SÓ NO BACKDROP
     document.querySelectorAll('.modal').forEach(modal => {
         modal.addEventListener('click', (e) => {
+            // Só fecha se clicar EXATAMENTE no backdrop (não nos filhos)
             if (e.target === modal) {
                 modal.classList.remove('show');
             }
@@ -225,6 +226,7 @@ async function buscarProdutos(termo) {
         const data = await response.json();
         
         if (data.success) {
+            console.log(`🔍 ${data.data.length} produto(s) encontrado(s)`);
             renderizarResultadosProdutos(data.data);
         } else {
             console.error('Erro ao buscar produtos:', data);
@@ -257,16 +259,20 @@ function renderizarResultadosProdutos(produtos) {
 
 // ===== ADICIONAR PRODUTO =====
 function adicionarProduto(produto) {
+    console.log('🔍 adicionarProduto chamado com:', produto);
+    
     // Verificar se já existe
     const itemExistente = pedidoAtual.itens.find(i => i.id_produto === produto.id);
+    console.log('🔍 Item já existe?', itemExistente);
     
     if (itemExistente) {
         // Incrementar quantidade
         itemExistente.quantidade++;
         itemExistente.valor_total = itemExistente.quantidade * itemExistente.valor_unitario;
+        console.log('✅ Quantidade atualizada:', itemExistente.quantidade);
     } else {
         // Adicionar novo item
-        pedidoAtual.itens.push({
+        const novoItem = {
             id_produto: produto.id,
             codigo: produto.codigo,
             ean: produto.ean,
@@ -277,7 +283,11 @@ function adicionarProduto(produto) {
             valor_unitario: parseFloat(produto.preco),
             valor_total: parseFloat(produto.preco),
             estoque: parseFloat(produto.estoque)
-        });
+        };
+        
+        console.log('➕ Adicionando novo item:', novoItem);
+        pedidoAtual.itens.push(novoItem);
+        console.log('📦 Total de itens no pedido:', pedidoAtual.itens.length);
     }
     
     // Limpar busca
@@ -285,7 +295,9 @@ function adicionarProduto(produto) {
     document.getElementById('resultadosBusca').innerHTML = '';
     
     // Atualizar interface
+    console.log('🔄 Chamando renderizarItens()');
     renderizarItens();
+    console.log('🔄 Chamando calcularTotais()');
     calcularTotais();
     
     // Focar novamente no input de busca
@@ -294,54 +306,65 @@ function adicionarProduto(produto) {
     }, 100);
 }
 
-// ===== RENDERIZAR ITENS =====
 function renderizarItens() {
+    console.log('🔄 renderizarItens() executado - Total de itens:', pedidoAtual.itens.length);
+    
     const tbody = document.getElementById('itensTabela');
+    const badge = document.getElementById('quantidadeItens');
+    
+    badge.textContent = `${pedidoAtual.itens.length} itens`;
     
     if (pedidoAtual.itens.length === 0) {
+        console.log('📭 Nenhum item - mostrando mensagem vazia');
         tbody.innerHTML = `
-            <tr class="empty-state">
-                <td colspan="6">
+            <tr>
+                <td colspan="7" class="empty-state">
                     <div class="empty-message">Nenhum item adicionado</div>
                 </td>
             </tr>
         `;
-        document.getElementById('quantidadeItens').textContent = '0 itens';
         return;
     }
+    
+    console.log('📦 Renderizando itens:', pedidoAtual.itens);
     
     tbody.innerHTML = pedidoAtual.itens.map((item, index) => `
         <tr>
             <td class="item-seq">${index + 1}</td>
             <td>
                 <div class="item-nome">${item.descricao}</div>
-                ${item.codigo ? `<div class="item-codigo">Cód: ${item.codigo}</div>` : ''}
+                <div class="item-codigo">Cód: ${item.codigo}</div>
             </td>
-            <td class="item-qtd">${item.quantidade.toFixed(3)}</td>
-            <td class="item-valor">R$ ${item.valor_unitario.toFixed(2)}</td>
-            <td class="item-valor">R$ ${item.valor_total.toFixed(2)}</td>
+            <td class="item-qtd">${parseFloat(item.quantidade).toFixed(3)}</td>
+            <td class="item-valor">R$ ${parseFloat(item.valor_unitario).toFixed(2)}</td>
+            <td class="item-valor"><strong>R$ ${parseFloat(item.valor_total).toFixed(2)}</strong></td>
             <td class="item-acoes">
-                <button class="btn-action" onclick="editarQuantidade(${index})" title="Editar Quantidade">✏️</button>
+                <button class="btn-action" onclick="editarItem(${index})" title="Editar quantidade">✏️</button>
                 <button class="btn-action" onclick="removerItem(${index})" title="Remover">🗑️</button>
             </td>
         </tr>
     `).join('');
-    
-    document.getElementById('quantidadeItens').textContent = `${pedidoAtual.itens.length} ${pedidoAtual.itens.length === 1 ? 'item' : 'itens'}`;
 }
 
-// ===== EDITAR QUANTIDADE =====
-function editarQuantidade(index) {
-    const item = pedidoAtual.itens[index];
+function editarItem(index) {
     itemEmEdicao = index;
+    const item = pedidoAtual.itens[index];
     
+    // IDs CORRETOS do HTML
     document.getElementById('nomeProdutoModal').textContent = item.descricao;
-    document.getElementById('estoqueProdutoModal').textContent = `Estoque disponível: ${item.estoque.toFixed(3)} ${item.unidade}`;
+    document.getElementById('estoqueProdutoModal').textContent = `Estoque: ${item.estoque.toFixed(3)}`;
     document.getElementById('novaQuantidade').value = item.quantidade;
     
     document.getElementById('modalQuantidade').classList.add('show');
-    document.getElementById('novaQuantidade').focus();
-    document.getElementById('novaQuantidade').select();
+    setTimeout(() => {
+        document.getElementById('novaQuantidade').select();
+    }, 100);
+}
+
+// CORREÇÃO: Funções do modal de quantidade
+function fecharModalQuantidade() {
+    document.getElementById('modalQuantidade').classList.remove('show');
+    itemEmEdicao = null;
 }
 
 function confirmarQuantidade() {
@@ -352,13 +375,23 @@ function confirmarQuantidade() {
         return;
     }
     
-    const item = pedidoAtual.itens[itemEmEdicao];
-    
-    if (novaQtd > item.estoque) {
-        showMessage(`Estoque insuficiente. Disponível: ${item.estoque.toFixed(3)}`, 'error');
+    if (itemEmEdicao === null) {
+        showMessage('Nenhum item selecionado', 'error');
         return;
     }
     
+    const item = pedidoAtual.itens[itemEmEdicao];
+    
+    // Validar estoque
+    if (novaQtd > item.estoque) {
+        showMessage(
+            `Estoque insuficiente. Disponível: ${item.estoque.toFixed(3)}`,
+            'error'
+        );
+        return;
+    }
+    
+    // Atualizar quantidade
     item.quantidade = novaQtd;
     item.valor_total = item.quantidade * item.valor_unitario;
     
@@ -367,12 +400,6 @@ function confirmarQuantidade() {
     fecharModalQuantidade();
 }
 
-function fecharModalQuantidade() {
-    document.getElementById('modalQuantidade').classList.remove('show');
-    itemEmEdicao = null;
-}
-
-// ===== REMOVER ITEM =====
 function removerItem(index) {
     pedidoAtual.itens.splice(index, 1);
     renderizarItens();
@@ -381,8 +408,12 @@ function removerItem(index) {
 
 // ===== CALCULAR TOTAIS =====
 function calcularTotais() {
+    console.log('💰 calcularTotais() executado');
     pedidoAtual.valor_bruto = pedidoAtual.itens.reduce((sum, item) => sum + item.valor_total, 0);
     pedidoAtual.valor_liquido = pedidoAtual.valor_bruto - pedidoAtual.desconto + pedidoAtual.acrescimo;
+    
+    console.log('💰 Valor bruto:', pedidoAtual.valor_bruto.toFixed(2));
+    console.log('💰 Valor líquido:', pedidoAtual.valor_liquido.toFixed(2));
     
     document.getElementById('subtotal').textContent = `R$ ${pedidoAtual.valor_bruto.toFixed(2)}`;
     document.getElementById('desconto').textContent = `R$ ${pedidoAtual.desconto.toFixed(2)}`;
@@ -395,13 +426,6 @@ function calcularTotais() {
 // ===== BUSCAR CLIENTES =====
 async function buscarClientes(termo) {
     try {
-        // CORREÇÃO 2: Validação extra do termo de busca
-        if (!termo || termo.trim().length < 2) {
-            document.getElementById('resultadosBuscaCliente').innerHTML = 
-                '<div class="empty-message">Digite pelo menos 2 caracteres para buscar</div>';
-            return;
-        }
-        
         const response = await fetch(
             `${API_URL}/pdv/clientes/buscar?termo=${encodeURIComponent(termo)}`,
             {
@@ -418,13 +442,9 @@ async function buscarClientes(termo) {
             renderizarResultadosClientes(data.data);
         } else {
             console.error('Erro ao buscar clientes:', data);
-            document.getElementById('resultadosBuscaCliente').innerHTML = 
-                '<div class="empty-message">Erro ao buscar clientes</div>';
         }
     } catch (error) {
         console.error('Erro ao buscar clientes:', error);
-        document.getElementById('resultadosBuscaCliente').innerHTML = 
-            '<div class="empty-message">Erro ao buscar clientes</div>';
     }
 }
 
@@ -537,8 +557,9 @@ function abrirModalPagamento() {
         return;
     }
     
-    const valorRestante = pedidoAtual.valor_liquido - 
-        pedidoAtual.pagamentos.reduce((sum, p) => sum + p.valor, 0);
+    // CORREÇÃO 2: Calcular valor restante descontando o troco dos pagamentos já feitos
+    const totalPagoEfetivo = pedidoAtual.pagamentos.reduce((sum, p) => sum + (p.valor - (p.troco || 0)), 0);
+    const valorRestante = pedidoAtual.valor_liquido - totalPagoEfetivo;
     
     document.getElementById('valorPagamento').value = valorRestante.toFixed(2);
     document.getElementById('valorTroco').value = '';
@@ -562,8 +583,10 @@ function calcularTroco() {
     }
     
     const valorPago = parseFloat(document.getElementById('valorPagamento').value) || 0;
-    const valorRestante = pedidoAtual.valor_liquido - 
-        pedidoAtual.pagamentos.reduce((sum, p) => sum + p.valor, 0);
+    
+    // CORREÇÃO 2: Calcular valor restante descontando o troco dos pagamentos já feitos
+    const totalPagoEfetivo = pedidoAtual.pagamentos.reduce((sum, p) => sum + (p.valor - (p.troco || 0)), 0);
+    const valorRestante = pedidoAtual.valor_liquido - totalPagoEfetivo;
     
     const troco = Math.max(0, valorPago - valorRestante);
     document.getElementById('valorTroco').value = troco.toFixed(2);
@@ -634,7 +657,8 @@ function removerPagamento(index) {
 }
 
 function atualizarStatusPagamento() {
-    const totalPago = pedidoAtual.pagamentos.reduce((sum, p) => sum + p.valor, 0);
+    // CORREÇÃO 2: Total pago EFETIVO = valor - troco
+    const totalPago = pedidoAtual.pagamentos.reduce((sum, p) => sum + (p.valor - (p.troco || 0)), 0);
     const faltante = pedidoAtual.valor_liquido - totalPago;
     
     document.getElementById('totalPago').textContent = `R$ ${totalPago.toFixed(2)}`;
@@ -678,11 +702,23 @@ async function finalizarPedido() {
     }
     console.log('✅ Pagamentos validados:', pedidoAtual.pagamentos.length);
     
-    const totalPago = pedidoAtual.pagamentos.reduce((sum, p) => sum + p.valor, 0);
+    // CORREÇÃO 2: Validar com total pago efetivo (descontando troco)
+    const totalPago = pedidoAtual.pagamentos.reduce((sum, p) => sum + (p.valor - (p.troco || 0)), 0);
     const diferenca = Math.abs(totalPago - pedidoAtual.valor_liquido);
     
+    console.log('💰 Total do pedido:', pedidoAtual.valor_liquido.toFixed(2));
+    console.log('💵 Total pago efetivo:', totalPago.toFixed(2));
+    console.log('📊 Diferença:', diferenca.toFixed(2));
+    
     if (diferenca > 0.01) {
-        showMessage('O total dos pagamentos não confere com o valor do pedido', 'error');
+        console.error('❌ Total pago não confere');
+        showMessage(
+            `O total dos pagamentos não confere com o valor do pedido.\n` +
+            `Valor do pedido: R$ ${pedidoAtual.valor_liquido.toFixed(2)}\n` +
+            `Total pago (descontado troco): R$ ${totalPago.toFixed(2)}\n` +
+            `Diferença: R$ ${diferenca.toFixed(2)}`,
+            'error'
+        );
         return;
     }
     
@@ -865,6 +901,14 @@ function limparPedidoAtual() {
     document.getElementById('observacoes').value = '';
     document.getElementById('buscaProduto').value = '';
     document.getElementById('resultadosBusca').innerHTML = '';
+    
+    // CORREÇÃO: Resetar botão finalizar
+    const btnFinalizar = document.getElementById('btnFinalizar');
+    if (btnFinalizar) {
+        btnFinalizar.disabled = false;
+        btnFinalizar.textContent = '✅ Finalizar Pedido';
+        btnFinalizar.style.opacity = '1';
+    }
     
     renderizarItens();
     renderizarPagamentos();
