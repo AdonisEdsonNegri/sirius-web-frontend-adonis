@@ -1,7 +1,9 @@
-// SIRIUS WEB - Produtos JavaScript (VERSÃO FINAL COM VALIDAÇÕES)
-// API Configuration
-//const API_URL = 'http://localhost:3000'; // Trocar para Vercel depois
+// =====================================================
+// SIRIUS WEB - Produtos JavaScript
+// VERSÃO CORRIGIDA - ORDENAÇÃO FUNCIONANDO
+// =====================================================
 
+// Detecta ambiente
 const isDev = window.location.hostname === 'localhost' 
            || window.location.hostname === '127.0.0.1'
            || window.location.hostname === ''
@@ -18,7 +20,9 @@ let filtroAtivo = null;
 let valorFiltro = '';
 let ordenacaoAtual = 'codigo'; // codigo, descricao, data_criacao, ultimos
 
-// Inicialização
+// =====================================================
+// INICIALIZAÇÃO
+// =====================================================
 document.addEventListener('DOMContentLoaded', () => {
     verificarAutenticacao();
     carregarProdutos();
@@ -40,13 +44,14 @@ function verificarAutenticacao() {
     console.log('✅ Autenticado - Token:', token ? 'OK' : 'FALTA', 'EmpresaID:', empresaId);
 }
 
-// Menu Toggle (Mobile)
+// =====================================================
+// MENU TOGGLE E DROPDOWN (MOBILE)
+// =====================================================
 function toggleMenu() {
     const toolbar = document.getElementById('toolbar');
     toolbar.classList.toggle('collapsed');
 }
 
-// Dropdown Mobile
 function toggleDropdown(event, element) {
     if (window.innerWidth <= 768) {
         event.preventDefault();
@@ -55,19 +60,21 @@ function toggleDropdown(event, element) {
     }
 }
 
-// Sistema de Abas
+// =====================================================
+// SISTEMA DE ABAS
+// =====================================================
 function mudarAba(aba) {
     console.log('Mudando para aba:', aba);
-    // Remover active de todas as abas
     document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
     document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
     
-    // Ativar aba clicada
     document.querySelector(`[data-tab="${aba}"]`).classList.add('active');
     document.getElementById(`tab-${aba}`).classList.add('active');
 }
 
-// Ordenação
+// =====================================================
+// ORDENAÇÃO ✅ CORRIGIDA - ENVIA PARÂMETROS PARA BACKEND
+// =====================================================
 function aplicarOrdenacao(tipo) {
     event.preventDefault();
     ordenacaoAtual = tipo;
@@ -84,12 +91,39 @@ function aplicarOrdenacao(tipo) {
     carregarProdutos(1);
 }
 
-// Carregar Produtos
+// =====================================================
+// CARREGAR PRODUTOS ✅ CORRIGIDO - ADICIONA PARÂMETROS DE ORDENAÇÃO
+// =====================================================
 async function carregarProdutos(pagina = 1) {
     try {
         mostrarLoading(true);
         
         let url = `${API_URL}/produtos?page=${pagina}&limit=20`;
+        
+        // ✅ CORREÇÃO: Adicionar parâmetros de ordenação para o backend
+        let orderBy = 'codigo';
+        let orderDir = 'ASC';
+        
+        switch (ordenacaoAtual) {
+            case 'codigo':
+                orderBy = 'codigo';
+                orderDir = 'ASC';
+                break;
+            case 'descricao':
+                orderBy = 'descricao';
+                orderDir = 'ASC';
+                break;
+            case 'data_criacao':
+                orderBy = 'id_produto';
+                orderDir = 'ASC';
+                break;
+            case 'ultimos':
+                orderBy = 'id_produto';
+                orderDir = 'DESC';  // ✅ DESC para últimos lançamentos
+                break;
+        }
+        
+        url += `&orderBy=${orderBy}&orderDir=${orderDir}`;
         
         // Aplicar filtros com parâmetros ESPECÍFICOS
         if (filtroAtivo === 'codigo' && valorFiltro) {
@@ -115,12 +149,11 @@ async function carregarProdutos(pagina = 1) {
         if (data.success) {
             let produtos = data.data;
             
-            // Log para debug - mostrar estrutura do primeiro produto
             if (produtos.length > 0) {
                 console.log('🔍 Estrutura do produto (primeiro item):', produtos[0]);
             }
             
-            // Filtros client-side
+            // Filtros client-side (apenas para estoque_zero e estoque_baixo)
             if (filtroAtivo === 'estoque_zero') {
                 produtos = produtos.filter(p => parseFloat(p.estoque_atual || 0) === 0);
             } else if (filtroAtivo === 'estoque_baixo') {
@@ -129,9 +162,6 @@ async function carregarProdutos(pagina = 1) {
                     parseFloat(p.estoque_atual || 0) < parseFloat(p.estoque_minimo || 0)
                 );
             }
-            
-            // Ordenação client-side
-            produtos = ordenarProdutos(produtos);
             
             renderizarTabela(produtos);
             atualizarPaginacao(data.pagination);
@@ -147,23 +177,9 @@ async function carregarProdutos(pagina = 1) {
     }
 }
 
-function ordenarProdutos(produtos) {
-    const copia = [...produtos];
-    
-    switch (ordenacaoAtual) {
-        case 'codigo':
-            return copia.sort((a, b) => a.codigo.localeCompare(b.codigo));
-        case 'descricao':
-            return copia.sort((a, b) => a.descricao.localeCompare(b.descricao));
-        case 'data_criacao':
-            return copia.sort((a, b) => a.id - b.id); // ASC
-        case 'ultimos':
-            return copia.sort((a, b) => b.id - a.id); // DESC
-        default:
-            return copia;
-    }
-}
-
+// =====================================================
+// RENDERIZAR TABELA
+// =====================================================
 function renderizarTabela(produtos) {
     const tbody = document.getElementById('tbody');
     
@@ -177,34 +193,19 @@ function renderizarTabela(produtos) {
         const statusClass = estoqueBaixo ? 'estoque-baixo' : '';
         const statusBadge = p.ativo === 'S' ? '🟢 Ativo' : '🔴 Inativo';
         
-        // Usar o campo id que vem da API
-        const produtoId = p.id;
-        
-        // Escapar aspas na descrição
-        const descricaoEscapada = (p.descricao || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
-        
         return `
             <tr class="${statusClass}">
-                <td>${p.codigo}</td>
-                <td>${p.descricao}</td>
-                <td>${p.unidade || 'UN'}</td>
-                <td>${formatarNumero(p.estoque_atual, 3)}</td>
-                <td>R$ ${formatarNumero(p.preco_custo, 2)}</td>
-                <td>R$ ${formatarNumero(p.preco_venda, 2)}</td>
+                <td>${p.codigo || '-'}</td>
+                <td>${p.descricao || '-'}</td>
+                <td>${p.unidade || '-'}</td>
+                <td>${parseFloat(p.estoque_atual || 0).toFixed(3)}</td>
+                <td>R$ ${parseFloat(p.preco_custo || 0).toFixed(2)}</td>
+                <td>R$ ${parseFloat(p.preco_venda || 0).toFixed(2)}</td>
                 <td>${statusBadge}</td>
                 <td style="white-space: nowrap;">
-                    <button class="btn-small btn-ficha" 
-                            onclick="gerarRelatorioIndividual(${produtoId})" 
-                            title="Ficha Completa do Produto">📄</button>
-                    <button class="btn-small btn-movimentacoes" 
-                            onclick="verMovimentacoes(${produtoId})" 
-                            title="Movimentações de Estoque">📊</button>
-                    <button class="btn-small btn-edit" 
-                            onclick="editarProduto(${produtoId})" 
-                            title="Editar Produto">✏️</button>
-                    <button class="btn-small btn-delete" 
-                            onclick="confirmarExclusao(${produtoId}, '${descricaoEscapada}')" 
-                            title="Inativar Produto">🗑️</button>
+                    <button class="btn-small btn-edit" onclick="editarProduto(${p.id})" title="Editar">✏️</button>
+                    <button class="btn-small btn-movimentacoes" onclick="window.location.href='produtos-movimentacoes.html?id=${p.id}'" title="Movimentações">📊</button>
+                    <button class="btn-small btn-delete" onclick="confirmarExclusao(${p.id}, '${p.descricao.replace(/'/g, "\\'")})" title="Inativar">🗑️</button>
                 </td>
             </tr>
         `;
@@ -213,14 +214,13 @@ function renderizarTabela(produtos) {
     console.log('✅ Tabela renderizada:', produtos.length, 'produtos');
 }
 
+// =====================================================
+// PAGINAÇÃO
+// =====================================================
 function atualizarPaginacao(pagination) {
-    if (!pagination) {
-        console.warn('⚠️ Paginação não fornecida');
-        return;
-    }
-    
     totalPaginas = pagination.totalPages;
-    document.getElementById('pageInfo').textContent = `Página ${pagination.page} de ${pagination.totalPages}`;
+    document.getElementById('paginaInfo').textContent = 
+        `Página ${pagination.page} de ${pagination.totalPages}`;
     document.getElementById('btnPrev').disabled = !pagination.hasPrev;
     document.getElementById('btnNext').disabled = !pagination.hasNext;
     
@@ -236,7 +236,9 @@ function mudarPagina(direcao) {
     }
 }
 
-// Filtros
+// =====================================================
+// FILTROS
+// =====================================================
 async function aplicarFiltro(tipo) {
     event.preventDefault();
     
@@ -289,7 +291,9 @@ function limparFiltro() {
     carregarProdutos(1);
 }
 
-// Relatório Geral
+// =====================================================
+// RELATÓRIO GERAL
+// =====================================================
 function gerarRelatorio() {
     event.preventDefault();
     
@@ -365,217 +369,8 @@ function gerarRelatorio() {
 }
 
 // =====================================================
-// VALIDAÇÃO DE CÓDIGO DE BARRAS EAN-13
+// MODAL - ABRIR/FECHAR
 // =====================================================
-function validarEAN13(codigoBarras) {
-    // Remove espaços e hífens
-    const ean = codigoBarras.replace(/[\s-]/g, '');
-    
-    // Verifica se tem 13 dígitos numéricos
-    if (!/^\d{13}$/.test(ean)) {
-        return { valido: false, mensagem: 'O código EAN-13 deve conter exatamente 13 dígitos numéricos.' };
-    }
-    
-    // Calcula o dígito verificador
-    const digitos = ean.split('').map(Number);
-    const digitoVerificador = digitos[12];
-    
-    let soma = 0;
-    for (let i = 0; i < 12; i++) {
-        // Multiplica por 1 ou 3 alternadamente (posições ímpares por 1, pares por 3)
-        soma += digitos[i] * (i % 2 === 0 ? 1 : 3);
-    }
-    
-    const resto = soma % 10;
-    const digitoCalculado = resto === 0 ? 0 : 10 - resto;
-    
-    if (digitoCalculado !== digitoVerificador) {
-        return { 
-            valido: false, 
-            mensagem: `Código EAN-13 inválido! O dígito verificador correto deveria ser ${digitoCalculado}, mas foi informado ${digitoVerificador}.` 
-        };
-    }
-    
-    return { valido: true, mensagem: 'Código EAN-13 válido!' };
-}
-
-// Alert Customizado "Sirius Web informa:" (com z-index alto para aparecer sobre modal)
-function alertSirius(mensagem) {
-    const existente = document.getElementById('alertSirius');
-    if (existente) existente.remove();
-    
-    const overlay = document.createElement('div');
-    overlay.id = 'alertSirius';
-    overlay.style.cssText = `
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0,0,0,0.6);
-        z-index: 99999;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    `;
-    
-    const box = document.createElement('div');
-    box.style.cssText = `
-        background: white;
-        padding: 30px;
-        border-radius: 15px;
-        box-shadow: 0 10px 40px rgba(0,0,0,0.3);
-        max-width: 500px;
-        width: 90%;
-        animation: slideDown 0.3s ease-out;
-    `;
-    
-    box.innerHTML = `
-        <h3 style="color: #667eea; margin: 0 0 20px 0; font-size: 1.5em;">🏢 Sirius Web informa:</h3>
-        <p style="color: #333; font-size: 1.1em; margin: 0 0 25px 0; line-height: 1.5;">${mensagem}</p>
-        <button onclick="document.getElementById('alertSirius').remove()" 
-                style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
-                       color: white; 
-                       border: none; 
-                       padding: 12px 30px; 
-                       border-radius: 8px; 
-                       cursor: pointer; 
-                       font-size: 16px;
-                       font-weight: bold;
-                       width: 100%;">
-            OK
-        </button>
-    `;
-    
-    overlay.appendChild(box);
-    document.body.appendChild(overlay);
-    
-    // Fechar ao clicar fora
-    overlay.addEventListener('click', (e) => {
-        if (e.target === overlay) overlay.remove();
-    });
-}
-
-// Relatório Individual do Produto (FICHA)
-async function gerarRelatorioIndividual(id) {
-    console.log('📄 Gerando ficha do produto ID:', id);
-    
-    if (!id || id === 'undefined') {
-        console.error('❌ ID inválido:', id);
-        alertSirius('ID do produto inválido!');
-        return;
-    }
-    
-    try {
-        const url = `${API_URL}/produtos/${id}`;
-        console.log('🔄 Buscando produto:', url);
-        
-        const response = await fetch(url, {
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'X-Empresa-Id': empresaId
-            }
-        });
-        
-        console.log('📡 Response status:', response.status);
-        
-        const data = await response.json();
-        console.log('📦 Dados recebidos:', data);
-        
-        if (!data.success) {
-            console.error('❌ Erro na API:', data.message);
-            alertSirius(data.message || 'Erro ao buscar produto');
-            return;
-        }
-        
-        const p = data.data;
-        console.log('✅ Produto encontrado:', p);
-        
-        let html = `
-            <!DOCTYPE html>
-            <html>
-            <head>
-                <meta charset="UTF-8">
-                <title>Ficha do Produto - ${p.descricao}</title>
-                <style>
-                    body { font-family: Arial, sans-serif; margin: 20px; }
-                    h1 { color: #667eea; text-align: center; }
-                    .info { text-align: center; color: #666; margin-bottom: 30px; }
-                    .section { margin-bottom: 30px; padding: 20px; border: 2px solid #667eea; border-radius: 10px; }
-                    .section-title { color: #667eea; font-size: 1.3em; margin-bottom: 15px; border-bottom: 2px solid #667eea; padding-bottom: 10px; }
-                    .field { margin: 10px 0; display: grid; grid-template-columns: 200px 1fr; }
-                    .field strong { color: #333; }
-                    @media print {
-                        button { display: none; }
-                    }
-                </style>
-            </head>
-            <body>
-                <h1>🏢 SIRIUS WEB - Ficha do Produto</h1>
-                <div class="info">
-                    <strong>Data:</strong> ${new Date().toLocaleDateString('pt-BR')} 
-                    <strong>Hora:</strong> ${new Date().toLocaleTimeString('pt-BR')}
-                </div>
-                
-                <div class="section">
-                    <div class="section-title">📦 Dados Básicos</div>
-                    <div class="field"><strong>Código:</strong> <span>${p.codigo}</span></div>
-                    <div class="field"><strong>Código de Barras (EAN):</strong> <span>${p.codigo_barras || '-'}</span></div>
-                    <div class="field"><strong>Descrição:</strong> <span>${p.descricao}</span></div>
-                    <div class="field"><strong>Descrição Complementar:</strong> <span>${p.descricao_complemento || '-'}</span></div>
-                    <div class="field"><strong>Unidade:</strong> <span>${p.unidade}</span></div>
-                    <div class="field"><strong>Preço Custo:</strong> <span>R$ ${formatarNumero(p.preco_custo, 2)}</span></div>
-                    <div class="field"><strong>Preço Venda:</strong> <span>R$ ${formatarNumero(p.preco_venda, 2)}</span></div>
-                    <div class="field"><strong>Status:</strong> <span>${p.ativo === 'S' ? '🟢 Ativo' : '🔴 Inativo'}</span></div>
-                    <div class="field"><strong>Disponível no PDV:</strong> <span>${p.ativo_pdv ? 'Sim' : 'Não'}</span></div>
-                </div>
-                
-                <div class="section">
-                    <div class="section-title">📊 Estoque</div>
-                    <div class="field"><strong>Estoque Atual:</strong> <span>${formatarNumero(p.estoque_atual, 3)}</span></div>
-                    <div class="field"><strong>Estoque Mínimo:</strong> <span>${formatarNumero(p.estoque_minimo, 3)}</span></div>
-                    <div class="field"><strong>Estoque Máximo:</strong> <span>${formatarNumero(p.estoque_maximo, 3)}</span></div>
-                </div>
-                
-                <div class="section">
-                    <div class="section-title">📋 Dados Fiscais (NFCe)</div>
-                    <div class="field"><strong>NCM:</strong> <span>${p.ncm || '-'}</span></div>
-                    <div class="field"><strong>CEST:</strong> <span>${p.cest || '-'}</span></div>
-                    <div class="field"><strong>CFOP:</strong> <span>${p.cfop || '-'}</span></div>
-                    <div class="field"><strong>Origem da Mercadoria:</strong> <span>${p.origem_mercadoria || '-'}</span></div>
-                    <div class="field"><strong>CST ICMS:</strong> <span>${p.icms_situacao_tributaria || '-'}</span></div>
-                    <div class="field"><strong>Alíquota ICMS:</strong> <span>${p.icms_aliquota || 0}%</span></div>
-                    <div class="field"><strong>CST PIS:</strong> <span>${p.pis_situacao_tributaria || '-'}</span></div>
-                    <div class="field"><strong>Alíquota PIS:</strong> <span>${p.pis_aliquota || 0}%</span></div>
-                    <div class="field"><strong>CST COFINS:</strong> <span>${p.cofins_situacao_tributaria || '-'}</span></div>
-                    <div class="field"><strong>Alíquota COFINS:</strong> <span>${p.cofins_aliquota || 0}%</span></div>
-                </div>
-                
-                ${p.observacoes ? `
-                <div class="section">
-                    <div class="section-title">📝 Observações</div>
-                    <p>${p.observacoes}</p>
-                </div>
-                ` : ''}
-                
-                <br>
-                <button onclick="window.print()" style="padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px;">🖨️ Imprimir</button>
-            </body>
-            </html>
-        `;
-        
-        const janela = window.open('', '_blank');
-        janela.document.write(html);
-        janela.document.close();
-        
-        console.log('✅ Relatório gerado com sucesso!');
-    } catch (error) {
-        console.error('❌ Erro ao gerar relatório:', error);
-        alertSirius('Erro ao gerar relatório: ' + error.message);
-    }
-}
-
-// Modal
 function abrirModal(produto = null) {
     const modal = document.getElementById('modal');
     const modalBody = modal.querySelector('.modal-body');
@@ -583,12 +378,10 @@ function abrirModal(produto = null) {
     modal.style.display = 'block';
     document.getElementById('modalTitle').textContent = produto ? 'Editar Produto' : 'Novo Produto';
     
-    // Scroll para o topo do modal
     setTimeout(() => {
         modalBody.scrollTop = 0;
     }, 50);
     
-    // Ativar primeira aba
     mudarAba('basico');
     
     if (produto) {
@@ -607,61 +400,73 @@ function fecharModal() {
     produtoEditando = null;
 }
 
+// =====================================================
+// PREENCHER FORMULÁRIO
+// =====================================================
 function preencherFormulario(produto) {
     console.log('📝 Preenchendo formulário com:', produto);
     
+    // Helper function null-safe
+    const preencherCampo = (id, valor) => {
+        const el = document.getElementById(id);
+        if (el) el.value = valor || '';
+    };
+    
+    const preencherCheckbox = (id, valor) => {
+        const el = document.getElementById(id);
+        if (el) el.checked = valor || false;
+    };
+    
     // Campos básicos
-    document.getElementById('codigo').value = produto.codigo || '';
-    document.getElementById('ean').value = produto.codigo_barras || '';
-    document.getElementById('descricao').value = produto.descricao || '';
-    document.getElementById('descricao_complemento').value = produto.descricao_complemento || '';
-    document.getElementById('unidade_comercial').value = produto.unidade || '';
-    document.getElementById('custo').value = produto.preco_custo || '';
-    document.getElementById('valor_venda').value = produto.preco_venda || '';
+    preencherCampo('codigo', produto.codigo);
+    preencherCampo('ean', produto.codigo_barras);
+    preencherCampo('descricao', produto.descricao);
+    preencherCampo('descricao_complemento', produto.descricao_complemento);
+    preencherCampo('unidade_comercial', produto.unidade);
+    preencherCampo('custo', produto.preco_custo);
+    preencherCampo('valor_venda', produto.preco_venda);
     
-    // Estoque
-    document.getElementById('saldo').value = produto.estoque_atual || '';
-    document.getElementById('estoque_minimo').value = produto.estoque_minimo || '';
-    document.getElementById('estoque_maximo').value = produto.estoque_maximo || '';
+    // Estoque (saldo é readonly)
+    preencherCampo('saldo', produto.estoque_atual);
+    preencherCampo('estoque_minimo', produto.estoque_minimo);
+    preencherCampo('estoque_maximo', produto.estoque_maximo);
     
-    // Dados fiscais
-    document.getElementById('ncm').value = produto.ncm || '';
-    document.getElementById('cest').value = produto.cest || '';
-    document.getElementById('cfop').value = produto.cfop || '';
-    document.getElementById('origem').value = produto.origem_mercadoria || '';
+    // Dados fiscais (null-safe)
+    preencherCampo('ncm', produto.ncm);
+    preencherCampo('cest', produto.cest);
+    preencherCampo('cfop', produto.cfop);
     
-    // ICMS
-    document.getElementById('cst_icms').value = produto.icms_situacao_tributaria || '';
-    document.getElementById('aliq_icms').value = produto.icms_aliquota || '';
+    const origemEl = document.getElementById('origem');
+    if (origemEl) origemEl.value = produto.origem_mercadoria || '';
     
-    // PIS
-    document.getElementById('cst_pis').value = produto.pis_situacao_tributaria || '';
-    document.getElementById('aliq_pis').value = produto.pis_aliquota || '';
-    
-    // COFINS
-    document.getElementById('cst_cofins').value = produto.cofins_situacao_tributaria || '';
-    document.getElementById('aliq_cofins').value = produto.cofins_aliquota || '';
+    preencherCampo('cst_icms', produto.icms_situacao_tributaria);
+    preencherCampo('aliq_icms', produto.icms_aliquota);
+    preencherCampo('cst_pis', produto.pis_situacao_tributaria);
+    preencherCampo('aliq_pis', produto.pis_aliquota);
+    preencherCampo('cst_cofins', produto.cofins_situacao_tributaria);
+    preencherCampo('aliq_cofins', produto.cofins_aliquota);
     
     // Configurações
-    document.getElementById('ativo').checked = produto.ativo === 'S';
-    document.getElementById('ativo_pdv').checked = produto.ativo_pdv || false;
-    document.getElementById('observacoes').value = produto.observacoes || '';
+    preencherCheckbox('ativo', produto.ativo === 'S');
+    preencherCheckbox('ativo_pdv', produto.ativo_pdv);
 }
 
-// Salvar Produto (COM VALIDAÇÕES COMPLETAS)
+// =====================================================
+// SALVAR PRODUTO
+// =====================================================
 async function salvarProduto(event) {
     event.preventDefault();
     
-    // ========== VALIDAÇÕES OBRIGATÓRIAS ==========
     const codigo = document.getElementById('codigo').value.trim();
-    const descricao = document.getElementById('descricao').value.trim();
-    const preco_venda = document.getElementById('valor_venda').value;
-    const unidade = document.getElementById('unidade_comercial').value.trim();
     const codigoBarras = document.getElementById('ean').value.trim();
+    const descricao = document.getElementById('descricao').value.trim();
+    const unidade = document.getElementById('unidade_comercial').value;
+    const preco_venda = document.getElementById('valor_venda').value;
     
+    // Validações
     if (!codigo) {
         alertSirius('Por favor, informe o <strong>código</strong> do produto!');
-        mudarAba('basico'); // Vai para a aba correta
+        mudarAba('basico');
         document.getElementById('codigo').focus();
         return;
     }
@@ -687,7 +492,7 @@ async function salvarProduto(event) {
         return;
     }
     
-    // ========== VALIDAÇÃO DO CÓDIGO EAN-13 (SE PREENCHIDO) ==========
+    // Validação EAN-13
     if (codigoBarras) {
         const validacao = validarEAN13(codigoBarras);
         if (!validacao.valido) {
@@ -698,7 +503,7 @@ async function salvarProduto(event) {
         }
     }
     
-    // ========== PREPARAR DADOS NO FORMATO DA API ==========
+    // Preparar dados (null-safe)
     const dados = {
         codigo: codigo,
         codigo_barras: codigoBarras || null,
@@ -707,33 +512,53 @@ async function salvarProduto(event) {
         unidade: unidade.toUpperCase(),
         preco_custo: parseFloat(document.getElementById('custo').value) || 0,
         preco_venda: parseFloat(preco_venda),
-        estoque_atual: parseFloat(document.getElementById('saldo').value) || 0,
+        // estoque_atual NÃO enviado (readonly)
         estoque_minimo: parseFloat(document.getElementById('estoque_minimo').value) || 0,
-        estoque_maximo: parseFloat(document.getElementById('estoque_maximo').value) || 0,
-        ncm: document.getElementById('ncm').value.trim() || null,
-        cest: document.getElementById('cest').value.trim() || null,
-        cfop: document.getElementById('cfop').value.trim() || null,
-        origem_mercadoria: document.getElementById('origem').value || null,
-        icms_situacao_tributaria: document.getElementById('cst_icms').value.trim() || null,
-        icms_aliquota: parseFloat(document.getElementById('aliq_icms').value) || 0,
-        pis_situacao_tributaria: document.getElementById('cst_pis').value.trim() || null,
-        pis_aliquota: parseFloat(document.getElementById('aliq_pis').value) || 0,
-        cofins_situacao_tributaria: document.getElementById('cst_cofins').value.trim() || null,
-        cofins_aliquota: parseFloat(document.getElementById('aliq_cofins').value) || 0,
-        ativo: document.getElementById('ativo').checked ? 'S' : 'N',
-        ativo_pdv: document.getElementById('ativo_pdv').checked,
-        observacoes: document.getElementById('observacoes').value.trim() || null
+        estoque_maximo: parseFloat(document.getElementById('estoque_maximo').value) || 0
     };
+    
+    // Campos fiscais null-safe
+    const ncmEl = document.getElementById('ncm');
+    if (ncmEl && ncmEl.value.trim()) dados.ncm = ncmEl.value.trim();
+    
+    const cestEl = document.getElementById('cest');
+    if (cestEl && cestEl.value.trim()) dados.cest = cestEl.value.trim();
+    
+    const cfopEl = document.getElementById('cfop');
+    if (cfopEl && cfopEl.value.trim()) dados.cfop = cfopEl.value.trim();
+    
+    const origemEl = document.getElementById('origem');
+    if (origemEl && origemEl.value) dados.origem_mercadoria = origemEl.value;
+    
+    const cstIcmsEl = document.getElementById('cst_icms');
+    if (cstIcmsEl && cstIcmsEl.value.trim()) dados.icms_situacao_tributaria = cstIcmsEl.value.trim();
+    
+    const aliqIcmsEl = document.getElementById('aliq_icms');
+    if (aliqIcmsEl && aliqIcmsEl.value) dados.icms_aliquota = parseFloat(aliqIcmsEl.value) || 0;
+    
+    const cstPisEl = document.getElementById('cst_pis');
+    if (cstPisEl && cstPisEl.value.trim()) dados.pis_situacao_tributaria = cstPisEl.value.trim();
+    
+    const aliqPisEl = document.getElementById('aliq_pis');
+    if (aliqPisEl && aliqPisEl.value) dados.pis_aliquota = parseFloat(aliqPisEl.value) || 0;
+    
+    const cstCofinsEl = document.getElementById('cst_cofins');
+    if (cstCofinsEl && cstCofinsEl.value.trim()) dados.cofins_situacao_tributaria = cstCofinsEl.value.trim();
+    
+    const aliqCofinsEl = document.getElementById('aliq_cofins');
+    if (aliqCofinsEl && aliqCofinsEl.value) dados.cofins_aliquota = parseFloat(aliqCofinsEl.value) || 0;
+    
+    const ativoEl = document.getElementById('ativo');
+    dados.ativo = ativoEl && ativoEl.checked ? 'S' : 'N';
+    
+    const ativoPdvEl = document.getElementById('ativo_pdv');
+    dados.ativo_pdv = ativoPdvEl ? ativoPdvEl.checked : false;
     
     console.log('💾 Salvando produto:', dados);
     
     try {
         const produtoId = produtoEditando ? produtoEditando.id : null;
-        
-        const url = produtoId 
-            ? `${API_URL}/produtos/${produtoId}` 
-            : `${API_URL}/produtos`;
-        
+        const url = produtoId ? `${API_URL}/produtos/${produtoId}` : `${API_URL}/produtos`;
         const method = produtoId ? 'PUT' : 'POST';
         
         console.log(`📤 ${method} ${url}`);
@@ -764,7 +589,9 @@ async function salvarProduto(event) {
     }
 }
 
-// Editar Produto
+// =====================================================
+// EDITAR PRODUTO
+// =====================================================
 async function editarProduto(id) {
     console.log('✏️ Editando produto ID:', id);
     
@@ -799,7 +626,9 @@ async function editarProduto(id) {
     }
 }
 
-// Excluir Produto
+// =====================================================
+// EXCLUIR PRODUTO (INATIVAR)
+// =====================================================
 function confirmarExclusao(id, descricao) {
     const existente = document.getElementById('alertSirius');
     if (existente) existente.remove();
@@ -892,7 +721,40 @@ async function excluirProduto(id) {
     }
 }
 
-// Utilidades
+// =====================================================
+// VALIDAÇÃO EAN-13
+// =====================================================
+function validarEAN13(codigoBarras) {
+    const ean = codigoBarras.replace(/[\s-]/g, '');
+    
+    if (!/^\d{13}$/.test(ean)) {
+        return { valido: false, mensagem: 'O código EAN-13 deve conter exatamente 13 dígitos numéricos.' };
+    }
+    
+    const digitos = ean.split('').map(Number);
+    const digitoVerificador = digitos[12];
+    
+    let soma = 0;
+    for (let i = 0; i < 12; i++) {
+        soma += digitos[i] * (i % 2 === 0 ? 1 : 3);
+    }
+    
+    const resto = soma % 10;
+    const digitoCalculado = resto === 0 ? 0 : 10 - resto;
+    
+    if (digitoCalculado !== digitoVerificador) {
+        return { 
+            valido: false, 
+            mensagem: `Código EAN-13 inválido! O dígito verificador correto deveria ser ${digitoCalculado}, mas foi informado ${digitoVerificador}.` 
+        };
+    }
+    
+    return { valido: true, mensagem: 'Código EAN-13 válido!' };
+}
+
+// =====================================================
+// UTILITÁRIOS
+// =====================================================
 function mostrarLoading(show) {
     document.getElementById('loading').style.display = show ? 'block' : 'none';
     document.getElementById('tabelaContainer').style.display = show ? 'none' : 'block';
@@ -911,29 +773,62 @@ function mostrarMensagem(texto, tipo) {
     console.log(`📢 Mensagem (${tipo}):`, texto);
 }
 
-function formatarNumero(valor, decimais = 2) {
-    if (valor === null || valor === undefined) return '0,00';
-    return parseFloat(valor).toFixed(decimais).replace('.', ',');
+// Alert customizado
+function alertSirius(mensagem) {
+    const existente = document.getElementById('alertSirius');
+    if (existente) existente.remove();
+    
+    const overlay = document.createElement('div');
+    overlay.id = 'alertSirius';
+    overlay.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.6);
+        z-index: 99999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    `;
+    
+    const box = document.createElement('div');
+    box.style.cssText = `
+        background: white;
+        padding: 30px;
+        border-radius: 15px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        max-width: 500px;
+        width: 90%;
+    `;
+    
+    box.innerHTML = `
+        <h3 style="color: #667eea; margin: 0 0 20px 0; font-size: 1.5em;">🏢 Sirius Web informa:</h3>
+        <p style="color: #333; font-size: 1.1em; margin: 0 0 25px 0; line-height: 1.5;">${mensagem}</p>
+        <button onclick="document.getElementById('alertSirius').remove()" 
+                style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+                       color: white; 
+                       border: none; 
+                       padding: 12px 30px; 
+                       border-radius: 8px; 
+                       cursor: pointer; 
+                       font-size: 16px;
+                       font-weight: bold;
+                       width: 100%;">
+            OK
+        </button>
+    `;
+    
+    overlay.appendChild(box);
+    document.body.appendChild(overlay);
+    
+    overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) overlay.remove();
+    });
 }
 
-// =====================================================
-// NAVEGAR PARA MOVIMENTAÇÕES
-// =====================================================
-function verMovimentacoes(produtoId) {
-    window.location.href = `produtos-movimentacoes.html?id=${produtoId}`;
-}
-
-// Fechar modal ao clicar fora
-window.onclick = function(event) {
-    const modal = document.getElementById('modal');
-    if (event.target == modal) {
-        fecharModal();
-    }
-}
-
-// =====================================================
-// MODAL PROMPT PERSONALIZADO (Sirius Web)
-// =====================================================
+// Prompt customizado
 function siriusPrompt(mensagem, valorPadrao = '', titulo = 'Sirius Web') {
     return new Promise((resolve) => {
         const existente = document.getElementById('alertSirius');
@@ -962,18 +857,20 @@ function siriusPrompt(mensagem, valorPadrao = '', titulo = 'Sirius Web') {
             box-shadow: 0 10px 40px rgba(0,0,0,0.3);
             max-width: 500px;
             width: 90%;
-            animation: slideDown 0.3s ease-out;
         `;
         
-        const inputId = 'siriusPromptInput_' + Date.now();
+        const inputId = 'siriusPromptInput';
         
         box.innerHTML = `
-            <h3 style="color: #667eea; margin: 0 0 20px 0; font-size: 1.5em;">🏢 ${titulo}</h3>
+            <h3 style="color: #667eea; margin: 0 0 15px 0; font-size: 1.5em;">🏢 ${titulo}</h3>
             <p style="color: #333; font-size: 1.1em; margin: 0 0 15px 0; line-height: 1.5;">${mensagem}</p>
             <input type="text" id="${inputId}" value="${valorPadrao}" 
-                   style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; 
-                          font-size: 16px; margin-bottom: 20px; box-sizing: border-box;"
-                   placeholder="Digite aqui...">
+                   style="width: 100%; 
+                          padding: 12px; 
+                          border: 2px solid #ddd; 
+                          border-radius: 8px; 
+                          font-size: 16px;
+                          margin-bottom: 20px;">
             <div style="display: flex; gap: 10px;">
                 <button id="btnCancelar" 
                         style="background: #6c757d; 
@@ -1009,20 +906,17 @@ function siriusPrompt(mensagem, valorPadrao = '', titulo = 'Sirius Web') {
         const btnOk = document.getElementById('btnOk');
         const btnCancelar = document.getElementById('btnCancelar');
         
-        // Focar e selecionar texto
         setTimeout(() => {
             input.focus();
             input.select();
         }, 100);
         
-        // Handler OK
         const confirmar = () => {
             const valor = input.value.trim();
             overlay.remove();
             resolve(valor || null);
         };
         
-        // Handler Cancelar
         const cancelar = () => {
             overlay.remove();
             resolve(null);
@@ -1031,14 +925,12 @@ function siriusPrompt(mensagem, valorPadrao = '', titulo = 'Sirius Web') {
         btnOk.onclick = confirmar;
         btnCancelar.onclick = cancelar;
         
-        // ENTER confirma
         input.onkeypress = (e) => {
             if (e.key === 'Enter') {
                 confirmar();
             }
         };
         
-        // ESC cancela
         overlay.onkeydown = (e) => {
             if (e.key === 'Escape') {
                 cancelar();
@@ -1047,4 +939,12 @@ function siriusPrompt(mensagem, valorPadrao = '', titulo = 'Sirius Web') {
     });
 }
 
-console.log('🚀 Produtos JS - VERSÃO FINAL COM VALIDAÇÕES ✅');
+// Fechar modal ao clicar fora
+window.onclick = function(event) {
+    const modal = document.getElementById('modal');
+    if (event.target == modal) {
+        fecharModal();
+    }
+}
+
+console.log('🚀 Produtos JS - VERSÃO CORRIGIDA COM ORDENAÇÃO FUNCIONANDO ✅');

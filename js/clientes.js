@@ -95,28 +95,33 @@ function validarCPF(cpf) {
         return { valido: false, mensagem: 'CPF deve conter 11 dígitos.' };
     }
     
+    // Verifica se todos os dígitos são iguais
     if (/^(\d)\1{10}$/.test(cpf)) {
         return { valido: false, mensagem: 'CPF inválido.' };
     }
     
+    // ✅ CÁLCULO CORRETO DO PRIMEIRO DÍGITO VERIFICADOR
     let soma = 0;
     for (let i = 0; i < 9; i++) {
         soma += parseInt(cpf.charAt(i)) * (10 - i);
     }
-    let resto = (soma * 10) % 11;
-    if (resto === 10 || resto === 11) resto = 0;
-    if (resto !== parseInt(cpf.charAt(9))) {
-        return { valido: false, mensagem: 'CPF inválido! Dígito verificador incorreto.' };
+    let resto = soma % 11;
+    let digito1 = resto < 2 ? 0 : 11 - resto;
+    
+    if (digito1 !== parseInt(cpf.charAt(9))) {
+        return { valido: false, mensagem: 'CPF inválido! Primeiro dígito verificador incorreto.' };
     }
     
+    // ✅ CÁLCULO CORRETO DO SEGUNDO DÍGITO VERIFICADOR
     soma = 0;
     for (let i = 0; i < 10; i++) {
         soma += parseInt(cpf.charAt(i)) * (11 - i);
     }
-    resto = (soma * 10) % 11;
-    if (resto === 10 || resto === 11) resto = 0;
-    if (resto !== parseInt(cpf.charAt(10))) {
-        return { valido: false, mensagem: 'CPF inválido! Dígito verificador incorreto.' };
+    resto = soma % 11;
+    let digito2 = resto < 2 ? 0 : 11 - resto;
+    
+    if (digito2 !== parseInt(cpf.charAt(10))) {
+        return { valido: false, mensagem: 'CPF inválido! Segundo dígito verificador incorreto.' };
     }
     
     return { valido: true, mensagem: 'CPF válido!' };

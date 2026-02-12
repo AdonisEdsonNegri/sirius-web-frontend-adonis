@@ -287,13 +287,7 @@
                 <div class="card-value" id="plano">-</div>
                 <div class="card-info">Gratuito com limites</div>
             </div>
-
-            <div class="card">
-                <h3>NFCe Disponíveis</h3>
-                <div class="card-value" id="nfce">-</div>
-                <div class="card-info">Limite mensal</div>
-            </div>
-
+       
             <div class="card">
                 <h3>Acessos Rápidos</h3>
                 <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 16px;">
@@ -396,8 +390,7 @@
 
             // Atualizar plano
             document.getElementById('plano').textContent = empresa.plano;
-            document.getElementById('nfce').textContent = '200';
-
+            
             // Buscar dados completos da empresa
             try {
                 const response = await fetch(`${API_URL}/empresas/${empresa.id}`, {

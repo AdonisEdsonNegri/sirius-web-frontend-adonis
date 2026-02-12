@@ -148,144 +148,107 @@
         .pagination button { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: bold; }
         .pagination button:hover:not(:disabled) { opacity: 0.9; }
         .pagination button:disabled { opacity: 0.5; cursor: not-allowed; }
+        .pagination span { font-size: 16px; font-weight: bold; color: #333; }
         
-        /* Loading */
-        .loading { text-align: center; padding: 40px; color: #666; font-size: 18px; }
-        
-        /* Mensagem de Sucesso/Erro */
-        .mensagem { padding: 15px 20px; border-radius: 8px; margin-bottom: 20px; font-weight: bold; text-align: center; display: none; }
-        .mensagem.sucesso { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
-        .mensagem.erro { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
-        
-        /* Hidden */
-        .hidden { display: none !important; }
-        
-        /* Responsividade */
-        @media (max-width: 768px) {
-            .container { padding: 15px; }
-            h1 { font-size: 1.8em; }
-            .btn-toolbar { flex-direction: column; }
-            .btn { width: 100%; }
-            .form-row { grid-template-columns: 1fr; }
-            .btn-voltar {
-                position: static;
-                width: 100%;
-                justify-content: center;
-                margin-bottom: 20px;
-            }
-        }
+        /* Loading e Mensagens */
+        .loading, .mensagem { padding: 15px; margin-bottom: 20px; border-radius: 8px; text-align: center; font-weight: bold; }
+        .loading { background-color: #e3f2fd; color: #1976d2; }
+        .mensagem.success { background-color: #d4edda; color: #155724; }
+        .mensagem.error { background-color: #f8d7da; color: #721c24; }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- Botão Voltar - Canto Superior Direito -->
-        <button class="btn-voltar" onclick="voltarPagina()" title="Voltar">
-            <span>←</span>
-            <span>Voltar</span>
-        </button>
+        <!-- ✅ BOTÃO VOLTAR CORRIGIDO - VAI DIRETO PARA DASHBOARD -->
+        <button class="btn-voltar" onclick="voltarPagina()">⬅ Voltar</button>
         
-        <h1>📦 Produtos</h1>
-        <p class="subtitle">Gestão completa de produtos e estoque</p>
+        <h1>📦 Gestão de Produtos</h1>
+        <p class="subtitle">Cadastro e controle de estoque</p>
         
-        <!-- Mensagem de feedback -->
-        <div id="mensagem" class="mensagem"></div>
-        
-        <!-- Toolbar -->
         <div class="btn-toolbar">
-            <!-- Novo Produto - Azul Mais Forte -->
             <button class="btn" onclick="abrirModal()">➕ Novo Produto</button>
             
-            <!-- Dropdown Ordenação - Azul Médio/Forte -->
-            <div class="dropdown">
+            <div class="dropdown" onclick="toggleDropdown(event, this)">
                 <button class="btn btn-ordenacao">📊 Ordenação</button>
                 <div class="dropdown-content">
                     <a href="#" onclick="aplicarOrdenacao('codigo')">🔢 Por Código</a>
-                    <a href="#" onclick="aplicarOrdenacao('descricao')">🔤 Por Descrição</a>
+                    <a href="#" onclick="aplicarOrdenacao('descricao')">📝 Por Descrição</a>
                     <a href="#" onclick="aplicarOrdenacao('data_criacao')">📅 Ordem de Inserção</a>
-                    <a href="#" onclick="aplicarOrdenacao('ultimos')">⏰ Últimos Lançamentos</a>
+                    <a href="#" onclick="aplicarOrdenacao('ultimos')">⏱️ Últimos Lançamentos</a>
                 </div>
             </div>
             
-            <!-- Dropdown Filtros - Azul Médio -->
-            <div class="dropdown">
+            <div class="dropdown" onclick="toggleDropdown(event, this)">
                 <button class="btn btn-filtros">🔍 Filtros</button>
                 <div class="dropdown-content">
                     <a href="#" onclick="aplicarFiltro('codigo')">🔢 Por Código</a>
-                    <a href="#" onclick="aplicarFiltro('descricao')">🔤 Por Descrição</a>
-                    <a href="#" onclick="aplicarFiltro('ean')">📟 Por EAN</a>
-                    <a href="#" onclick="aplicarFiltro('estoque_zero')">📉 Estoque Zero</a>
-                    <a href="#" onclick="aplicarFiltro('estoque_baixo')">⚠️ Estoque Baixo</a>
+                    <a href="#" onclick="aplicarFiltro('descricao')">📝 Por Descrição</a>
+                    <a href="#" onclick="aplicarFiltro('ean')">📊 Por EAN/Barras</a>
+                    <a href="#" onclick="aplicarFiltro('estoque_zero')">⚠️ Estoque Zero</a>
+                    <a href="#" onclick="aplicarFiltro('estoque_baixo')">📉 Estoque Abaixo do Mínimo</a>
                 </div>
             </div>
-            
-            <!-- Dropdown Relatórios - Azul Mais Suave -->
-            <div class="dropdown">
+
+            <div class="dropdown" onclick="toggleDropdown(event, this)">
                 <button class="btn btn-relatorio">📄 Relatórios</button>
                 <div class="dropdown-content">
-                    <a href="#" onclick="gerarRelatorio('completo')">📋 Listagem Completa</a>
-                    <a href="#" onclick="gerarRelatorio('estoque')">📊 Relatório de Estoque</a>
-                    <a href="#" onclick="gerarRelatorio('precos')">💰 Tabela de Preços</a>
+                    <a href="#" onclick="gerarRelatorio()">📊 Produtos sob Filtro</a>
                 </div>
             </div>
         </div>
         
-        <!-- Filtro Ativo -->
-        <div id="filtroAtivo" class="filtro-ativo hidden">
-            <span>🔍 Filtro ativo: <strong id="filtroTexto"></strong></span>
+        <div id="filtroAtivo" class="filtro-ativo" style="display:none;">
+            <div><strong>Filtro ativo:</strong> <span id="textoFiltro"></span></div>
             <button class="btn-limpar-filtro" onclick="limparFiltro()">✖ Limpar</button>
         </div>
         
-        <!-- Loading -->
-        <div id="loading" class="loading" style="display: none;">
-            ⏳ Carregando produtos...
-        </div>
+        <div id="mensagem" class="mensagem"></div>
+        <div id="loading" class="loading" style="display:none;">Carregando produtos...</div>
         
-        <!-- Tabela -->
         <div id="tabelaContainer">
-            <table>
+            <table id="tabelaProdutos">
                 <thead>
                     <tr>
                         <th>Código</th>
-                        <th>EAN</th>
                         <th>Descrição</th>
                         <th>Unidade</th>
                         <th>Estoque</th>
+                        <th>Preço Custo</th>
                         <th>Preço Venda</th>
                         <th>Status</th>
                         <th>Ações</th>
                     </tr>
                 </thead>
-                <tbody id="tbody">
-                    <tr><td colspan="8" style="text-align:center; padding: 40px;">Carregando...</td></tr>
-                </tbody>
+                <tbody id="tbody"></tbody>
             </table>
         </div>
         
         <div class="pagination">
-            <button id="btnPrev" onclick="mudarPagina(-1)" disabled>← Anterior</button>
-            <span id="pageInfo">Página 1</span>
-            <button id="btnNext" onclick="mudarPagina(1)">Próxima →</button>
+            <button id="btnPrev" onclick="mudarPagina(-1)">◀ Anterior</button>
+            <span id="paginaInfo">Página 1 de 1</span>
+            <button id="btnNext" onclick="mudarPagina(1)">Próximo ▶</button>
         </div>
     </div>
 
-    <!-- Modal com Abas -->
+    <!-- Modal de Cadastro/Edição -->
     <div id="modal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2 class="form-title" id="modalTitle">Novo Produto</h2>
+                <h2 id="modalTitle" class="form-title">Novo Produto</h2>
                 <span class="close" onclick="fecharModal()">&times;</span>
             </div>
             
             <!-- Abas -->
             <div class="tabs">
-                <button class="tab-button active" data-tab="basico" onclick="mudarAba('basico')">📦 Dados Básicos</button>
-                <button class="tab-button" data-tab="estoque" onclick="mudarAba('estoque')">📊 Estoque</button>
-                <button class="tab-button" data-tab="fiscais" onclick="mudarAba('fiscais')">📋 Dados Fiscais</button>
+                <button class="tab-button active" data-tab="basico" onclick="mudarAba('basico')">📋 Dados Básicos</button>
+                <button class="tab-button" data-tab="estoque" onclick="mudarAba('estoque')">📦 Estoque</button>
+                <button class="tab-button" data-tab="fiscais" onclick="mudarAba('fiscais')">🧾 Dados Fiscais</button>
                 <button class="tab-button" data-tab="config" onclick="mudarAba('config')">⚙️ Configurações</button>
             </div>
             
             <div class="modal-body">
                 <form id="produtoForm" onsubmit="salvarProduto(event)">
+                    
                     <!-- Aba: Dados Básicos -->
                     <div id="tab-basico" class="tab-content active">
                         <div class="form-row">
@@ -294,32 +257,37 @@
                                 <input type="text" id="codigo" required>
                             </div>
                             <div class="form-group">
-                                <label>Código de Barras (EAN)</label>
-                                <input type="text" id="ean" maxlength="14">
+                                <label>Código de Barras (EAN-13)</label>
+                                <input type="text" id="ean" maxlength="13">
                             </div>
                         </div>
 
-                        <div class="form-group">
-                            <label>Descrição *</label>
-                            <input type="text" id="descricao" required>
+                        <div class="form-row">
+                            <div class="form-group" style="grid-column: 1 / -1;">
+                                <label>Descrição *</label>
+                                <input type="text" id="descricao" required>
+                            </div>
                         </div>
 
-                        <div class="form-group">
-                            <label>Descrição Complementar</label>
-                            <input type="text" id="descricao_complemento">
+                        <div class="form-row">
+                            <div class="form-group" style="grid-column: 1 / -1;">
+                                <label>Descrição Complementar</label>
+                                <input type="text" id="descricao_complemento">
+                            </div>
                         </div>
 
                         <div class="form-row">
                             <div class="form-group">
-                                <label>Unidade Comercial *</label>
+                                <label>Unidade de Medida *</label>
                                 <select id="unidade_comercial" required>
                                     <option value="">Selecione...</option>
                                     <option value="UN">UN - Unidade</option>
-                                    <option value="PC">PC - Peça</option>
+                                    <option value="CX">CX - Caixa</option>
                                     <option value="KG">KG - Quilograma</option>
                                     <option value="MT">MT - Metro</option>
                                     <option value="LT">LT - Litro</option>
-                                    <option value="CX">CX - Caixa</option>
+                                    <option value="PC">PC - Peça</option>
+                                    <option value="PR">PR - Par</option>
                                     <option value="PT">PT - Pacote</option>
                                 </select>
                             </div>
@@ -341,8 +309,13 @@
                     <div id="tab-estoque" class="tab-content">
                         <div class="form-row">
                             <div class="form-group">
-                                <label>Saldo Atual</label>
-                                <input type="number" id="saldo" step="0.01" value="0">
+                                <label>Estoque Atual (Somente Leitura)</label>
+                                <input type="number" id="saldo" step="0.001" min="0" placeholder="0,000" 
+                                       readonly 
+                                       style="background-color: #f3f4f6; cursor: not-allowed; color: #6b7280;">
+                                <small style="color: #ef4444; font-size: 12px; display: block; margin-top: 4px;">
+                                    ⚠️ O saldo só pode ser alterado através de movimentações de estoque
+                                </small>
                             </div>
                         </div>
 
@@ -457,9 +430,9 @@
 
     <script src="js/produtos.js"></script>
     <script>
-        // Função para voltar à página anterior
+        // ✅ CORREÇÃO: Função voltarPagina() agora vai DIRETO para dashboard.html
         function voltarPagina() {
-            window.history.back();
+            window.location.href = 'dashboard.html';
         }
     </script>
 </body>
