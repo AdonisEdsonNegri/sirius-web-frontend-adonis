@@ -49,7 +49,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
     }
     
-    document.getElementById('userName').textContent = usuario.nome;
+    // ✅ CORREÇÃO: NÃO tenta mais atualizar userName (não existe no HTML)
+    // A linha abaixo foi REMOVIDA pois causava erro:
+    // document.getElementById('userName').textContent = usuario.nome;
     
     // Inicializar pedido
     await inicializarPedido();
@@ -186,10 +188,9 @@ function configurarEventos() {
         }, 300);
     });
     
-    // CORREÇÃO 1: Fechar modais ao clicar fora - SÓ NO BACKDROP
+    // Fechar modais ao clicar fora
     document.querySelectorAll('.modal').forEach(modal => {
         modal.addEventListener('click', (e) => {
-            // Só fecha se clicar EXATAMENTE no backdrop (não nos filhos)
             if (e.target === modal) {
                 modal.classList.remove('show');
             }
@@ -226,7 +227,6 @@ async function buscarProdutos(termo) {
         const data = await response.json();
         
         if (data.success) {
-            console.log(`🔍 ${data.data.length} produto(s) encontrado(s)`);
             renderizarResultadosProdutos(data.data);
         } else {
             console.error('Erro ao buscar produtos:', data);
@@ -259,20 +259,16 @@ function renderizarResultadosProdutos(produtos) {
 
 // ===== ADICIONAR PRODUTO =====
 function adicionarProduto(produto) {
-    console.log('🔍 adicionarProduto chamado com:', produto);
-    
     // Verificar se já existe
     const itemExistente = pedidoAtual.itens.find(i => i.id_produto === produto.id);
-    console.log('🔍 Item já existe?', itemExistente);
     
     if (itemExistente) {
         // Incrementar quantidade
         itemExistente.quantidade++;
         itemExistente.valor_total = itemExistente.quantidade * itemExistente.valor_unitario;
-        console.log('✅ Quantidade atualizada:', itemExistente.quantidade);
     } else {
         // Adicionar novo item
-        const novoItem = {
+        pedidoAtual.itens.push({
             id_produto: produto.id,
             codigo: produto.codigo,
             ean: produto.ean,
@@ -283,11 +279,7 @@ function adicionarProduto(produto) {
             valor_unitario: parseFloat(produto.preco),
             valor_total: parseFloat(produto.preco),
             estoque: parseFloat(produto.estoque)
-        };
-        
-        console.log('➕ Adicionando novo item:', novoItem);
-        pedidoAtual.itens.push(novoItem);
-        console.log('📦 Total de itens no pedido:', pedidoAtual.itens.length);
+        });
     }
     
     // Limpar busca
@@ -295,9 +287,7 @@ function adicionarProduto(produto) {
     document.getElementById('resultadosBusca').innerHTML = '';
     
     // Atualizar interface
-    console.log('🔄 Chamando renderizarItens()');
     renderizarItens();
-    console.log('🔄 Chamando calcularTotais()');
     calcularTotais();
     
     // Focar novamente no input de busca
@@ -306,65 +296,54 @@ function adicionarProduto(produto) {
     }, 100);
 }
 
+// ===== RENDERIZAR ITENS =====
 function renderizarItens() {
-    console.log('🔄 renderizarItens() executado - Total de itens:', pedidoAtual.itens.length);
-    
     const tbody = document.getElementById('itensTabela');
-    const badge = document.getElementById('quantidadeItens');
-    
-    badge.textContent = `${pedidoAtual.itens.length} itens`;
     
     if (pedidoAtual.itens.length === 0) {
-        console.log('📭 Nenhum item - mostrando mensagem vazia');
         tbody.innerHTML = `
-            <tr>
-                <td colspan="7" class="empty-state">
+            <tr class="empty-state">
+                <td colspan="6">
                     <div class="empty-message">Nenhum item adicionado</div>
                 </td>
             </tr>
         `;
+        document.getElementById('quantidadeItens').textContent = '0 itens';
         return;
     }
-    
-    console.log('📦 Renderizando itens:', pedidoAtual.itens);
     
     tbody.innerHTML = pedidoAtual.itens.map((item, index) => `
         <tr>
             <td class="item-seq">${index + 1}</td>
             <td>
                 <div class="item-nome">${item.descricao}</div>
-                <div class="item-codigo">Cód: ${item.codigo}</div>
+                ${item.codigo ? `<div class="item-codigo">Cód: ${item.codigo}</div>` : ''}
             </td>
-            <td class="item-qtd">${parseFloat(item.quantidade).toFixed(3)}</td>
-            <td class="item-valor">R$ ${parseFloat(item.valor_unitario).toFixed(2)}</td>
-            <td class="item-valor"><strong>R$ ${parseFloat(item.valor_total).toFixed(2)}</strong></td>
+            <td class="item-qtd">${item.quantidade.toFixed(3)}</td>
+            <td class="item-valor">R$ ${item.valor_unitario.toFixed(2)}</td>
+            <td class="item-valor">R$ ${item.valor_total.toFixed(2)}</td>
             <td class="item-acoes">
-                <button class="btn-action" onclick="editarItem(${index})" title="Editar quantidade">✏️</button>
+                <button class="btn-action" onclick="editarQuantidade(${index})" title="Editar Quantidade">✏️</button>
                 <button class="btn-action" onclick="removerItem(${index})" title="Remover">🗑️</button>
             </td>
         </tr>
     `).join('');
+    
+    document.getElementById('quantidadeItens').textContent = `${pedidoAtual.itens.length} ${pedidoAtual.itens.length === 1 ? 'item' : 'itens'}`;
 }
 
-function editarItem(index) {
-    itemEmEdicao = index;
+// ===== EDITAR QUANTIDADE =====
+function editarQuantidade(index) {
     const item = pedidoAtual.itens[index];
+    itemEmEdicao = index;
     
-    // IDs CORRETOS do HTML
     document.getElementById('nomeProdutoModal').textContent = item.descricao;
-    document.getElementById('estoqueProdutoModal').textContent = `Estoque: ${item.estoque.toFixed(3)}`;
+    document.getElementById('estoqueProdutoModal').textContent = `Estoque disponível: ${item.estoque.toFixed(3)} ${item.unidade}`;
     document.getElementById('novaQuantidade').value = item.quantidade;
     
     document.getElementById('modalQuantidade').classList.add('show');
-    setTimeout(() => {
-        document.getElementById('novaQuantidade').select();
-    }, 100);
-}
-
-// CORREÇÃO: Funções do modal de quantidade
-function fecharModalQuantidade() {
-    document.getElementById('modalQuantidade').classList.remove('show');
-    itemEmEdicao = null;
+    document.getElementById('novaQuantidade').focus();
+    document.getElementById('novaQuantidade').select();
 }
 
 function confirmarQuantidade() {
@@ -375,23 +354,13 @@ function confirmarQuantidade() {
         return;
     }
     
-    if (itemEmEdicao === null) {
-        showMessage('Nenhum item selecionado', 'error');
-        return;
-    }
-    
     const item = pedidoAtual.itens[itemEmEdicao];
     
-    // Validar estoque
     if (novaQtd > item.estoque) {
-        showMessage(
-            `Estoque insuficiente. Disponível: ${item.estoque.toFixed(3)}`,
-            'error'
-        );
+        showMessage(`Estoque insuficiente. Disponível: ${item.estoque.toFixed(3)}`, 'error');
         return;
     }
     
-    // Atualizar quantidade
     item.quantidade = novaQtd;
     item.valor_total = item.quantidade * item.valor_unitario;
     
@@ -400,6 +369,12 @@ function confirmarQuantidade() {
     fecharModalQuantidade();
 }
 
+function fecharModalQuantidade() {
+    document.getElementById('modalQuantidade').classList.remove('show');
+    itemEmEdicao = null;
+}
+
+// ===== REMOVER ITEM =====
 function removerItem(index) {
     pedidoAtual.itens.splice(index, 1);
     renderizarItens();
@@ -408,12 +383,8 @@ function removerItem(index) {
 
 // ===== CALCULAR TOTAIS =====
 function calcularTotais() {
-    console.log('💰 calcularTotais() executado');
     pedidoAtual.valor_bruto = pedidoAtual.itens.reduce((sum, item) => sum + item.valor_total, 0);
     pedidoAtual.valor_liquido = pedidoAtual.valor_bruto - pedidoAtual.desconto + pedidoAtual.acrescimo;
-    
-    console.log('💰 Valor bruto:', pedidoAtual.valor_bruto.toFixed(2));
-    console.log('💰 Valor líquido:', pedidoAtual.valor_liquido.toFixed(2));
     
     document.getElementById('subtotal').textContent = `R$ ${pedidoAtual.valor_bruto.toFixed(2)}`;
     document.getElementById('desconto').textContent = `R$ ${pedidoAtual.desconto.toFixed(2)}`;
@@ -426,6 +397,12 @@ function calcularTotais() {
 // ===== BUSCAR CLIENTES =====
 async function buscarClientes(termo) {
     try {
+        if (!termo || termo.trim().length < 2) {
+            document.getElementById('resultadosBuscaCliente').innerHTML = 
+                '<div class="empty-message">Digite pelo menos 2 caracteres para buscar</div>';
+            return;
+        }
+        
         const response = await fetch(
             `${API_URL}/pdv/clientes/buscar?termo=${encodeURIComponent(termo)}`,
             {
@@ -442,9 +419,13 @@ async function buscarClientes(termo) {
             renderizarResultadosClientes(data.data);
         } else {
             console.error('Erro ao buscar clientes:', data);
+            document.getElementById('resultadosBuscaCliente').innerHTML = 
+                '<div class="empty-message">Erro ao buscar clientes</div>';
         }
     } catch (error) {
         console.error('Erro ao buscar clientes:', error);
+        document.getElementById('resultadosBuscaCliente').innerHTML = 
+            '<div class="empty-message">Erro ao buscar clientes</div>';
     }
 }
 
@@ -456,28 +437,7 @@ function renderizarResultadosClientes(clientes) {
         return;
     }
     
-    // CORREÇÃO EXTRA: Filtrar no frontend também para garantir
-    const termoBusca = document.getElementById('inputBuscaCliente').value.trim().toLowerCase();
-    const clientesFiltrados = clientes.filter(c => {
-        const razaoSocial = (c.razao_social || '').toLowerCase();
-        const nomeFantasia = (c.nome_fantasia || '').toLowerCase();
-        const documento = (c.documento || '').toLowerCase();
-        const cpf = (c.cpf || '').replace(/\D/g, '');
-        const cnpj = (c.cnpj || '').replace(/\D/g, '');
-        
-        return razaoSocial.includes(termoBusca) ||
-               nomeFantasia.includes(termoBusca) ||
-               documento.includes(termoBusca) ||
-               cpf.includes(termoBusca) ||
-               cnpj.includes(termoBusca);
-    });
-    
-    if (clientesFiltrados.length === 0) {
-        container.innerHTML = '<div class="empty-message">Nenhum cliente encontrado com este termo</div>';
-        return;
-    }
-    
-    container.innerHTML = clientesFiltrados.map(c => `
+    container.innerHTML = clientes.map(c => `
         <div class="resultado-item" onclick="selecionarCliente(${JSON.stringify(c).replace(/"/g, '&quot;')})">
             <div class="resultado-nome">${c.razao_social}</div>
             <div class="resultado-info">
@@ -557,9 +517,8 @@ function abrirModalPagamento() {
         return;
     }
     
-    // CORREÇÃO 2: Calcular valor restante descontando o troco dos pagamentos já feitos
-    const totalPagoEfetivo = pedidoAtual.pagamentos.reduce((sum, p) => sum + (p.valor - (p.troco || 0)), 0);
-    const valorRestante = pedidoAtual.valor_liquido - totalPagoEfetivo;
+    const valorRestante = pedidoAtual.valor_liquido - 
+        pedidoAtual.pagamentos.reduce((sum, p) => sum + p.valor, 0);
     
     document.getElementById('valorPagamento').value = valorRestante.toFixed(2);
     document.getElementById('valorTroco').value = '';
@@ -574,59 +533,48 @@ function fecharModalPagamento() {
 }
 
 function calcularTroco() {
-    const formaSelecionada = formasPagamento.find(f => 
-        f.id == document.getElementById('formaPagamento').value
-    );
+    const formaSelecionada = formasPagamento.find(f => f.id == document.getElementById('formaPagamento').value);
     
     if (!formaSelecionada || !formaSelecionada.permite_troco) {
         return;
     }
     
+    const valorRestante = pedidoAtual.valor_liquido - 
+        pedidoAtual.pagamentos.reduce((sum, p) => sum + p.valor, 0);
+    
     const valorPago = parseFloat(document.getElementById('valorPagamento').value) || 0;
+    const troco = valorPago - valorRestante;
     
-    // CORREÇÃO 2: Calcular valor restante descontando o troco dos pagamentos já feitos
-    const totalPagoEfetivo = pedidoAtual.pagamentos.reduce((sum, p) => sum + (p.valor - (p.troco || 0)), 0);
-    const valorRestante = pedidoAtual.valor_liquido - totalPagoEfetivo;
-    
-    const troco = Math.max(0, valorPago - valorRestante);
-    document.getElementById('valorTroco').value = troco.toFixed(2);
+    document.getElementById('valorTroco').value = troco > 0 ? troco.toFixed(2) : '0.00';
 }
 
 function adicionarPagamento() {
     const idForma = document.getElementById('formaPagamento').value;
-    const valor = parseFloat(document.getElementById('valorPagamento').value);
+    const valorStr = document.getElementById('valorPagamento').value;
     
     if (!idForma) {
         showMessage('Selecione uma forma de pagamento', 'error');
         return;
     }
     
+    const valor = parseFloat(valorStr);
     if (!valor || valor <= 0) {
-        showMessage('Informe um valor válido', 'error');
+        showMessage('Valor inválido', 'error');
         return;
     }
     
-    const formaSelecionada = formasPagamento.find(f => f.id == idForma);
-    
-    // Validar se a forma de pagamento foi encontrada
-    if (!formaSelecionada) {
-        showMessage('Forma de pagamento não encontrada. Tente recarregar a página.', 'error');
-        return;
-    }
-    
-    const troco = formaSelecionada.permite_troco ? 
-        parseFloat(document.getElementById('valorTroco').value) || 0 : 0;
+    const forma = formasPagamento.find(f => f.id == idForma);
+    const troco = forma.permite_troco ? parseFloat(document.getElementById('valorTroco').value) || 0 : 0;
     
     pedidoAtual.pagamentos.push({
-        id_forma_pagamento: parseInt(idForma),
-        descricao: formaSelecionada.descricao,
+        id_forma_pagamento: forma.id,
+        descricao: forma.descricao,
         valor: valor,
-        troco: troco,
-        permite_troco: formaSelecionada.permite_troco
+        troco: troco
     });
     
     renderizarPagamentos();
-    atualizarStatusPagamento();
+    calcularTotais();
     fecharModalPagamento();
 }
 
@@ -653,72 +601,39 @@ function renderizarPagamentos() {
 function removerPagamento(index) {
     pedidoAtual.pagamentos.splice(index, 1);
     renderizarPagamentos();
-    atualizarStatusPagamento();
+    calcularTotais();
 }
 
 function atualizarStatusPagamento() {
-    // CORREÇÃO 2: Total pago EFETIVO = valor - troco
-    const totalPago = pedidoAtual.pagamentos.reduce((sum, p) => sum + (p.valor - (p.troco || 0)), 0);
+    const totalPago = pedidoAtual.pagamentos.reduce((sum, p) => sum + p.valor, 0);
     const faltante = pedidoAtual.valor_liquido - totalPago;
     
     document.getElementById('totalPago').textContent = `R$ ${totalPago.toFixed(2)}`;
     document.getElementById('valorFaltante').textContent = `R$ ${Math.max(0, faltante).toFixed(2)}`;
     
-    // Habilitar/desabilitar botão finalizar
     const btnFinalizar = document.getElementById('btnFinalizar');
-    if (faltante <= 0.01 && pedidoAtual.itens.length > 0) {
-        btnFinalizar.disabled = false;
-        btnFinalizar.style.opacity = '1';
-    } else {
+    if (faltante > 0.01) {
         btnFinalizar.disabled = true;
         btnFinalizar.style.opacity = '0.5';
+    } else {
+        btnFinalizar.disabled = false;
+        btnFinalizar.style.opacity = '1';
     }
 }
 
 // ===== FINALIZAR PEDIDO =====
 async function finalizarPedido() {
-    console.log('🔍 Iniciando finalização do pedido...');
-    console.log('📦 Dados do pedido:', JSON.stringify(pedidoAtual, null, 2));
-    
     // Validações
-    if (!pedidoAtual.cliente || !pedidoAtual.cliente.id) {
-        console.error('❌ Cliente não selecionado');
-        showMessage('Nenhum cliente selecionado. Por favor, selecione um cliente.', 'error');
-        return;
-    }
-    console.log('✅ Cliente validado:', pedidoAtual.cliente);
-    
     if (pedidoAtual.itens.length === 0) {
-        console.error('❌ Nenhum item no pedido');
         showMessage('Adicione itens ao pedido', 'error');
         return;
     }
-    console.log('✅ Itens validados:', pedidoAtual.itens.length);
     
-    if (pedidoAtual.pagamentos.length === 0) {
-        console.error('❌ Nenhum pagamento');
-        showMessage('Adicione pelo menos uma forma de pagamento', 'error');
-        return;
-    }
-    console.log('✅ Pagamentos validados:', pedidoAtual.pagamentos.length);
+    const totalPago = pedidoAtual.pagamentos.reduce((sum, p) => sum + p.valor, 0);
+    const faltante = pedidoAtual.valor_liquido - totalPago;
     
-    // CORREÇÃO 2: Validar com total pago efetivo (descontando troco)
-    const totalPago = pedidoAtual.pagamentos.reduce((sum, p) => sum + (p.valor - (p.troco || 0)), 0);
-    const diferenca = Math.abs(totalPago - pedidoAtual.valor_liquido);
-    
-    console.log('💰 Total do pedido:', pedidoAtual.valor_liquido.toFixed(2));
-    console.log('💵 Total pago efetivo:', totalPago.toFixed(2));
-    console.log('📊 Diferença:', diferenca.toFixed(2));
-    
-    if (diferenca > 0.01) {
-        console.error('❌ Total pago não confere');
-        showMessage(
-            `O total dos pagamentos não confere com o valor do pedido.\n` +
-            `Valor do pedido: R$ ${pedidoAtual.valor_liquido.toFixed(2)}\n` +
-            `Total pago (descontado troco): R$ ${totalPago.toFixed(2)}\n` +
-            `Diferença: R$ ${diferenca.toFixed(2)}`,
-            'error'
-        );
+    if (faltante > 0.01) {
+        showMessage(`Faltam R$ ${faltante.toFixed(2)} para completar o pagamento`, 'error');
         return;
     }
     
@@ -756,7 +671,6 @@ async function finalizarPedido() {
         const data = await response.json();
         
         if (data.success) {
-            // CORREÇÃO 3: Mostrar relatório do pedido
             mostrarRelatorioPedido(data.data);
         } else {
             throw new Error(data.message || 'Erro ao finalizar pedido');
@@ -790,7 +704,6 @@ async function novoPedido() {
     document.getElementById('buscaProduto').value = '';
     document.getElementById('resultadosBusca').innerHTML = '';
     
-    // CORREÇÃO 1: Resetar botão finalizar
     const btnFinalizar = document.getElementById('btnFinalizar');
     btnFinalizar.disabled = false;
     btnFinalizar.textContent = '✅ Finalizar Pedido';
@@ -809,7 +722,6 @@ async function novoPedido() {
 
 // ===== RELATÓRIO DO PEDIDO =====
 function mostrarRelatorioPedido(pedidoFinalizado) {
-    // CORREÇÃO: Limpar dados do pedido ANTES de mostrar o relatório
     const dadosPedidoParaRelatorio = {
         numero: pedidoAtual.numero,
         cliente: {...pedidoAtual.cliente},
@@ -827,8 +739,6 @@ function mostrarRelatorioPedido(pedidoFinalizado) {
     limparPedidoAtual();
     
     const modal = document.getElementById('modalRelatorioPedido');
-    
-    // Usar dados salvos ou dados do servidor
     const dados = pedidoFinalizado.pedido || pedidoFinalizado || dadosPedidoParaRelatorio;
     
     // Cabeçalho
@@ -884,7 +794,6 @@ function mostrarRelatorioPedido(pedidoFinalizado) {
 }
 
 function limparPedidoAtual() {
-    // Resetar estado do pedido
     pedidoAtual = {
         numero: null,
         cliente: null,
@@ -897,18 +806,9 @@ function limparPedidoAtual() {
         observacoes: ''
     };
     
-    // Limpar interface
     document.getElementById('observacoes').value = '';
     document.getElementById('buscaProduto').value = '';
     document.getElementById('resultadosBusca').innerHTML = '';
-    
-    // CORREÇÃO: Resetar botão finalizar
-    const btnFinalizar = document.getElementById('btnFinalizar');
-    if (btnFinalizar) {
-        btnFinalizar.disabled = false;
-        btnFinalizar.textContent = '✅ Finalizar Pedido';
-        btnFinalizar.style.opacity = '1';
-    }
     
     renderizarItens();
     renderizarPagamentos();
@@ -918,7 +818,6 @@ function limparPedidoAtual() {
 
 function fecharRelatorioPedido() {
     document.getElementById('modalRelatorioPedido').classList.remove('show');
-    // Iniciar novo pedido automaticamente
     inicializarPedido();
     document.getElementById('buscaProduto').focus();
 }
@@ -933,7 +832,6 @@ function showMessage(mensagem, tipo = 'info', callback = null) {
     const titulo = document.getElementById('mensagemTitulo');
     const texto = document.getElementById('mensagemTexto');
     
-    // Definir título baseado no tipo
     switch(tipo) {
         case 'success':
             titulo.textContent = '✅ Sucesso';
@@ -955,7 +853,6 @@ function showMessage(mensagem, tipo = 'info', callback = null) {
     texto.textContent = mensagem;
     modal.classList.add('show');
     
-    // Se houver callback, executar ao fechar
     if (callback) {
         modal.dataset.callback = 'temp';
         window.tempCallback = callback;
@@ -966,7 +863,6 @@ function fecharModalMensagem() {
     const modal = document.getElementById('modalMensagem');
     modal.classList.remove('show');
     
-    // Executar callback se houver
     if (modal.dataset.callback && window.tempCallback) {
         const cb = window.tempCallback;
         delete window.tempCallback;
