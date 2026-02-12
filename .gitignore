@@ -1,0 +1,262 @@
+# =====================================================
+# SIRIUS WEB - Frontend .gitignore
+# =====================================================
+# Este arquivo define quais arquivos/pastas o Git deve ignorar
+# Última atualização: 09/02/2026
+
+# =====================================================
+# SISTEMA OPERACIONAL
+# =====================================================
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+[Dd]esktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+# =====================================================
+# IDEs e EDITORES
+# =====================================================
+
+# Visual Studio Code
+.vscode/
+*.code-workspace
+.history/
+
+# JetBrains (WebStorm, IntelliJ, PhpStorm)
+.idea/
+*.iml
+*.ipr
+*.iws
+.idea_modules/
+atlassian-ide-plugin.xml
+com_crashlytics_export_strings.xml
+crashlytics.properties
+crashlytics-build.properties
+fabric.properties
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+*.tmlanguage.cache
+*.tmPreferences.cache
+*.stTheme.cache
+*.sublime-workspace
+
+# Vim
+[._]*.s[a-v][a-z]
+[._]*.sw[a-p]
+[._]s[a-rt-v][a-z]
+[._]ss[a-gi-z]
+[._]sw[a-p]
+Session.vim
+Sessionx.vim
+.netrwhist
+tags
+[._]*.un~
+
+# Emacs
+*~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+*.elc
+auto-save-list
+tramp
+.\#*
+.org-id-locations
+*_archive
+*_flymake.*
+/eshell/history
+/eshell/lastdir
+/elpa/
+*.rel
+/auto/
+.cask/
+dist/
+flycheck_*.el
+/server/
+.projectile
+.dir-locals.el
+/network-security.data
+
+# Atom
+.atom/
+nohup.out
+
+# Notepad++
+*.bak
+
+# =====================================================
+# ARQUIVOS TEMPORÁRIOS E BACKUPS
+# =====================================================
+
+# Backups gerais
+*.bak
+*.backup
+*.old
+*.orig
+*.tmp
+*.temp
+*~
+*.cache
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.npm
+.yarn-integrity
+
+# =====================================================
+# NODE.JS (caso use ferramentas de build no futuro)
+# =====================================================
+
+# Dependências
+node_modules/
+jspm_packages/
+bower_components/
+
+# Lock files (opcional - alguns projetos preferem commitar)
+# Descomente se não quiser versionar:
+# package-lock.json
+# yarn.lock
+# pnpm-lock.yaml
+
+# Arquivos de npm/yarn
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+.npm
+.yarn-integrity
+.pnp.*
+.pnp.js
+
+# =====================================================
+# BUILD E DIST (caso use preprocessadores)
+# =====================================================
+
+# Diretórios de build
+dist/
+build/
+out/
+.cache/
+.parcel-cache/
+.next/
+.nuxt/
+.vuepress/dist
+.serverless/
+.fusebox/
+.dynamodb/
+.tern-port
+.vscode-test
+
+# Coverage (testes)
+coverage/
+*.lcov
+.nyc_output/
+lib-cov
+
+# =====================================================
+# AMBIENTE E CREDENCIAIS
+# =====================================================
+
+# Variáveis de ambiente (NUNCA commitar!)
+.env
+.env.local
+.env.development
+.env.development.local
+.env.test
+.env.test.local
+.env.production
+.env.production.local
+.env.*.local
+
+# Configurações locais
+config.local.js
+config.local.json
+*.local.js
+
+# Chaves e certificados
+*.key
+*.pem
+*.crt
+*.cer
+*.p12
+*.pfx
+
+# =====================================================
+# ESPECÍFICO DO PROJETO
+# =====================================================
+
+# Arquivos de teste locais (se criar)
+test-local/
+*.test.local.*
+
+# Documentação temporária
+docs-temp/
+
+# Arquivos de exemplo locais
+*.example.local.*
+
+# =====================================================
+# OUTROS
+# =====================================================
+
+# Thumbnails
+._*
+
+# Files that might appear in the root of a volume
+.DocumentRevisions-V100
+.fseventsd
+.TemporaryItems
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+
+# Directories potentially created on remote AFP share
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+# =====================================================
+# FIM DO .gitignore
+# =====================================================
