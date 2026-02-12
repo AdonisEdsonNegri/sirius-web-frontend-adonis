@@ -1,10 +1,6 @@
 // =====================================================
-// SIRIUS WEB - Movimentações de Estoque
+// SIRIUS WEB - Movimentações de Estoque - VERSÃO CORRIGIDA
 // =====================================================
-
-// Configuração
-//const API_URL = 'https://sirius-web-api-adonis.vercel.app';
-//const API_URL = 'http://localhost:3000';
 
 const isDev = window.location.hostname === 'localhost' 
            || window.location.hostname === '127.0.0.1'
@@ -13,7 +9,6 @@ const isDev = window.location.hostname === 'localhost'
 
 const API_URL = isDev ? 'http://localhost:3000' : 'https://sirius-web-api-adonis.vercel.app';
 
-// Estado da aplicação
 let state = {
     produtoId: null,
     produto: null,
@@ -29,9 +24,6 @@ let state = {
     tipoMovimentacao: null
 };
 
-// =====================================================
-// AUTENTICAÇÃO
-// =====================================================
 function checkAuth() {
     const token = localStorage.getItem('sirius_token');
     if (!token) {
@@ -48,22 +40,18 @@ function logout() {
     window.location.href = 'index.html';
 }
 
+// ✅ CORREÇÃO: Navegar direto sem usar history.back()
 function voltarProdutos() {
     window.location.href = 'produtos.html';
 }
 
-// =====================================================
-// INICIALIZAÇÃO
-// =====================================================
 async function init() {
     const token = checkAuth();
     if (!token) return;
 
-    // Atualizar nome do usuário
     const usuario = JSON.parse(localStorage.getItem('sirius_usuario'));
     document.getElementById('userName').textContent = usuario.nome;
 
-    // Pegar ID do produto da URL
     const urlParams = new URLSearchParams(window.location.search);
     state.produtoId = urlParams.get('id');
 
@@ -73,13 +61,9 @@ async function init() {
         return;
     }
 
-    // Carregar movimentações
     await loadMovimentacoes();
 }
 
-// =====================================================
-// CARREGAR MOVIMENTAÇÕES
-// =====================================================
 async function loadMovimentacoes() {
     const token = checkAuth();
     const empresas = JSON.parse(localStorage.getItem('sirius_empresas'));
@@ -99,17 +83,28 @@ async function loadMovimentacoes() {
         const data = await response.json();
 
         if (response.ok && data.success) {
-            // Atualizar produto
             state.produto = data.data.produto;
-            document.getElementById('produtoDescricao').textContent = state.produto.descricao;
-            document.getElementById('produtoSaldo').textContent = formatNumber(state.produto.saldo_atual);
-            document.getElementById('modalProdutoDescricao').textContent = state.produto.descricao;
+            
+            // ✅ CORREÇÃO: Verificar se elemento existe E se produto foi carregado
+            const descEl = document.getElementById('produtoDescricao');
+            if (descEl && state.produto) {
+                descEl.textContent = state.produto.descricao;
+            }
+            
+            const saldoEl = document.getElementById('produtoSaldo');
+            if (saldoEl && state.produto) {
+                saldoEl.textContent = formatNumber(state.produto.saldo_atual);
+            }
+            
+            // ✅ CORREÇÃO: Este elemento pode não existir quando modal está fechado
+            const modalDescEl = document.getElementById('modalProdutoDescricao');
+            if (modalDescEl && state.produto) {
+                modalDescEl.textContent = state.produto.descricao;
+            }
 
-            // Atualizar movimentações
             state.movimentacoes = data.data.movimentacoes;
             state.pagination = data.pagination;
 
-            // Renderizar view atual
             if (state.currentView === 'grid') {
                 renderGridView();
             } else {
@@ -143,9 +138,6 @@ async function loadMovimentacoes() {
     }
 }
 
-// =====================================================
-// RENDERIZAR GRID VIEW
-// =====================================================
 function renderGridView() {
     const tbody = document.getElementById('tableBody');
 
@@ -178,9 +170,6 @@ function renderGridView() {
     `).join('');
 }
 
-// =====================================================
-// RENDERIZAR DETAIL VIEW
-// =====================================================
 function renderDetailView() {
     const container = document.getElementById('detailCards');
 
@@ -201,58 +190,37 @@ function renderDetailView() {
                     <span class="badge ${mov.tipo === 'ENTRADA' ? 'badge-entrada' : 'badge-saida'}">
                         ${mov.tipo === 'ENTRADA' ? '📥 Entrada' : '📤 Saída'}
                     </span>
+                    <span>${formatDateTime(mov.data)}</span>
                 </div>
-                <div style="font-size: 14px; color: #6b7280;">
-                    ${formatDateTime(mov.data)}
+                <div class="detail-quantidade">
+                    ${formatNumber(mov.quantidade)}
                 </div>
             </div>
-
-            <div class="detail-info">
-                <div class="detail-field">
-                    <span class="detail-label">Quantidade</span>
-                    <span class="detail-value" style="font-weight: 600; font-size: 16px;">
-                        ${formatNumber(mov.quantidade)}
-                    </span>
-                </div>
-
+            <div class="detail-body">
                 <div class="detail-field">
                     <span class="detail-label">Saldo Anterior</span>
                     <span class="detail-value">${formatNumber(mov.saldo_anterior)}</span>
                 </div>
-
                 <div class="detail-field">
                     <span class="detail-label">Saldo Atual</span>
-                    <span class="detail-value" style="font-weight: 600; color: #059669;">
-                        ${formatNumber(mov.saldo_atual)}
-                    </span>
+                    <span class="detail-value" style="color: #059669; font-weight: 600;">${formatNumber(mov.saldo_atual)}</span>
                 </div>
-
                 <div class="detail-field">
                     <span class="detail-label">Usuário</span>
                     <span class="detail-value">${mov.usuario || '-'}</span>
                 </div>
-
-                ${mov.nota_fiscal ? `
-                    <div class="detail-field">
-                        <span class="detail-label">Nota Fiscal</span>
-                        <span class="detail-value">${mov.nota_fiscal}</span>
-                    </div>
-                ` : ''}
-
                 ${mov.pedido_venda_id ? `
                     <div class="detail-field">
                         <span class="detail-label">Pedido Venda</span>
                         <span class="detail-value">#${mov.pedido_venda_id}</span>
                     </div>
                 ` : ''}
-
                 ${mov.pedido_compra_id ? `
                     <div class="detail-field">
                         <span class="detail-label">Pedido Compra</span>
                         <span class="detail-value">#${mov.pedido_compra_id}</span>
                     </div>
                 ` : ''}
-
                 ${mov.observacao ? `
                     <div class="detail-field" style="grid-column: 1 / -1;">
                         <span class="detail-label">Observação</span>
@@ -264,24 +232,17 @@ function renderDetailView() {
     `).join('');
 }
 
-// =====================================================
-// PAGINAÇÃO
-// =====================================================
 function renderPagination() {
     const start = (state.pagination.page - 1) * state.pagination.limit + 1;
     const end = Math.min(state.pagination.page * state.pagination.limit, state.pagination.total);
-
     const info = `Mostrando ${start} a ${end} de ${state.pagination.total} movimentações`;
 
     document.getElementById('paginationInfo').textContent = info;
     document.getElementById('paginationInfoDetail').textContent = info;
-
     document.getElementById('currentPageBtn').textContent = state.pagination.page;
     document.getElementById('currentPageBtnDetail').textContent = state.pagination.page;
-
     document.getElementById('btnPrevious').disabled = !state.pagination.hasPrev;
     document.getElementById('btnPreviousDetail').disabled = !state.pagination.hasPrev;
-
     document.getElementById('btnNext').disabled = !state.pagination.hasNext;
     document.getElementById('btnNextDetail').disabled = !state.pagination.hasNext;
 }
@@ -300,19 +261,14 @@ async function nextPage() {
     }
 }
 
-// =====================================================
-// VIEWS
-// =====================================================
 function setView(view) {
     state.currentView = view;
 
-    // Atualizar botões
     document.querySelectorAll('.view-btn').forEach(btn => {
         btn.classList.remove('active');
     });
     document.querySelector(`[data-view="${view}"]`).classList.add('active');
 
-    // Mostrar/esconder views
     if (view === 'grid') {
         document.getElementById('gridView').style.display = 'block';
         document.getElementById('detailView').style.display = 'none';
@@ -321,7 +277,6 @@ function setView(view) {
         document.getElementById('detailView').style.display = 'block';
     }
 
-    // Renderizar
     if (view === 'grid') {
         renderGridView();
     } else {
@@ -329,26 +284,17 @@ function setView(view) {
     }
 }
 
-// =====================================================
-// ORDENAÇÃO
-// =====================================================
 async function toggleOrdenacao() {
     state.orderDir = state.orderDir === 'asc' ? 'desc' : 'asc';
-
     document.getElementById('ordenacaoIcon').textContent = state.orderDir === 'asc' ? '⬆️' : '⬇️';
     document.getElementById('ordenacaoText').textContent = state.orderDir === 'asc' ? 'Crescente' : 'Decrescente';
-
     await loadMovimentacoes();
 }
 
-// =====================================================
-// DROPDOWN
-// =====================================================
 function toggleDropdown(dropdownId) {
     const dropdown = document.getElementById(dropdownId);
     const menu = dropdown.querySelector('.dropdown-menu');
     
-    // Fechar outros dropdowns
     document.querySelectorAll('.dropdown-menu').forEach(m => {
         if (m !== menu) m.classList.remove('show');
     });
@@ -356,7 +302,6 @@ function toggleDropdown(dropdownId) {
     menu.classList.toggle('show');
 }
 
-// Fechar dropdown ao clicar fora
 document.addEventListener('click', (e) => {
     if (!e.target.closest('.dropdown')) {
         document.querySelectorAll('.dropdown-menu').forEach(menu => {
@@ -365,25 +310,22 @@ document.addEventListener('click', (e) => {
     }
 });
 
-// =====================================================
-// MODAL MOVIMENTAÇÃO
-// =====================================================
 function abrirModalMovimentacao(tipo) {
     state.tipoMovimentacao = tipo;
-
     document.getElementById('modalTitle').textContent = tipo === 'ENTRADA' ? 'Entrada de Estoque' : 'Saída de Estoque';
     
-    // Mudar cor do botão
     const btnConfirmar = document.getElementById('btnConfirmarModal');
     btnConfirmar.className = tipo === 'ENTRADA' ? 'btn btn-success' : 'btn btn-danger';
     
-    // Limpar form
     document.getElementById('formMovimentacao').reset();
-
-    // Mostrar modal
     document.getElementById('modalMovimentacao').classList.add('show');
 
-    // Focar no campo quantidade
+    // ✅ CORREÇÃO: Atualizar descrição do produto no modal
+    const modalDescEl = document.getElementById('modalProdutoDescricao');
+    if (modalDescEl && state.produto) {
+        modalDescEl.textContent = state.produto.descricao;
+    }
+
     setTimeout(() => {
         document.getElementById('quantidade').focus();
     }, 100);
@@ -395,9 +337,6 @@ function fecharModal() {
     state.tipoMovimentacao = null;
 }
 
-// =====================================================
-// CONFIRMAR MOVIMENTAÇÃO
-// =====================================================
 async function confirmarMovimentacao() {
     const form = document.getElementById('formMovimentacao');
     
@@ -410,7 +349,7 @@ async function confirmarMovimentacao() {
     const observacao = document.getElementById('observacao').value.trim();
 
     if (quantidade <= 0) {
-        await siriusAlert('Quantidade deve ser maior que zero!');
+        await siriusAlert('Quantidade deve ser maior que zero!', 'Erro');
         return;
     }
 
@@ -423,8 +362,6 @@ async function confirmarMovimentacao() {
     const empresaId = empresas[0].id;
 
     try {
-        console.log('📤 Enviando movimentação:', { tipo: state.tipoMovimentacao, quantidade });
-        
         const response = await fetch(
             `${API_URL}/movimentacoes/produto/${state.produtoId}`,
             {
@@ -442,73 +379,33 @@ async function confirmarMovimentacao() {
             }
         );
 
-        console.log('📥 Status da resposta:', response.status, response.statusText);
+        const data = await response.json();
 
-        // Tentar parsear JSON
-        let data;
-        try {
-            const responseText = await response.text();
-            console.log('📄 Resposta recebida:', responseText);
-            data = JSON.parse(responseText);
-        } catch (parseError) {
-            console.error('❌ Erro ao parsear JSON:', parseError);
-            throw new Error('Resposta inválida do servidor');
-        }
-
-        console.log('📦 Dados parseados:', data);
-
-        // Verificar se deu certo
         if (response.ok && data.success) {
-            console.log('✅ Movimentação criada com sucesso!');
-            
-            // Fechar modal PRIMEIRO
             fecharModal();
-            
-            // Aguardar um pouco para garantir que modal fechou
-            await new Promise(resolve => setTimeout(resolve, 100));
-            
-            // Mostrar mensagem de sucesso
             await siriusAlert(data.message, 'Sucesso ✅');
-            
-            // Recarregar movimentações
-            try {
-                console.log('🔄 Recarregando movimentações...');
-                state.pagination.page = 1;
-                await loadMovimentacoes();
-                console.log('✅ Movimentações recarregadas');
-            } catch (reloadError) {
-                console.error('⚠️ Erro ao recarregar (movimentação foi criada):', reloadError);
-                // NÃO mostra erro para usuário - movimentação foi criada com sucesso
-            }
-
+            state.pagination.page = 1;
+            await loadMovimentacoes();
         } else {
-            // Resposta indica erro
-            console.error('❌ Erro reportado pelo servidor:', data);
             throw new Error(data.message || 'Erro ao criar movimentação');
         }
 
     } catch (error) {
-        console.error('❌ Erro no processo:', error);
+        console.error('❌ Erro:', error);
         await siriusAlert(error.message || 'Erro ao processar movimentação', 'Erro');
-
     } finally {
         btnConfirmar.disabled = false;
         btnConfirmar.textContent = 'Confirmar';
     }
 }
 
-// =====================================================
-// FORMATAÇÃO
-// =====================================================
 function formatNumber(value) {
-    return parseFloat(value).toLocaleString('pt-BR', {
-        minimumFractionDigits: 3,
-        maximumFractionDigits: 3
-    });
+    return parseFloat(value).toFixed(3).replace('.', ',');
 }
 
-function formatDateTime(dateString) {
-    const date = new Date(dateString);
+function formatDateTime(datetime) {
+    if (!datetime) return '-';
+    const date = new Date(datetime);
     return date.toLocaleString('pt-BR', {
         day: '2-digit',
         month: '2-digit',
@@ -518,16 +415,13 @@ function formatDateTime(dateString) {
     });
 }
 
-// =====================================================
-// MODAIS PERSONALIZADOS (Sirius Web Informa)
-// =====================================================
-function siriusAlert(mensagem, titulo = 'Sirius Web Informa') {
+function siriusAlert(mensagem, titulo = 'Atenção') {
     return new Promise((resolve) => {
-        const existente = document.getElementById('alertSirius');
+        const existente = document.getElementById('siriusAlert');
         if (existente) existente.remove();
         
         const overlay = document.createElement('div');
-        overlay.id = 'alertSirius';
+        overlay.id = 'siriusAlert';
         overlay.style.cssText = `
             position: fixed;
             top: 0;
@@ -549,14 +443,13 @@ function siriusAlert(mensagem, titulo = 'Sirius Web Informa') {
             box-shadow: 0 10px 40px rgba(0,0,0,0.3);
             max-width: 500px;
             width: 90%;
-            animation: slideDown 0.3s ease-out;
         `;
         
         box.innerHTML = `
-            <h3 style="color: #667eea; margin: 0 0 20px 0; font-size: 1.5em;">🏢 ${titulo}</h3>
+            <h3 style="color: #2563eb; margin: 0 0 20px 0; font-size: 1.5em;">${titulo}</h3>
             <p style="color: #333; font-size: 1.1em; margin: 0 0 25px 0; line-height: 1.5;">${mensagem}</p>
-            <button id="btnOkAlert" 
-                    style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+            <button onclick="document.getElementById('siriusAlert').remove()" 
+                    style="background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%); 
                            color: white; 
                            border: none; 
                            padding: 12px 30px; 
@@ -572,29 +465,20 @@ function siriusAlert(mensagem, titulo = 'Sirius Web Informa') {
         overlay.appendChild(box);
         document.body.appendChild(overlay);
         
-        const btnOk = document.getElementById('btnOkAlert');
-        
-        const fechar = () => {
-            overlay.remove();
-            resolve(true);
-        };
-        
-        btnOk.onclick = fechar;
-        
-        // ESC fecha
-        overlay.onkeydown = (e) => {
-            if (e.key === 'Escape') {
-                fechar();
+        overlay.addEventListener('click', (e) => {
+            if (e.target === overlay) {
+                overlay.remove();
+                resolve();
             }
-        };
+        });
         
-        // Focar botão
-        setTimeout(() => btnOk.focus(), 100);
+        box.querySelector('button').addEventListener('click', () => {
+            overlay.remove();
+            resolve();
+        });
     });
 }
 
-// =====================================================
-// INICIALIZAR
-// =====================================================
-init();
-console.log('🚀 Movimentações carregado');
+document.addEventListener('DOMContentLoaded', init);
+
+console.log('🚀 Movimentações carregado - VERSÃO CORRIGIDA ✅');

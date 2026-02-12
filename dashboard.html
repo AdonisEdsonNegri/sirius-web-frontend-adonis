@@ -69,135 +69,135 @@
             display: flex;
             gap: 8px;
             padding: 0 24px;
+            position: relative;
         }
 
-        .nav a {
+        .nav-content a {
             padding: 16px 20px;
             color: #6b7280;
             text-decoration: none;
-            font-weight: 500;
-            border-bottom: 3px solid transparent;
+            border-bottom: 2px solid transparent;
             transition: all 0.2s;
+            font-weight: 500;
         }
 
-        .nav a:hover {
+        .nav-content a:hover {
             color: #2563eb;
-            background: #f9fafb;
+            background: #f3f4f6;
         }
 
-        .nav a.active {
+        .nav-content a.active {
             color: #2563eb;
             border-bottom-color: #2563eb;
         }
 
-        /* Dropdown Navigation */
+        /* Dropdown Configurações */
         .nav-dropdown {
             position: relative;
-            display: inline-block;
         }
 
         .nav-dropdown-btn {
             padding: 16px 20px;
-            color: #6b7280;
-            text-decoration: none;
-            font-weight: 500;
-            border-bottom: 3px solid transparent;
-            transition: all 0.2s;
             background: none;
             border: none;
+            color: #6b7280;
+            font-weight: 500;
             cursor: pointer;
-            font-size: inherit;
-            font-family: inherit;
+            font-size: 14px;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
         }
 
         .nav-dropdown-btn:hover {
             color: #2563eb;
-            background: #f9fafb;
+            background: #f3f4f6;
         }
 
         .nav-dropdown-content {
             display: none;
             position: absolute;
-            background-color: white;
-            min-width: 200px;
-            box-shadow: 0px 8px 16px rgba(0,0,0,0.2);
-            z-index: 1;
-            border-radius: 8px;
-            overflow: hidden;
             top: 100%;
-            left: 0;
-        }
-
-        .nav-dropdown-content a {
-            color: #374151;
-            padding: 12px 16px;
-            text-decoration: none;
-            display: block;
-            transition: background 0.2s;
-            border-bottom: none;
-        }
-
-        .nav-dropdown-content a:hover {
-            background-color: #f3f4f6;
-            color: #2563eb;
+            right: 0;
+            background: white;
+            min-width: 200px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            border-radius: 6px;
+            margin-top: 4px;
+            z-index: 1000;
         }
 
         .nav-dropdown:hover .nav-dropdown-content {
             display: block;
         }
 
+        .nav-dropdown-content a {
+            display: block;
+            padding: 12px 16px;
+            color: #374151;
+            text-decoration: none;
+            border-bottom: none;
+        }
+
+        .nav-dropdown-content a:hover {
+            background: #f3f4f6;
+            color: #2563eb;
+        }
+
         /* Container */
         .container {
             max-width: 1200px;
-            margin: 0 auto;
-            padding: 24px;
+            margin: 32px auto;
+            padding: 0 24px;
         }
 
         /* Cards Grid */
         .cards-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
+            gap: 24px;
             margin-bottom: 32px;
         }
 
         .card {
             background: white;
-            padding: 24px;
             border-radius: 12px;
+            padding: 24px;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
 
         .card h3 {
-            color: #374151;
-            font-size: 16px;
+            color: #6b7280;
+            font-size: 14px;
+            font-weight: 600;
             margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .card-value {
             font-size: 32px;
-            font-weight: bold;
-            color: #2563eb;
-            margin: 12px 0;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 8px;
         }
 
         .card-info {
-            color: #6b7280;
+            color: #9ca3af;
             font-size: 14px;
         }
 
         /* Empresa Info */
         .empresa-info {
             background: white;
-            padding: 24px;
             border-radius: 12px;
+            padding: 24px;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
 
         .empresa-info h2 {
-            color: #374151;
+            color: #1f2937;
             font-size: 20px;
-            margin-bottom: 20px;
+            margin-bottom: 16px;
             padding-bottom: 12px;
             border-bottom: 2px solid #e5e7eb;
         }
@@ -261,7 +261,6 @@
             <a href="dashboard.html" class="active">Dashboard</a>
             <a href="produtos.html">Produtos</a>
             <a href="clientes.html">Clientes</a>
-            <a href="#" onclick="showMessage('Módulo Fornecedores em desenvolvimento!'); return false;">Fornecedores</a>
             <a href="pdv.html">PDV</a>
             <a href="pedidos.html">Pedidos</a>
             

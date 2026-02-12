@@ -266,6 +266,17 @@ function abrirFiltroCliente() {
     inputBusca.addEventListener('input', buscarClientesFiltro);
 }
 
+// =====================================================
+// NORMALIZAÇÃO DE TEXTO (para busca sem acentos)
+// =====================================================
+function normalizeText(text) {
+    if (!text) return '';
+    return text
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '');
+}
+
 async function buscarClientesFiltro() {
     const termo = document.getElementById('buscaCliente').value.trim();
     const resultadosDiv = document.getElementById('resultadosBuscaCliente');
@@ -288,13 +299,31 @@ async function buscarClientesFiltro() {
         
         const result = await response.json();
         
-        if (result.success && result.data.length > 0) {
-            resultadosDiv.innerHTML = result.data.map(cliente => `
-                <div class="item-busca" onclick="selecionarClienteFiltro(${cliente.id}, '${cliente.razao_social.replace(/'/g, "\\'")}')">
-                    <strong>${cliente.razao_social}</strong><br>
-                    <small>${cliente.documento || ''}</small>
-                </div>
-            `).join('');
+        if (result.success && result.data && result.data.length > 0) {
+            // Normalizar termo de busca
+            const termoNormalizado = normalizeText(termo);
+            
+            // Filtrar clientes usando normalização de texto
+            const clientesFiltrados = result.data.filter(cliente => {
+                const nomeNormalizado = normalizeText(cliente.razao_social || '');
+                const documentoNormalizado = normalizeText(cliente.documento || '');
+                const fantasiaNormalizado = normalizeText(cliente.nome_fantasia || '');
+                
+                return nomeNormalizado.includes(termoNormalizado) ||
+                       documentoNormalizado.includes(termoNormalizado) ||
+                       fantasiaNormalizado.includes(termoNormalizado);
+            });
+            
+            if (clientesFiltrados.length > 0) {
+                resultadosDiv.innerHTML = clientesFiltrados.map(cliente => `
+                    <div class="item-busca" onclick="selecionarClienteFiltro(${cliente.id}, '${cliente.razao_social.replace(/'/g, "\\'")}')">
+                        <strong>${cliente.razao_social}</strong><br>
+                        <small>${cliente.documento || ''}</small>
+                    </div>
+                `).join('');
+            } else {
+                resultadosDiv.innerHTML = '<div class="item-busca">Nenhum cliente encontrado</div>';
+            }
         } else {
             resultadosDiv.innerHTML = '<div class="item-busca">Nenhum cliente encontrado</div>';
         }
@@ -533,6 +562,61 @@ function imprimirPedidoAtual() {
 // GERAR RELATÓRIO DE PEDIDOS
 // =====================================================
 async function gerarRelatorioPedidos() {
+    // TÉCNICA: Abrir janela IMEDIATAMENTE (igual produtos/clientes)
+    const janelaRelatorio = window.open('', '_blank');
+    
+    if (!janelaRelatorio) {
+        mostrarMensagem('Popup bloqueado! Por favor, permita popups para este site.', 'error');
+        return;
+    }
+    
+    // Mostrar tela de carregamento enquanto busca dados
+    janelaRelatorio.document.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Gerando Relatório...</title>
+            <style>
+                body {
+                    font-family: Arial, sans-serif;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    height: 100vh;
+                    margin: 0;
+                    background: #f5f5f5;
+                }
+                .loading {
+                    text-align: center;
+                    font-size: 18px;
+                    color: #667eea;
+                }
+                .spinner {
+                    border: 4px solid #f3f3f3;
+                    border-top: 4px solid #667eea;
+                    border-radius: 50%;
+                    width: 40px;
+                    height: 40px;
+                    animation: spin 1s linear infinite;
+                    margin: 20px auto;
+                }
+                @keyframes spin {
+                    0% { transform: rotate(0deg); }
+                    100% { transform: rotate(360deg); }
+                }
+            </style>
+        </head>
+        <body>
+            <div class="loading">
+                <div class="spinner"></div>
+                <p>Gerando relatório de pedidos...</p>
+                <p style="font-size: 14px; color: #999;">Aguarde, buscando dados...</p>
+            </div>
+        </body>
+        </html>
+    `);
+    
     try {
         const empresaId = obterEmpresaId();
         const token = obterToken();
@@ -596,18 +680,21 @@ async function gerarRelatorioPedidos() {
                 }
             }
             
-            imprimirRelatorioPedidos(pedidosDetalhados);
+            // Preencher janela que já foi aberta com o relatório
+            imprimirRelatorioPedidos(pedidosDetalhados, janelaRelatorio);
         } else {
+            janelaRelatorio.close();
             mostrarMensagem('Nenhum pedido encontrado para o relatório', 'error');
         }
         
     } catch (error) {
         console.error('Erro ao gerar relatório:', error);
+        janelaRelatorio.close();
         mostrarMensagem('Erro ao gerar relatório: ' + error.message, 'error');
     }
 }
 
-function imprimirRelatorioPedidos(pedidos) {
+function imprimirRelatorioPedidos(pedidos, janelaRelatorio) {
     const dataAtual = new Date().toLocaleDateString('pt-BR', {
         day: '2-digit',
         month: '2-digit',
@@ -635,6 +722,9 @@ function imprimirRelatorioPedidos(pedidos) {
                 th { background: #f0f0f0; font-weight: bold; }
                 .totais { text-align: right; margin-top: 8px; font-weight: bold; }
                 .footer { margin-top: 20px; text-align: center; font-size: 8pt; color: #666; }
+                @media print {
+                    button { display: none; }
+                }
             </style>
         </head>
         <body>
@@ -739,18 +829,16 @@ function imprimirRelatorioPedidos(pedidos) {
             <div class="footer">
                 Relatório gerado pelo SIRIUS WEB ERP - Total de ${pedidos.length} pedido(s)
             </div>
+            <br>
+            <button onclick="window.print()" style="padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 5px; cursor: pointer;">🖨️ Imprimir</button>
         </body>
         </html>
     `;
     
-    const janelaImpressao = window.open('', '_blank');
-    janelaImpressao.document.write(html);
-    janelaImpressao.document.close();
-    janelaImpressao.focus();
-    
-    setTimeout(() => {
-        janelaImpressao.print();
-    }, 500);
+    // Preencher janela que já foi aberta
+    janelaRelatorio.document.open();
+    janelaRelatorio.document.write(html);
+    janelaRelatorio.document.close();
 }
 
 // =====================================================
@@ -894,6 +982,12 @@ function imprimirPedido(pedido) {
     `;
     
     const janelaImpressao = window.open('', '_blank');
+    
+    if (!janelaImpressao) {
+        mostrarMensagem('Popup bloqueado! Permita popups para este site e tente novamente.', 'error');
+        return;
+    }
+    
     janelaImpressao.document.write(html);
     janelaImpressao.document.close();
     janelaImpressao.focus();
