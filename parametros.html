@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIRIUS WEB - Parâmetros</title>
+    <link rel="stylesheet" href="css/parametros.css">
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="header-content">
+            <h1>SIRIUS WEB - Parâmetros</h1>
+            <div class="user-info">
+                <span id="userName">Carregando...</span>
+                <button class="btn-logout" onclick="logout()">Sair</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="nav">
+        <div class="nav-content">
+            <a href="dashboard.html">Dashboard</a>
+            <a href="produtos.html">Produtos</a>
+            <a href="clientes.html">Clientes</a>
+            <a href="#" onclick="showMessage('Módulo Fornecedores em desenvolvimento!'); return false;">Fornecedores</a>
+            <a href="pdv.html">PDV</a>
+            <a href="pedidos.html">Pedidos</a>
+            
+            <!-- Dropdown Configurações -->
+            <div class="nav-dropdown">
+                <button class="nav-dropdown-btn">⚙️ Configurações ▼</button>
+                <div class="nav-dropdown-content">
+                    <a href="vendedores.html">👨‍💼 Vendedores</a>
+                    <a href="formas-pagamento.html">💳 Formas de Pagamento</a>
+                    <a href="regimes-tributarios.html">📋 Regimes Tributários</a>
+                    <a href="parametros.html" class="active">⚙️ Parâmetros</a>
+                    <a href="#" onclick="showMessage('Módulo Caixas Cadastradas em desenvolvimento!'); return false;">💰 Caixas Cadastradas</a>
+                    <a href="#" onclick="showMessage('Módulo Usuários em desenvolvimento!'); return false;">👥 Usuários</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Container Principal -->
+    <div class="container">
+        
+        <!-- Toolbar -->
+        <div class="toolbar">
+            <h2>⚙️ Parâmetros do Sistema</h2>
+            <div class="toolbar-actions">
+                <button class="btn btn-primary" onclick="abrirModalNovo()">
+                    ➕ Novo Parâmetro
+                </button>
+            </div>
+        </div>
+
+        <!-- Filtros -->
+        <div class="filters-card">
+            <div class="filters">
+                <input 
+                    type="text" 
+                    id="filtroParametro" 
+                    placeholder="🔍 Buscar por identificador..."
+                    class="search-input"
+                >
+                <select id="filtroModulo" class="filter-select">
+                    <option value="">Todos os Módulos</option>
+                    <option value="PDV">PDV</option>
+                    <option value="NFCe">NFCe</option>
+                    <option value="Vendas">Vendas</option>
+                    <option value="Estoque">Estoque</option>
+                    <option value="Financeiro">Financeiro</option>
+                    <option value="Geral">Geral</option>
+                </select>
+                <input 
+                    type="text" 
+                    id="filtroTabela" 
+                    placeholder="Filtrar por tabela..."
+                    class="search-input"
+                >
+                <button class="btn btn-secondary" onclick="limparFiltros()">🔄 Limpar</button>
+            </div>
+            <div class="filters-info">
+                <span id="totalRegistros">0 parâmetros encontrados</span>
+            </div>
+        </div>
+
+        <!-- Grid de Parâmetros -->
+        <div class="parametros-grid" id="parametrosGrid">
+            <!-- Preenchido via JavaScript -->
+            <div class="loading">Carregando parâmetros...</div>
+        </div>
+
+        <!-- Paginação -->
+        <div class="pagination" id="paginacao">
+            <!-- Preenchido via JavaScript -->
+        </div>
+
+    </div>
+
+    <!-- Modal: Novo/Editar Parâmetro -->
+    <div id="modalParametro" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitulo">Novo Parâmetro</h3>
+                <span class="modal-close" onclick="fecharModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="formParametro" onsubmit="salvarParametro(event)">
+                    <input type="hidden" id="id_parametro">
+                    
+                    <div class="form-group">
+                        <label for="parametro">Identificador do Parâmetro *</label>
+                        <input 
+                            type="text" 
+                            id="parametro" 
+                            placeholder="Ex: PDV_CLIENTE_PADRAO"
+                            required
+                            maxlength="200"
+                        >
+                        <small>Use letras maiúsculas, números e underscore (_)</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="descricao">Descrição</label>
+                        <input 
+                            type="text" 
+                            id="descricao" 
+                            placeholder="Breve descrição do parâmetro"
+                            maxlength="500"
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="descricaocomplementar">Descrição Complementar</label>
+                        <textarea 
+                            id="descricaocomplementar" 
+                            placeholder="Informações adicionais sobre o parâmetro..."
+                            rows="3"
+                        ></textarea>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="modulo">Módulo</label>
+                            <select id="modulo">
+                                <option value="">Selecione...</option>
+                                <option value="PDV">PDV</option>
+                                <option value="NFCe">NFCe</option>
+                                <option value="Vendas">Vendas</option>
+                                <option value="Estoque">Estoque</option>
+                                <option value="Financeiro">Financeiro</option>
+                                <option value="Geral">Geral</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="tabela">Tabela Relacionada</label>
+                            <input 
+                                type="text" 
+                                id="tabela" 
+                                placeholder="Ex: clientes, produtos..."
+                                maxlength="100"
+                            >
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="opcoes">Opções (JSON ou CSV)</label>
+                        <textarea 
+                            id="opcoes" 
+                            placeholder='Ex: ["opcao1", "opcao2"] ou 1,2,3,4,5'
+                            rows="3"
+                        ></textarea>
+                        <small>Formato JSON ou valores separados por vírgula</small>
+                    </div>
+
+                    <div class="modal-actions">
+                        <button type="button" class="btn btn-secondary" onclick="fecharModal()">
+                            Cancelar
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            💾 Salvar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Visualizar Detalhes -->
+    <div id="modalDetalhes" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>📋 Detalhes do Parâmetro</h3>
+                <span class="modal-close" onclick="fecharModalDetalhes()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="detalhes-grid">
+                    <div class="detalhe-item">
+                        <label>ID</label>
+                        <span id="detalhe_id">-</span>
+                    </div>
+                    <div class="detalhe-item">
+                        <label>Identificador</label>
+                        <span id="detalhe_parametro" class="destaque">-</span>
+                    </div>
+                    <div class="detalhe-item full-width">
+                        <label>Descrição</label>
+                        <span id="detalhe_descricao">-</span>
+                    </div>
+                    <div class="detalhe-item full-width">
+                        <label>Descrição Complementar</label>
+                        <span id="detalhe_descricaocomplementar">-</span>
+                    </div>
+                    <div class="detalhe-item">
+                        <label>Módulo</label>
+                        <span id="detalhe_modulo">-</span>
+                    </div>
+                    <div class="detalhe-item">
+                        <label>Tabela</label>
+                        <span id="detalhe_tabela">-</span>
+                    </div>
+                    <div class="detalhe-item full-width">
+                        <label>Opções</label>
+                        <span id="detalhe_opcoes">-</span>
+                    </div>
+                    <div class="detalhe-item">
+                        <label>Criado em</label>
+                        <span id="detalhe_created_at">-</span>
+                    </div>
+                    <div class="detalhe-item">
+                        <label>Atualizado em</label>
+                        <span id="detalhe_updated_at">-</span>
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button class="btn btn-secondary" onclick="fecharModalDetalhes()">
+                        Fechar
+                    </button>
+                    <button class="btn btn-primary" onclick="editarDoDetalhes()">
+                        ✏️ Editar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Confirmar Exclusão -->
+    <div id="modalExcluir" class="modal">
+        <div class="modal-content modal-sm">
+            <div class="modal-header" style="background: #ef4444;">
+                <h3>⚠️ Confirmar Exclusão</h3>
+                <span class="modal-close" onclick="fecharModalExcluir()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <p>Tem certeza que deseja excluir o parâmetro:</p>
+                <p><strong id="excluir_parametro">-</strong></p>
+                <p class="warning">⚠️ Esta ação não pode ser desfeita!</p>
+                <div class="modal-actions">
+                    <button class="btn btn-secondary" onclick="fecharModalExcluir()">
+                        Cancelar
+                    </button>
+                    <button class="btn btn-danger" onclick="confirmarExclusao()">
+                        🗑️ Excluir
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Mensagem -->
+    <div id="modalMensagem" class="modal">
+        <div class="modal-content modal-sm">
+            <div class="modal-header">
+                <h3 id="mensagemTitulo">Informação</h3>
+                <span class="modal-close" onclick="fecharModalMensagem()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <p id="mensagemTexto"></p>
+                <div class="modal-actions">
+                    <button class="btn btn-primary btn-block" onclick="fecharModalMensagem()">
+                        OK
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/parametros.js"></script>
+</body>
+</html>
