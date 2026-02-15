@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIRIUS WEB - Configuração de Parâmetros</title>
+    <link rel="stylesheet" href="css/parametros-config.css">
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="header-content">
+            <h1>⚙️ SIRIUS WEB - Configuração de Parâmetros</h1>
+            <div class="user-info">
+                <span class="badge-super-admin">SUPER ADMIN</span>
+                <span id="userName">Carregando...</span>
+                <button class="btn-logout" onclick="logout()">Sair</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="nav">
+        <div class="nav-content">
+            <a href="dashboard.html">Dashboard</a>
+            <a href="produtos.html">Produtos</a>
+            <a href="clientes.html">Clientes</a>
+            <a href="pdv.html">PDV</a>
+            <a href="pedidos.html">Pedidos</a>
+            
+            <!-- Dropdown Configurações -->
+            <div class="nav-dropdown">
+                <button class="nav-dropdown-btn">⚙️ Configurações ▼</button>
+                <div class="nav-dropdown-content">
+                    <a href="vendedores.html">👨‍💼 Vendedores</a>
+                    <a href="formas-pagamento.html">💳 Formas de Pagamento</a>
+                    <a href="regimes-tributarios.html">📋 Regimes Tributários</a>
+                    <a href="parametros-config.html" class="active">⚙️ Parâmetros</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Container -->
+    <div class="container">
+        <div class="page-header">
+            <div>
+                <h2>🎯 Configuração de Parâmetros por Empresa</h2>
+                <p class="subtitle">Defina versões e funcionalidades para cada cliente</p>
+            </div>
+        </div>
+
+        <!-- Seletor de Empresa -->
+        <div class="empresa-selector">
+            <div class="selector-header">
+                <label for="selectEmpresa">📌 Selecione a Empresa:</label>
+                <button class="btn btn-refresh" onclick="carregarEmpresas()" title="Atualizar lista">
+                    🔄 Atualizar
+                </button>
+            </div>
+            <select id="selectEmpresa" onchange="carregarParametrosEmpresa()">
+                <option value="">-- Selecione uma empresa --</option>
+            </select>
+            <div id="empresaInfo" class="empresa-info" style="display: none;">
+                <div class="info-item">
+                    <strong>Razão Social:</strong> <span id="empresaRazao">-</span>
+                </div>
+                <div class="info-item">
+                    <strong>CNPJ:</strong> <span id="empresaCnpj">-</span>
+                </div>
+                <div class="info-item">
+                    <strong>Plano:</strong> <span id="empresaPlano" class="badge">-</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mensagens -->
+        <div id="mensagem" class="mensagem" style="display: none;"></div>
+
+        <!-- Loading -->
+        <div id="loading" class="loading" style="display: none;">
+            ⏳ Carregando parâmetros...
+        </div>
+
+        <!-- Parâmetros -->
+        <div id="parametrosContainer" style="display: none;">
+            <div class="toolbar">
+                <h3>📋 Parâmetros Disponíveis</h3>
+                <div class="toolbar-actions">
+                    <button class="btn btn-secondary" onclick="resetarTodosValores()">
+                        🔄 Resetar Todos para Padrão
+                    </button>
+                    <button class="btn btn-success" onclick="salvarTodasAlteracoes()">
+                        💾 Salvar Todas Alterações
+                    </button>
+                </div>
+            </div>
+
+            <!-- Grid de Parâmetros por Módulo -->
+            <div id="parametrosGrid"></div>
+        </div>
+
+        <!-- Empty State -->
+        <div id="emptyState" class="empty-state">
+            <div class="empty-icon">🏢</div>
+            <h3>Selecione uma Empresa</h3>
+            <p>Escolha uma empresa acima para configurar seus parâmetros</p>
+        </div>
+    </div>
+
+    <script src="js/parametros-config.js"></script>
+</body>
+</html>

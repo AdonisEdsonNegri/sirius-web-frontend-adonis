@@ -447,6 +447,51 @@
         // Inicializar
         loadData();
         
+        // Verificar se usuário é admin e mostrar link de Parâmetros
+        function verificarSeEhAdmin() {
+            try {
+                const empresas = JSON.parse(localStorage.getItem('sirius_empresas') || '[]');
+                
+                if (empresas.length > 0 && empresas[0].is_admin) {
+                    // Usuário é ADMIN - mostrar link de Parâmetros
+                    const dropdown = document.querySelector('.nav-dropdown-content');
+                    
+                    if (dropdown) {
+                        // Verificar se já existe o link (evita duplicação)
+                        const linkExiste = Array.from(dropdown.children).some(a => 
+                            a.textContent.includes('Parâmetros')
+                        );
+                        
+                        if (!linkExiste) {
+                            // Criar link de parâmetros
+                            const linkParametros = document.createElement('a');
+                            linkParametros.href = 'parametros-config.html';
+                            linkParametros.innerHTML = '⚙️ Parâmetros';
+                            
+                            // Adicionar ANTES do link "Caixas Cadastradas" (último link)
+                            const links = dropdown.children;
+                            if (links.length >= 3) {
+                                dropdown.insertBefore(linkParametros, links[3]); // Antes de "Caixas"
+                            } else {
+                                dropdown.appendChild(linkParametros);
+                            }
+                            
+                            console.log('✅ Link de Parâmetros adicionado (admin)');
+                        }
+                    }
+                } else {
+                    console.log('👤 Usuário não é admin - link de Parâmetros oculto');
+                }
+                
+            } catch (error) {
+                console.error('Erro ao verificar admin:', error);
+            }
+        }
+
+        // ✅ CHAMAR A FUNÇÃO (adicione esta linha logo após loadData(); )
+        verificarSeEhAdmin();
+
+
         console.log('🚀 Dashboard carregado');
     </script>
 </body>
