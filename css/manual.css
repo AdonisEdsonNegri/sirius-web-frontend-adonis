@@ -1,0 +1,654 @@
+/* =====================================================
+   SIRIUS WEB - Manual do Usuário CSS
+   ===================================================== */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --primary: #2563eb;
+    --primary-dark: #1e40af;
+    --success: #10b981;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+    --info: #3b82f6;
+    
+    --super-admin: #fbbf24;
+    --admin: #3b82f6;
+    --user: #6b7280;
+    
+    --bg-primary: #ffffff;
+    --bg-secondary: #f9fafb;
+    --bg-tertiary: #f3f4f6;
+    
+    --text-primary: #1f2937;
+    --text-secondary: #6b7280;
+    
+    --border: #e5e7eb;
+    --shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    line-height: 1.6;
+}
+
+/* ===== HEADER ===== */
+.header {
+    background: var(--primary);
+    color: white;
+    padding: 16px 0;
+    box-shadow: var(--shadow);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.header-content {
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: 0 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header h1 {
+    font-size: 24px;
+    font-weight: 700;
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.btn-back {
+    padding: 8px 16px;
+    background: rgba(255,255,255,0.2);
+    color: white;
+    text-decoration: none;
+    border-radius: 6px;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.btn-back:hover {
+    background: rgba(255,255,255,0.3);
+}
+
+/* ===== CONTAINER ===== */
+.container {
+    max-width: 1600px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 24px;
+    padding: 24px;
+    min-height: calc(100vh - 80px);
+}
+
+/* ===== SIDEBAR ===== */
+.sidebar {
+    background: var(--bg-primary);
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: var(--shadow);
+    height: fit-content;
+    position: sticky;
+    top: 90px;
+}
+
+.sidebar-header {
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 2px solid var(--border);
+}
+
+.sidebar-header h3 {
+    color: var(--text-primary);
+    font-size: 18px;
+}
+
+.sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    color: var(--text-secondary);
+    text-decoration: none;
+    border-radius: 8px;
+    transition: all 0.2s;
+    font-weight: 500;
+}
+
+.nav-item:hover {
+    background: var(--bg-tertiary);
+    color: var(--primary);
+}
+
+.nav-item.active {
+    background: var(--primary);
+    color: white;
+}
+
+.nav-icon {
+    font-size: 20px;
+}
+
+/* ===== MAIN CONTENT ===== */
+.main-content {
+    background: var(--bg-primary);
+    border-radius: 12px;
+    padding: 40px;
+    box-shadow: var(--shadow);
+}
+
+.section {
+    margin-bottom: 60px;
+    scroll-margin-top: 90px;
+}
+
+.section:last-child {
+    margin-bottom: 0;
+}
+
+.section h2 {
+    font-size: 32px;
+    color: var(--text-primary);
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 3px solid var(--primary);
+}
+
+.section h3 {
+    font-size: 24px;
+    color: var(--text-primary);
+    margin-top: 32px;
+    margin-bottom: 16px;
+}
+
+.section h4 {
+    font-size: 18px;
+    color: var(--text-primary);
+    margin-top: 20px;
+    margin-bottom: 12px;
+}
+
+.section p {
+    margin-bottom: 16px;
+    color: var(--text-secondary);
+}
+
+.section ul,
+.section ol {
+    margin-left: 24px;
+    margin-bottom: 16px;
+}
+
+.section li {
+    margin-bottom: 8px;
+    color: var(--text-secondary);
+}
+
+.section code {
+    background: var(--bg-tertiary);
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-family: 'Courier New', monospace;
+    font-size: 14px;
+    color: var(--danger);
+}
+
+.section pre {
+    background: #1f2937;
+    color: #f9fafb;
+    padding: 16px;
+    border-radius: 8px;
+    overflow-x: auto;
+    margin: 16px 0;
+}
+
+.section pre code {
+    background: none;
+    color: inherit;
+    padding: 0;
+}
+
+/* ===== INFO BOXES ===== */
+.info-box,
+.success-box,
+.warning-box,
+.tip-box {
+    display: flex;
+    gap: 16px;
+    padding: 20px;
+    border-radius: 12px;
+    margin: 24px 0;
+}
+
+.info-box {
+    background: #dbeafe;
+    border-left: 4px solid var(--info);
+}
+
+.success-box {
+    background: #d1fae5;
+    border-left: 4px solid var(--success);
+}
+
+.warning-box {
+    background: #fee2e2;
+    border-left: 4px solid var(--danger);
+}
+
+.tip-box {
+    background: #fef3c7;
+    border-left: 4px solid var(--warning);
+}
+
+.info-icon,
+.success-icon,
+.warning-icon,
+.tip-icon {
+    font-size: 32px;
+    flex-shrink: 0;
+}
+
+.info-content,
+.success-content,
+.warning-content,
+.tip-content {
+    flex: 1;
+}
+
+.info-content h4,
+.success-content h4,
+.warning-content h4,
+.tip-content h4 {
+    margin: 0 0 8px 0;
+    color: var(--text-primary);
+}
+
+.info-content p,
+.success-content p,
+.warning-content p,
+.tip-content p {
+    margin: 0;
+}
+
+/* ===== EXAMPLE BOX ===== */
+.example-box {
+    background: var(--bg-tertiary);
+    padding: 20px;
+    border-radius: 8px;
+    margin: 20px 0;
+    border-left: 4px solid var(--primary);
+}
+
+.example-box h4 {
+    margin: 0 0 12px 0;
+    color: var(--primary);
+}
+
+/* ===== PERMISSION CARDS ===== */
+.permission-card {
+    background: white;
+    border-radius: 12px;
+    padding: 24px;
+    margin: 24px 0;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.permission-card.super-admin {
+    border-top: 4px solid var(--super-admin);
+}
+
+.permission-card.admin {
+    border-top: 4px solid var(--admin);
+}
+
+.permission-card.user {
+    border-top: 4px solid var(--user);
+}
+
+.card-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+    padding-bottom: 16px;
+    border-bottom: 2px solid var(--border);
+}
+
+.card-header h3 {
+    margin: 0;
+    font-size: 22px;
+}
+
+.card-body h4 {
+    margin-top: 16px;
+    margin-bottom: 8px;
+    font-size: 16px;
+    color: var(--primary);
+}
+
+.card-body p {
+    margin-bottom: 12px;
+}
+
+.card-body ul {
+    margin: 8px 0 16px 24px;
+}
+
+/* ===== BADGES ===== */
+.badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.badge-super {
+    background: var(--super-admin);
+    color: #78350f;
+}
+
+.badge-admin {
+    background: var(--admin);
+    color: white;
+}
+
+.badge-user {
+    background: var(--user);
+    color: white;
+}
+
+/* ===== ARCHITECTURE DIAGRAM ===== */
+.architecture-diagram {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    margin: 32px 0;
+}
+
+.table-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 24px;
+    border-radius: 12px;
+    width: 100%;
+    max-width: 600px;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+}
+
+.table-card h4 {
+    margin: 0 0 8px 0;
+    font-size: 20px;
+    color: white;
+}
+
+.table-subtitle {
+    font-size: 14px;
+    opacity: 0.9;
+    margin-bottom: 16px;
+}
+
+.table-card ul {
+    margin: 16px 0;
+}
+
+.table-card li {
+    color: white;
+    margin-bottom: 8px;
+}
+
+.table-note {
+    margin-top: 16px;
+    padding: 12px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 8px;
+    font-weight: 600;
+}
+
+.arrow-down {
+    font-size: 32px;
+    color: var(--primary);
+}
+
+/* ===== TABLES ===== */
+.params-table,
+.comparison-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+}
+
+.params-table thead,
+.comparison-table thead {
+    background: var(--primary);
+    color: white;
+}
+
+.params-table th,
+.comparison-table th {
+    padding: 16px;
+    text-align: left;
+    font-weight: 600;
+}
+
+.params-table td,
+.comparison-table td {
+    padding: 16px;
+    border-bottom: 1px solid var(--border);
+}
+
+.params-table tbody tr:hover,
+.comparison-table tbody tr:hover {
+    background: var(--bg-tertiary);
+}
+
+/* ===== PARAM DETAIL ===== */
+.param-detail {
+    background: var(--bg-tertiary);
+    padding: 20px;
+    border-radius: 8px;
+    margin: 20px 0;
+    border-left: 4px solid var(--primary);
+}
+
+.param-detail h4 {
+    margin: 0 0 12px 0;
+    color: var(--primary);
+}
+
+/* ===== STEPS ===== */
+.step {
+    display: flex;
+    gap: 20px;
+    margin: 24px 0;
+    padding: 20px;
+    background: var(--bg-tertiary);
+    border-radius: 12px;
+}
+
+.step-number {
+    width: 48px;
+    height: 48px;
+    background: var(--primary);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.step-content {
+    flex: 1;
+}
+
+.step-content h4 {
+    margin: 0 0 12px 0;
+    color: var(--primary);
+}
+
+.step-content p {
+    margin-bottom: 12px;
+}
+
+.step-content .note {
+    font-size: 14px;
+    color: var(--text-secondary);
+    font-style: italic;
+}
+
+/* ===== USE CASE ===== */
+.use-case {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    margin: 20px 0;
+    box-shadow: var(--shadow);
+    border-left: 4px solid var(--success);
+}
+
+.use-case p {
+    margin-bottom: 8px;
+}
+
+.use-case strong {
+    color: var(--text-primary);
+}
+
+/* ===== FAQ ===== */
+.faq-item {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    margin: 16px 0;
+    box-shadow: var(--shadow);
+    border-left: 4px solid var(--info);
+}
+
+.faq-item h4 {
+    margin: 0 0 12px 0;
+    color: var(--primary);
+    font-size: 18px;
+}
+
+.faq-item p {
+    margin-bottom: 12px;
+}
+
+.faq-item:last-child {
+    margin-bottom: 0;
+}
+
+/* ===== GLOSSARY ===== */
+.glossary {
+    background: white;
+    padding: 24px;
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+}
+
+.glossary dt {
+    font-weight: 700;
+    color: var(--primary);
+    margin-top: 16px;
+    font-size: 18px;
+}
+
+.glossary dt:first-child {
+    margin-top: 0;
+}
+
+.glossary dd {
+    margin: 8px 0 16px 24px;
+    color: var(--text-secondary);
+}
+
+/* ===== FOOTER ===== */
+.footer {
+    margin-top: 60px;
+    padding-top: 24px;
+    border-top: 2px solid var(--border);
+    text-align: center;
+    color: var(--text-secondary);
+}
+
+.footer p {
+    margin: 8px 0;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 1024px) {
+    .container {
+        grid-template-columns: 1fr;
+    }
+    
+    .sidebar {
+        position: relative;
+        top: 0;
+    }
+    
+    .main-content {
+        padding: 24px;
+    }
+}
+
+@media (max-width: 768px) {
+    .header h1 {
+        font-size: 18px;
+    }
+    
+    .header-actions {
+        flex-direction: column;
+        gap: 8px;
+        align-items: flex-end;
+    }
+    
+    .section h2 {
+        font-size: 24px;
+    }
+    
+    .section h3 {
+        font-size: 20px;
+    }
+    
+    .step {
+        flex-direction: column;
+    }
+    
+    .permission-card {
+        padding: 16px;
+    }
+}
+
+/* ===== SMOOTH SCROLLING ===== */
+html {
+    scroll-behavior: smooth;
+}

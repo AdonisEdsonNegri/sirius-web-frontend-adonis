@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIRIUS WEB - Manual do Usuário</title>
+    <link rel="stylesheet" href="css/manual.css">
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="header-content">
+            <h1>📚 SIRIUS WEB - Manual do Usuário</h1>
+            <div class="header-actions">
+                <span id="userName">Carregando...</span>
+                <a href="dashboard.html" class="btn-back">← Voltar ao Dashboard</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Container -->
+    <div class="container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h3>📑 Índice</h3>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="#introducao" class="nav-item active">
+                    <span class="nav-icon">🏠</span>
+                    Introdução
+                </a>
+                <a href="#hierarquia" class="nav-item">
+                    <span class="nav-icon">👥</span>
+                    Hierarquia de Permissões
+                </a>
+                <a href="#parametros" class="nav-item">
+                    <span class="nav-icon">⚙️</span>
+                    Sistema de Parâmetros
+                </a>
+                <a href="#configuracao" class="nav-item">
+                    <span class="nav-icon">🎯</span>
+                    Como Configurar
+                </a>
+                <a href="#casos-uso" class="nav-item">
+                    <span class="nav-icon">💡</span>
+                    Casos de Uso
+                </a>
+                <a href="#faq" class="nav-item">
+                    <span class="nav-icon">❓</span>
+                    Perguntas Frequentes
+                </a>
+                <a href="#glossario" class="nav-item">
+                    <span class="nav-icon">📖</span>
+                    Glossário
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Introdução -->
+            <section id="introducao" class="section">
+                <h2>🏠 Introdução ao SIRIUS WEB</h2>
+                
+                <div class="info-box">
+                    <div class="info-icon">ℹ️</div>
+                    <div class="info-content">
+                        <h4>Bem-vindo ao SIRIUS WEB!</h4>
+                        <p>SIRIUS WEB é um sistema ERP completo de gestão empresarial multi-tenant (SaaS), desenvolvido para atender múltiplas empresas com diferentes necessidades e versões personalizadas.</p>
+                    </div>
+                </div>
+
+                <h3>📌 O que é Multi-Tenant (SaaS)?</h3>
+                <p>Multi-tenant significa que <strong>uma única instalação</strong> do sistema atende <strong>múltiplas empresas</strong> (tenants), cada uma com seus próprios dados e configurações completamente isoladas.</p>
+
+                <div class="example-box">
+                    <h4>Exemplo prático:</h4>
+                    <ul>
+                        <li><strong>Empresa A:</strong> Usa versão completa (PDV + Estoque + Financeiro)</li>
+                        <li><strong>Empresa B:</strong> Usa versão intermediária (PDV + Estoque)</li>
+                        <li><strong>Empresa C:</strong> Usa versão básica (apenas PDV)</li>
+                    </ul>
+                    <p><strong>Todas usando o mesmo sistema, mas com funcionalidades diferentes!</strong></p>
+                </div>
+
+                <h3>🎯 Modelo de Negócio</h3>
+                <p>O SIRIUS WEB opera em modelo SaaS (Software as a Service), onde:</p>
+                <ul>
+                    <li>✅ <strong>Soft Clever</strong> é o proprietário e administrador do sistema</li>
+                    <li>✅ <strong>Empresas clientes</strong> contratam o uso do sistema</li>
+                    <li>✅ Cada empresa paga conforme o plano contratado</li>
+                    <li>✅ Soft Clever controla quais funcionalidades cada empresa tem acesso</li>
+                </ul>
+            </section>
+
+            <!-- Hierarquia -->
+            <section id="hierarquia" class="section">
+                <h2>👥 Hierarquia de Permissões</h2>
+
+                <p>O sistema possui 3 níveis hierárquicos de usuários, cada um com permissões específicas:</p>
+
+                <!-- Super Admin -->
+                <div class="permission-card super-admin">
+                    <div class="card-header">
+                        <span class="badge badge-super">SUPER ADMIN</span>
+                        <h3>👑 Super Administrador</h3>
+                    </div>
+                    <div class="card-body">
+                        <p><strong>Quem é:</strong> Você (Soft Clever) e sua equipe técnica</p>
+                        
+                        <h4>✅ Pode fazer:</h4>
+                        <ul>
+                            <li>Ver e gerenciar <strong>TODAS as empresas</strong> do sistema</li>
+                            <li>Configurar parâmetros de <strong>qualquer empresa</strong></li>
+                            <li>Criar e editar definições globais de parâmetros</li>
+                            <li>Controlar versões e funcionalidades por empresa</li>
+                            <li>Acessar relatórios globais do sistema</li>
+                            <li>Tudo que um Admin normal pode fazer</li>
+                        </ul>
+
+                        <h4>🔒 Identificação:</h4>
+                        <p>Campo <code>is_super_admin = true</code> na tabela <code>usuarios</code></p>
+                    </div>
+                </div>
+
+                <!-- Admin -->
+                <div class="permission-card admin">
+                    <div class="card-header">
+                        <span class="badge badge-admin">ADMIN</span>
+                        <h3>👨‍💼 Administrador da Empresa</h3>
+                    </div>
+                    <div class="card-body">
+                        <p><strong>Quem é:</strong> Dono ou gerente da empresa cliente</p>
+                        
+                        <h4>✅ Pode fazer:</h4>
+                        <ul>
+                            <li>Gerenciar <strong>apenas SUA empresa</strong></li>
+                            <li>Cadastrar vendedores, formas de pagamento</li>
+                            <li>Configurar regimes tributários</li>
+                            <li>Gerenciar produtos, clientes</li>
+                            <li>Usar PDV, emitir NFCe</li>
+                            <li>Ver relatórios da empresa</li>
+                        </ul>
+
+                        <h4>❌ NÃO pode fazer:</h4>
+                        <ul>
+                            <li>Configurar parâmetros (isso é controlado por você!)</li>
+                            <li>Ver ou acessar outras empresas</li>
+                            <li>Alterar plano ou versão do sistema</li>
+                        </ul>
+
+                        <h4>🔒 Identificação:</h4>
+                        <p>Campo <code>is_admin = true</code> na tabela <code>usuario_empresa</code> para empresa específica</p>
+                    </div>
+                </div>
+
+                <!-- Usuário Normal -->
+                <div class="permission-card user">
+                    <div class="card-header">
+                        <span class="badge badge-user">USUÁRIO</span>
+                        <h3>👤 Usuário Normal</h3>
+                    </div>
+                    <div class="card-body">
+                        <p><strong>Quem é:</strong> Funcionário da empresa cliente (vendedor, operador)</p>
+                        
+                        <h4>✅ Pode fazer:</h4>
+                        <ul>
+                            <li>Usar PDV (vender produtos)</li>
+                            <li>Consultar produtos e clientes</li>
+                            <li>Ver relatórios básicos</li>
+                        </ul>
+
+                        <h4>❌ NÃO pode fazer:</h4>
+                        <ul>
+                            <li>Cadastrar vendedores ou formas de pagamento</li>
+                            <li>Acessar configurações</li>
+                            <li>Ver dados de outras empresas</li>
+                            <li>Alterar parâmetros</li>
+                        </ul>
+
+                        <h4>🔒 Identificação:</h4>
+                        <p>Campo <code>is_admin = false</code> na tabela <code>usuario_empresa</code></p>
+                    </div>
+                </div>
+
+                <div class="warning-box">
+                    <div class="warning-icon">⚠️</div>
+                    <div class="warning-content">
+                        <h4>Importante sobre Segurança:</h4>
+                        <p>O status de <strong>Super Admin</strong> deve ser concedido apenas à equipe da Soft Clever. Nunca torne um cliente Super Admin, pois ele teria acesso a dados de todas as empresas!</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Parâmetros -->
+            <section id="parametros" class="section">
+                <h2>⚙️ Sistema de Parâmetros</h2>
+
+                <h3>🎯 O que são Parâmetros?</h3>
+                <p>Parâmetros são <strong>configurações que controlam o comportamento do sistema</strong> para cada empresa. Eles permitem que você personalize funcionalidades sem alterar o código.</p>
+
+                <div class="example-box">
+                    <h4>Exemplo prático:</h4>
+                    <p><strong>Parâmetro:</strong> "Permite vendas com saldo negativo?"</p>
+                    <ul>
+                        <li><strong>Empresa A (valor: S):</strong> Pode vender mesmo sem estoque (saldo fica negativo)</li>
+                        <li><strong>Empresa B (valor: N):</strong> Sistema bloqueia venda se não tiver estoque</li>
+                    </ul>
+                    <p><strong>Mesmo parâmetro, comportamentos diferentes!</strong></p>
+                </div>
+
+                <h3>🏗️ Arquitetura (2 Tabelas)</h3>
+
+                <div class="architecture-diagram">
+                    <div class="table-card">
+                        <h4>📋 parametros_definicoes</h4>
+                        <p class="table-subtitle">Definições Globais (mesma para todas empresas)</p>
+                        <ul>
+                            <li><strong>Código:</strong> PEDIDO_PERGUNTA_QUANTIDADE</li>
+                            <li><strong>Descrição:</strong> Pergunta quantidade ao adicionar produto?</li>
+                            <li><strong>Tipo:</strong> BOOLEAN (S/N)</li>
+                            <li><strong>Valor Padrão:</strong> N</li>
+                            <li><strong>Módulo:</strong> PDV</li>
+                        </ul>
+                        <p class="table-note">✨ Você cria essas definições como Super Admin</p>
+                    </div>
+
+                    <div class="arrow-down">⬇️</div>
+
+                    <div class="table-card">
+                        <h4>💾 parametros_valores</h4>
+                        <p class="table-subtitle">Valores por Empresa (cada empresa tem o seu)</p>
+                        <ul>
+                            <li><strong>Empresa 1:</strong> PEDIDO_PERGUNTA_QUANTIDADE = S</li>
+                            <li><strong>Empresa 2:</strong> PEDIDO_PERGUNTA_QUANTIDADE = N</li>
+                            <li><strong>Empresa 3:</strong> (não configurou, usa padrão = N)</li>
+                        </ul>
+                        <p class="table-note">✨ Você configura esses valores por empresa</p>
+                    </div>
+                </div>
+
+                <h3>📊 Tipos de Parâmetros</h3>
+                <table class="params-table">
+                    <thead>
+                        <tr>
+                            <th>Tipo</th>
+                            <th>Descrição</th>
+                            <th>Exemplo</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>BOOLEAN</code></td>
+                            <td>Sim ou Não</td>
+                            <td>S, N</td>
+                        </tr>
+                        <tr>
+                            <td><code>INTEGER</code></td>
+                            <td>Número inteiro</td>
+                            <td>1, 10, 100</td>
+                        </tr>
+                        <tr>
+                            <td><code>DECIMAL</code></td>
+                            <td>Número decimal</td>
+                            <td>1.5, 10.99</td>
+                        </tr>
+                        <tr>
+                            <td><code>SELECT</code></td>
+                            <td>Lista de opções</td>
+                            <td>Opção1, Opção2, Opção3</td>
+                        </tr>
+                        <tr>
+                            <td><code>TEXT</code></td>
+                            <td>Texto livre</td>
+                            <td>Qualquer texto</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>🎯 Parâmetros Atuais do Sistema</h3>
+                
+                <div class="param-detail">
+                    <h4>1️⃣ PEDIDO_PERGUNTA_QUANTIDADE</h4>
+                    <p><strong>Descrição:</strong> Ao escolher um produto para um item de pedido perguntar qual será a quantidade</p>
+                    <p><strong>Tipo:</strong> BOOLEAN (S/N)</p>
+                    <p><strong>Valor Padrão:</strong> N</p>
+                    <p><strong>Comportamento:</strong></p>
+                    <ul>
+                        <li><strong>S (Sim):</strong> Sistema abre modal perguntando quantidade (padrão 1)</li>
+                        <li><strong>N (Não):</strong> Adiciona produto automaticamente com quantidade 1</li>
+                    </ul>
+                </div>
+
+                <div class="param-detail">
+                    <h4>2️⃣ PERMITE_SALDO_NEGATIVO</h4>
+                    <p><strong>Descrição:</strong> Permite vendas com saldo negativo?</p>
+                    <p><strong>Tipo:</strong> BOOLEAN (S/N)</p>
+                    <p><strong>Valor Padrão:</strong> N</p>
+                    <p><strong>Comportamento:</strong></p>
+                    <ul>
+                        <li><strong>S (Sim):</strong> Permite vender mesmo sem estoque (saldo fica negativo)</li>
+                        <li><strong>N (Não):</strong> Bloqueia venda se estoque insuficiente</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Configuração -->
+            <section id="configuracao" class="section">
+                <h2>🎯 Como Configurar Parâmetros</h2>
+
+                <div class="success-box">
+                    <div class="success-icon">✅</div>
+                    <div class="success-content">
+                        <h4>Apenas Super Admin!</h4>
+                        <p>Somente usuários com permissão de Super Admin podem acessar e configurar parâmetros. Clientes não têm acesso a essa funcionalidade.</p>
+                    </div>
+                </div>
+
+                <h3>📍 Passo a Passo</h3>
+
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h4>Acessar a Tela de Configuração</h4>
+                        <p>No menu principal, clique em: <strong>Configurações → ⚙️ Parâmetros</strong></p>
+                        <p class="note">💡 Ou acesse diretamente: <code>parametros-config.html</code></p>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h4>Selecionar a Empresa</h4>
+                        <p>No topo da tela, use o dropdown para selecionar qual empresa deseja configurar:</p>
+                        <ul>
+                            <li>Você verá <strong>TODAS</strong> as empresas cadastradas</li>
+                            <li>Escolha a empresa que deseja configurar</li>
+                            <li>Os parâmetros dessa empresa serão carregados automaticamente</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h4>Visualizar Informações da Empresa</h4>
+                        <p>Após selecionar, você verá:</p>
+                        <ul>
+                            <li><strong>Razão Social</strong></li>
+                            <li><strong>CNPJ</strong></li>
+                            <li><strong>Plano contratado</strong> (FREE, BASIC, PRO, etc)</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <h4>Alterar Valores dos Parâmetros</h4>
+                        <p>Para cada parâmetro você verá:</p>
+                        <ul>
+                            <li><strong>Código:</strong> Identificador técnico</li>
+                            <li><strong>Descrição:</strong> O que o parâmetro faz</li>
+                            <li><strong>Dropdown de valores:</strong> S/N ou outras opções</li>
+                            <li><strong>Badge:</strong> "PADRÃO" ou "CUSTOMIZADO"</li>
+                        </ul>
+                        <p>Clique no dropdown e escolha o novo valor. O campo ficará <span style="background: #fffbeb; color: #92400e; padding: 2px 8px; border-radius: 4px;">amarelo</span> indicando modificação.</p>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="step-number">5</div>
+                    <div class="step-content">
+                        <h4>Salvar Alterações</h4>
+                        <p>Após alterar os valores desejados, clique em:</p>
+                        <p><strong>💾 Salvar Todas Alterações</strong></p>
+                        <p>Uma mensagem de confirmação aparecerá e os valores serão salvos!</p>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="step-number">6</div>
+                    <div class="step-content">
+                        <h4>Resetar para Padrão (Opcional)</h4>
+                        <p>Para voltar um parâmetro ao valor padrão:</p>
+                        <ul>
+                            <li>Clique no botão <strong>🔄</strong> ao lado do parâmetro customizado</li>
+                            <li>Ou use <strong>🔄 Resetar Todos para Padrão</strong> para resetar todos de uma vez</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="tip-box">
+                    <div class="tip-icon">💡</div>
+                    <div class="tip-content">
+                        <h4>Dica Profissional:</h4>
+                        <p>Você pode alternar entre empresas sem sair da tela! Basta selecionar outra empresa no dropdown e configurar seus parâmetros. Muito eficiente para configurar várias empresas rapidamente!</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Casos de Uso -->
+            <section id="casos-uso" class="section">
+                <h2>💡 Casos de Uso Práticos</h2>
+
+                <h3>Cenário 1: Empresa com Controle Rígido de Estoque</h3>
+                <div class="use-case">
+                    <p><strong>Cliente:</strong> Farmácia ABC Ltda</p>
+                    <p><strong>Necessidade:</strong> Nunca vender produtos sem estoque</p>
+                    <p><strong>Configuração:</strong></p>
+                    <ul>
+                        <li>PERMITE_SALDO_NEGATIVO = <strong>N</strong></li>
+                    </ul>
+                    <p><strong>Resultado:</strong> Sistema bloqueia venda se produto estiver zerado</p>
+                </div>
+
+                <h3>Cenário 2: Empresa que Trabalha com Encomendas</h3>
+                <div class="use-case">
+                    <p><strong>Cliente:</strong> Loja de Roupas XYZ</p>
+                    <p><strong>Necessidade:</strong> Vender produtos que ainda não chegaram (encomendas)</p>
+                    <p><strong>Configuração:</strong></p>
+                    <ul>
+                        <li>PERMITE_SALDO_NEGATIVO = <strong>S</strong></li>
+                    </ul>
+                    <p><strong>Resultado:</strong> Pode vender mesmo sem estoque (saldo fica -5, por exemplo)</p>
+                </div>
+
+                <h3>Cenário 3: Restaurante com Quantidades Variáveis</h3>
+                <div class="use-case">
+                    <p><strong>Cliente:</strong> Restaurante Bom Sabor</p>
+                    <p><strong>Necessidade:</strong> Perguntar quantidade de cada item (ex: 2 refrigerantes, 3 cervejas)</p>
+                    <p><strong>Configuração:</strong></p>
+                    <ul>
+                        <li>PEDIDO_PERGUNTA_QUANTIDADE = <strong>S</strong></li>
+                    </ul>
+                    <p><strong>Resultado:</strong> Ao adicionar item, sistema pergunta: "Quantidade? [1]"</p>
+                </div>
+
+                <h3>Cenário 4: Loja de Conveniência Rápida</h3>
+                <div class="use-case">
+                    <p><strong>Cliente:</strong> Conveniência 24h</p>
+                    <p><strong>Necessidade:</strong> Vendas rápidas, sempre 1 unidade por vez</p>
+                    <p><strong>Configuração:</strong></p>
+                    <ul>
+                        <li>PEDIDO_PERGUNTA_QUANTIDADE = <strong>N</strong></li>
+                    </ul>
+                    <p><strong>Resultado:</strong> Clica no produto, já adiciona quantidade 1 (mais rápido)</p>
+                </div>
+
+                <h3>Cenário 5: Versões Diferenciadas</h3>
+                <div class="use-case">
+                    <p><strong>Situação:</strong> Você tem 3 clientes com necessidades diferentes</p>
+                    
+                    <table class="comparison-table">
+                        <thead>
+                            <tr>
+                                <th>Empresa</th>
+                                <th>Plano</th>
+                                <th>Pergunta Qtd</th>
+                                <th>Saldo Negativo</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Empresa A</td>
+                                <td>COMPLETO</td>
+                                <td>S</td>
+                                <td>S</td>
+                            </tr>
+                            <tr>
+                                <td>Empresa B</td>
+                                <td>INTERMEDIÁRIO</td>
+                                <td>N</td>
+                                <td>S</td>
+                            </tr>
+                            <tr>
+                                <td>Empresa C</td>
+                                <td>BÁSICO</td>
+                                <td>N</td>
+                                <td>N</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    
+                    <p><strong>Resultado:</strong> Cada empresa usa o sistema de forma diferente, conforme suas necessidades!</p>
+                </div>
+            </section>
+
+            <!-- FAQ -->
+            <section id="faq" class="section">
+                <h2>❓ Perguntas Frequentes (FAQ)</h2>
+
+                <div class="faq-item">
+                    <h4>❓ Clientes podem ver ou alterar parâmetros?</h4>
+                    <p><strong>Não!</strong> Apenas Super Admins (você e sua equipe) podem ver e configurar parâmetros. Clientes nem veem o menu de configuração.</p>
+                </div>
+
+                <div class="faq-item">
+                    <h4>❓ O que acontece se eu não configurar um parâmetro para uma empresa?</h4>
+                    <p>O sistema usa automaticamente o <strong>valor padrão</strong> definido na criação do parâmetro. Por exemplo, se PERMITE_SALDO_NEGATIVO tem padrão "N", empresas não configuradas usarão "N".</p>
+                </div>
+
+                <div class="faq-item">
+                    <h4>❓ Posso criar novos parâmetros?</h4>
+                    <p><strong>Sim!</strong> Como Super Admin, você pode acessar "Parâmetros → Definições" e criar novos parâmetros globais. Depois, configura os valores por empresa.</p>
+                </div>
+
+                <div class="faq-item">
+                    <h4>❓ Como faço para resetar todas configurações de uma empresa?</h4>
+                    <p>Na tela de configuração, selecione a empresa e clique em <strong>"🔄 Resetar Todos para Padrão"</strong>. Todos parâmetros customizados voltarão aos valores padrão.</p>
+                </div>
+
+                <div class="faq-item">
+                    <h4>❓ Posso configurar parâmetros diferentes para filiais da mesma empresa?</h4>
+                    <p>Atualmente cada "empresa" no sistema é independente. Se você cadastrar Matriz e Filial como empresas separadas, pode configurar parâmetros diferentes para cada uma.</p>
+                </div>
+
+                <div class="faq-item">
+                    <h4>❓ Alterações em parâmetros entram em vigor imediatamente?</h4>
+                    <p><strong>Sim!</strong> Assim que você salva, os usuários da empresa já usarão os novos valores na próxima ação que executarem.</p>
+                </div>
+
+                <div class="faq-item">
+                    <h4>❓ Consigo ver histórico de alterações em parâmetros?</h4>
+                    <p>O sistema registra <code>updated_at</code> (data/hora) e <code>updated_by</code> (quem alterou) na tabela parametros_valores. Para ver, consulte diretamente no banco de dados.</p>
+                </div>
+
+                <div class="faq-item">
+                    <h4>❓ Como torno alguém da minha equipe Super Admin?</h4>
+                    <p>Execute no banco de dados PostgreSQL:</p>
+                    <pre><code>UPDATE usuarios 
+SET is_super_admin = true 
+WHERE email = 'email@domembro.com';</code></pre>
+                    <p><strong>⚠️ Cuidado:</strong> Super Admin tem acesso a TUDO!</p>
+                </div>
+
+                <div class="faq-item">
+                    <h4>❓ Parâmetros afetam performance do sistema?</h4>
+                    <p><strong>Não!</strong> Os parâmetros são consultados quando necessário e são muito leves. O impacto em performance é desprezível.</p>
+                </div>
+
+                <div class="faq-item">
+                    <h4>❓ Posso ter parâmetros por módulo (PDV, NFCe, etc)?</h4>
+                    <p><strong>Sim!</strong> Ao criar um parâmetro, você define em qual módulo ele se aplica. Na tela de configuração, os parâmetros são agrupados por módulo automaticamente.</p>
+                </div>
+            </section>
+
+            <!-- Glossário -->
+            <section id="glossario" class="section">
+                <h2>📖 Glossário de Termos</h2>
+
+                <dl class="glossary">
+                    <dt>Super Admin</dt>
+                    <dd>Usuário com permissões globais que pode acessar e configurar todas as empresas do sistema. Geralmente a equipe da Soft Clever.</dd>
+
+                    <dt>Admin</dt>
+                    <dd>Administrador de uma empresa específica. Pode gerenciar sua empresa mas não outras empresas ou parâmetros globais.</dd>
+
+                    <dt>Multi-Tenant</dt>
+                    <dd>Arquitetura onde um único sistema atende múltiplas empresas (tenants) com dados isolados.</dd>
+
+                    <dt>SaaS (Software as a Service)</dt>
+                    <dd>Modelo de negócio onde o software é oferecido como serviço, geralmente por assinatura mensal.</dd>
+
+                    <dt>Parâmetro</dt>
+                    <dd>Configuração que controla comportamento do sistema sem alterar código.</dd>
+
+                    <dt>Definição de Parâmetro</dt>
+                    <dd>Estrutura global que define o que é um parâmetro (código, descrição, tipo, valor padrão). Mesma para todas empresas.</dd>
+
+                    <dt>Valor de Parâmetro</dt>
+                    <dd>Valor específico configurado para uma empresa. Pode ser diferente do padrão.</dd>
+
+                    <dt>Valor Padrão</dt>
+                    <dd>Valor que será usado se a empresa não tiver configuração customizada para aquele parâmetro.</dd>
+
+                    <dt>Customizado</dt>
+                    <dd>Quando uma empresa tem valor específico configurado, diferente do padrão.</dd>
+
+                    <dt>Tenant</dt>
+                    <dd>Uma empresa/cliente no sistema multi-tenant. Cada tenant tem seus dados isolados.</dd>
+
+                    <dt>ERP</dt>
+                    <dd>Enterprise Resource Planning - Sistema de gestão empresarial integrado.</dd>
+
+                    <dt>PDV</dt>
+                    <dd>Ponto de Venda - Módulo para realizar vendas diretas ao consumidor.</dd>
+
+                    <dt>NFCe</dt>
+                    <dd>Nota Fiscal de Consumidor Eletrônica - Documento fiscal obrigatório para vendas.</dd>
+                </dl>
+            </section>
+
+            <!-- Footer -->
+            <div class="footer">
+                <p>📚 SIRIUS WEB - Manual do Usuário</p>
+                <p>© 2026 Soft Clever Informática Ltda - Todos os direitos reservados</p>
+                <p>Versão 1.0 - Última atualização: Fevereiro 2026</p>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/manual.js"></script>
+</body>
+</html>
