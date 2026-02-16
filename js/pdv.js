@@ -30,9 +30,35 @@ let formasPagamento = [];
 let itemEmEdicao = null;
 let empresaId = null;
 
+// =====================================================
+// ✅ PARÂMETROS GLOBAIS (CARREGADOS UMA VEZ)
+// Performance: ZERO consultas ao banco durante uso!
+// =====================================================
+let PARAMETROS = {};
+
+function carregarParametros() {
+    try {
+        const parametrosStr = localStorage.getItem('sirius_parametros');
+        if (parametrosStr) {
+            PARAMETROS = JSON.parse(parametrosStr);
+            console.log('✅ Parâmetros carregados:', PARAMETROS);
+            console.log(`📊 Total de parâmetros: ${Object.keys(PARAMETROS).length}`);
+        } else {
+            console.warn('⚠️ Nenhum parâmetro encontrado no localStorage');
+            PARAMETROS = {};
+        }
+    } catch (error) {
+        console.error('❌ Erro ao carregar parâmetros:', error);
+        PARAMETROS = {};
+    }
+}
+
 // ===== INICIALIZAÇÃO =====
 document.addEventListener('DOMContentLoaded', async () => {
     console.log('🚀 PDV carregado');
+    
+    // ✅ CARREGAR PARÂMETROS PRIMEIRO (ANTES DE TUDO!)
+    carregarParametros();
     
     const token = checkAuth();
     if (!token) return;
@@ -74,6 +100,7 @@ function logout() {
     localStorage.removeItem('sirius_token');
     localStorage.removeItem('sirius_usuario');
     localStorage.removeItem('sirius_empresas');
+    localStorage.removeItem('sirius_parametros'); // ✅ Limpar parâmetros também
     window.location.href = 'index.html';
 }
 
@@ -199,7 +226,7 @@ function configurarEventos() {
     
     // Monitorar mudança de forma de pagamento
     document.getElementById('formaPagamento').addEventListener('change', (e) => {
-        const formaSelecionada = formasPagamento.find(f => f.id == e.target.value);
+        const formaSelecionada = formasPagamento.find(f => f.id_forma_pagamento == e.target.value);
         if (formaSelecionada && formaSelecionada.permite_troco) {
             document.getElementById('trocoGroup').style.display = 'block';
         } else {
@@ -245,7 +272,7 @@ function renderizarResultadosProdutos(produtos) {
     }
     
     container.innerHTML = produtos.map(p => `
-        <div class="resultado-item" onclick="adicionarProduto(${JSON.stringify(p).replace(/"/g, '&quot;')})">
+        <div class="resultado-item" onclick='adicionarProdutoAoPedido(${JSON.stringify(p).replace(/'/g, "&#39;")})'>
             <div class="resultado-nome">${p.descricao}</div>
             <div class="resultado-info">
                 ${p.codigo ? `<span>Cód: ${p.codigo}</span>` : ''}
@@ -257,14 +284,38 @@ function renderizarResultadosProdutos(produtos) {
     `).join('');
 }
 
-// ===== ADICIONAR PRODUTO =====
-function adicionarProduto(produto) {
+// =====================================================
+// ✅ ADICIONAR PRODUTO COM PARÂMETRO 1
+// PEDIDO_PERGUNTA_QUANTIDADE
+// =====================================================
+async function adicionarProdutoAoPedido(produto) {
+    console.log('🛒 Adicionando produto:', produto.descricao);
+    
+    // ✅ LER PARÂMETRO 1 (da memória, ZERO consultas!)
+    const perguntaQtd = PARAMETROS.PEDIDO_PERGUNTA_QUANTIDADE || 'N';
+    console.log(`📊 PEDIDO_PERGUNTA_QUANTIDADE = ${perguntaQtd}`);
+    
+    if (perguntaQtd === 'S') {
+        // ✅ PARÂMETRO = S: Abrir modal perguntando quantidade
+        console.log('💬 Abrindo modal de quantidade...');
+        await abrirModalQuantidade(produto);
+    } else {
+        // ✅ PARÂMETRO = N: Adicionar direto com quantidade 1
+        console.log('➕ Adicionando direto com quantidade 1');
+        adicionarItemComQuantidade(produto, 1);
+    }
+}
+
+// =====================================================
+// ✅ ADICIONAR ITEM COM QUANTIDADE ESPECÍFICA
+// =====================================================
+function adicionarItemComQuantidade(produto, quantidade) {
     // Verificar se já existe
     const itemExistente = pedidoAtual.itens.find(i => i.id_produto === produto.id);
     
     if (itemExistente) {
         // Incrementar quantidade
-        itemExistente.quantidade++;
+        itemExistente.quantidade += quantidade;
         itemExistente.valor_total = itemExistente.quantidade * itemExistente.valor_unitario;
     } else {
         // Adicionar novo item
@@ -275,9 +326,9 @@ function adicionarProduto(produto) {
             descricao: produto.descricao,
             descricao_complemento: produto.descricao_complemento,
             unidade: produto.unidade,
-            quantidade: 1,
+            quantidade: quantidade,
             valor_unitario: parseFloat(produto.preco),
-            valor_total: parseFloat(produto.preco),
+            valor_total: quantidade * parseFloat(produto.preco),
             estoque: parseFloat(produto.estoque)
         });
     }
@@ -294,6 +345,183 @@ function adicionarProduto(produto) {
     setTimeout(() => {
         document.getElementById('buscaProduto').focus();
     }, 100);
+    
+    console.log(`✅ Produto adicionado: ${produto.descricao} - Qtd: ${quantidade}`);
+}
+
+// =====================================================
+// ✅ MODAL DE QUANTIDADE (PARÂMETRO 1)
+// VERSÃO DEFINITIVA: Remoção direta garantida
+// =====================================================
+async function abrirModalQuantidade(produto) {
+    return new Promise((resolve) => {
+        // Criar estrutura do modal
+        const modalOverlay = document.createElement('div');
+        modalOverlay.id = 'modalQuantidade';
+        modalOverlay.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+        `;
+        
+        modalOverlay.innerHTML = `
+            <div class="modal-content" style="
+                max-width: 400px;
+                background: white;
+                border-radius: 12px;
+                padding: 0;
+                box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            ">
+                <div style="padding: 20px; border-bottom: 1px solid #e5e7eb;">
+                    <h3 style="margin: 0; font-size: 20px;">📦 Quantidade</h3>
+                </div>
+                <div style="padding: 20px;">
+                    <p style="margin-bottom: 16px; font-weight: 600;">
+                        ${produto.descricao}
+                    </p>
+                    <p style="color: #6b7280; margin-bottom: 16px; font-size: 14px;">
+                        Estoque disponível: <strong>${parseFloat(produto.estoque).toFixed(3)}</strong>
+                    </p>
+                    <label style="display: block; margin-bottom: 8px; font-weight: 600; font-size: 14px;">
+                        Quantidade:
+                    </label>
+                    <input 
+                        type="number" 
+                        id="inputQuantidadeModal" 
+                        value="1" 
+                        min="0.001"
+                        step="0.001"
+                        style="
+                            width: 100%;
+                            padding: 12px;
+                            border: 2px solid #2563eb;
+                            border-radius: 8px;
+                            font-size: 18px;
+                            text-align: center;
+                            font-family: inherit;
+                        "
+                    >
+                </div>
+                <div style="
+                    padding: 20px;
+                    border-top: 1px solid #e5e7eb;
+                    display: flex;
+                    gap: 12px;
+                    justify-content: flex-end;
+                ">
+                    <button id="btnCancelarModal" style="
+                        padding: 10px 20px;
+                        background: #6b7280;
+                        color: white;
+                        border: none;
+                        border-radius: 6px;
+                        cursor: pointer;
+                        font-size: 14px;
+                        font-weight: 600;
+                    ">
+                        Cancelar
+                    </button>
+                    <button id="btnConfirmarModal" style="
+                        padding: 10px 20px;
+                        background: #2563eb;
+                        color: white;
+                        border: none;
+                        border-radius: 6px;
+                        cursor: pointer;
+                        font-size: 14px;
+                        font-weight: 600;
+                    ">
+                        ✅ Confirmar
+                    </button>
+                </div>
+            </div>
+        `;
+        
+        // Adicionar ao body
+        document.body.appendChild(modalOverlay);
+        
+        // ✅ FUNÇÃO PARA FECHAR MODAL - REMOÇÃO DIRETA!
+        const fecharModalDefinitivo = (confirmado) => {
+            const input = document.getElementById('inputQuantidadeModal');
+            const qtd = input ? parseFloat(input.value) : 1;
+            
+            console.log('🔒 Fechando modal...');
+            
+            // ✅ REMOÇÃO DIRETA usando a referência que criamos!
+            try {
+                document.body.removeChild(modalOverlay);
+                console.log('✅ Modal removido com sucesso!');
+            } catch (e) {
+                console.error('❌ Erro ao remover modal:', e);
+                // Tenta forçar display none
+                modalOverlay.style.display = 'none';
+            }
+            
+            // Adicionar item se confirmado
+            if (confirmado) {
+                if (isNaN(qtd) || qtd <= 0) {
+                    showMessage('Quantidade inválida!', 'error');
+                    resolve(null);
+                    return;
+                }
+                
+                console.log(`✅ Confirmado com quantidade: ${qtd}`);
+                adicionarItemComQuantidade(produto, qtd);
+                resolve(qtd);
+            } else {
+                console.log('❌ Cancelado');
+                resolve(null);
+            }
+        };
+        
+        // Event listeners
+        setTimeout(() => {
+            const input = document.getElementById('inputQuantidadeModal');
+            const btnConfirmar = document.getElementById('btnConfirmarModal');
+            const btnCancelar = document.getElementById('btnCancelarModal');
+            
+            if (input) {
+                input.focus();
+                input.select();
+                
+                // Enter para confirmar
+                input.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        fecharModalDefinitivo(true);
+                    }
+                });
+            }
+            
+            if (btnConfirmar) {
+                btnConfirmar.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    fecharModalDefinitivo(true);
+                });
+            }
+            
+            if (btnCancelar) {
+                btnCancelar.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    fecharModalDefinitivo(false);
+                });
+            }
+            
+            // Fechar ao clicar fora
+            modalOverlay.addEventListener('click', (e) => {
+                if (e.target === modalOverlay) {
+                    fecharModalDefinitivo(false);
+                }
+            });
+        }, 100);
+    });
 }
 
 // ===== RENDERIZAR ITENS =====
@@ -497,10 +725,13 @@ async function carregarFormasPagamento() {
         if (data.success) {
             formasPagamento = data.data;
             
+            console.log('✅ Formas de pagamento carregadas:', formasPagamento.length);
+            console.log('Primeira forma:', formasPagamento[0]);
+            
             const select = document.getElementById('formaPagamento');
             select.innerHTML = '<option value="">Selecione...</option>' + 
                 formasPagamento.map(f => 
-                    `<option value="${f.id}">${f.descricao}</option>`
+                    `<option value="${f.id_forma_pagamento}">${f.descricao}</option>`
                 ).join('');
         } else {
             console.error('Erro ao carregar formas de pagamento:', data);
@@ -517,6 +748,13 @@ function abrirModalPagamento() {
         return;
     }
     
+    // ✅ VERIFICAR SE SELECT TEM OPTIONS
+    const select = document.getElementById('formaPagamento');
+    if (select && select.options.length <= 1) {
+        console.warn('⚠️ Select vazio! Recarregando formas de pagamento...');
+        carregarFormasPagamento();
+    }
+    
     const valorRestante = pedidoAtual.valor_liquido - 
         pedidoAtual.pagamentos.reduce((sum, p) => sum + p.valor, 0);
     
@@ -525,15 +763,46 @@ function abrirModalPagamento() {
     document.getElementById('formaPagamento').value = '';
     document.getElementById('trocoGroup').style.display = 'none';
     
-    document.getElementById('modalPagamento').classList.add('show');
+    const modal = document.getElementById('modalPagamento');
+    modal.classList.add('show');
+    
+    console.log('✅ Modal de pagamento aberto');
 }
 
 function fecharModalPagamento() {
-    document.getElementById('modalPagamento').classList.remove('show');
+    const modal = document.getElementById('modalPagamento');
+    
+    if (!modal) {
+        console.error('❌ Modal de pagamento não encontrado!');
+        return;
+    }
+    
+    console.log('🔒 Fechando modal de pagamento...');
+    
+    // Método 1: classList.remove
+    try {
+        modal.classList.remove('show');
+        console.log('✅ Modal de pagamento fechado (classList.remove)');
+    } catch (e) {
+        console.error('❌ Erro ao remover classe show:', e);
+        // Método 2: forçar display none
+        try {
+            modal.style.display = 'none';
+            console.log('✅ Modal de pagamento fechado (display none)');
+        } catch (e2) {
+            console.error('❌ Erro ao esconder modal:', e2);
+        }
+    }
+    
+    // Limpar campos
+    document.getElementById('formaPagamento').value = '';
+    document.getElementById('valorPagamento').value = '';
+    document.getElementById('valorTroco').value = '';
+    document.getElementById('trocoGroup').style.display = 'none';
 }
 
 function calcularTroco() {
-    const formaSelecionada = formasPagamento.find(f => f.id == document.getElementById('formaPagamento').value);
+    const formaSelecionada = formasPagamento.find(f => f.id_forma_pagamento == document.getElementById('formaPagamento').value);
     
     if (!formaSelecionada || !formaSelecionada.permite_troco) {
         return;
@@ -549,10 +818,23 @@ function calcularTroco() {
 }
 
 function adicionarPagamento() {
-    const idForma = document.getElementById('formaPagamento').value;
+    const select = document.getElementById('formaPagamento');
+    const idForma = select ? select.value : undefined;
     const valorStr = document.getElementById('valorPagamento').value;
     
-    if (!idForma) {
+    console.log('🔍 Adicionando pagamento...');
+    console.log('Select encontrado:', !!select);
+    console.log('Quantidade de options:', select ? select.options.length : 0);
+    console.log('ID Forma selecionada:', idForma);
+    console.log('Formas disponíveis no array:', formasPagamento.length);
+    
+    if (!select || select.options.length <= 1) {
+        showMessage('Erro: Formas de pagamento não carregadas. Aguarde ou recarregue a página.', 'error');
+        console.error('❌ Select vazio ou não encontrado!');
+        return;
+    }
+    
+    if (!idForma || idForma === '') {
         showMessage('Selecione uma forma de pagamento', 'error');
         return;
     }
@@ -563,15 +845,26 @@ function adicionarPagamento() {
         return;
     }
     
-    const forma = formasPagamento.find(f => f.id == idForma);
+    // ✅ CORREÇÃO: Validar se forma existe ANTES de usar
+    const forma = formasPagamento.find(f => f.id_forma_pagamento == idForma);
+    if (!forma) {
+        showMessage('Forma de pagamento não encontrada. Recarregue a página.', 'error');
+        console.error('❌ Forma de pagamento não encontrada:', idForma);
+        console.error('Formas disponíveis:', formasPagamento);
+        console.error('IDs disponíveis:', formasPagamento.map(f => f.id_forma_pagamento));
+        return;
+    }
+    
     const troco = forma.permite_troco ? parseFloat(document.getElementById('valorTroco').value) || 0 : 0;
     
     pedidoAtual.pagamentos.push({
-        id_forma_pagamento: forma.id,
+        id_forma_pagamento: forma.id_forma_pagamento,
         descricao: forma.descricao,
         valor: valor,
         troco: troco
     });
+    
+    console.log('✅ Pagamento adicionado:', forma.descricao, '-', valor);
     
     renderizarPagamentos();
     calcularTotais();
@@ -637,16 +930,30 @@ async function finalizarPedido() {
         return;
     }
     
-    // Validar estoque
-    for (const item of pedidoAtual.itens) {
-        if (item.quantidade > item.estoque) {
-            showMessage(
-                `Estoque insuficiente para ${item.descricao}. ` +
-                `Disponível: ${item.estoque.toFixed(3)} - Solicitado: ${item.quantidade.toFixed(3)}`,
-                'error'
-            );
-            return;
+    // ✅ VALIDAR ESTOQUE COM PARÂMETRO 2
+    // PERMITE_SALDO_NEGATIVO
+    const permiteSaldoNegativo = PARAMETROS.PERMITE_SALDO_NEGATIVO || 'N';
+    console.log(`📊 PERMITE_SALDO_NEGATIVO = ${permiteSaldoNegativo}`);
+    
+    if (permiteSaldoNegativo === 'N') {
+        // ✅ PARÂMETRO = N: VALIDAR estoque (não permite negativo)
+        console.log('🔒 Validando estoque (não permite saldo negativo)...');
+        
+        for (const item of pedidoAtual.itens) {
+            if (item.quantidade > item.estoque) {
+                showMessage(
+                    `Estoque insuficiente para ${item.descricao}. ` +
+                    `Disponível: ${item.estoque.toFixed(3)} - Solicitado: ${item.quantidade.toFixed(3)}`,
+                    'error'
+                );
+                console.error(`❌ Estoque insuficiente: ${item.descricao}`);
+                return;
+            }
         }
+        console.log('✅ Estoque validado - tudo OK');
+    } else {
+        // ✅ PARÂMETRO = S: NÃO VALIDAR (permite negativo)
+        console.log('✅ Permite saldo negativo - pulando validação de estoque');
     }
     
     // Coletar observações
