@@ -8,6 +8,9 @@
 </head>
 <body>
     <div class="container">
+        <!-- ✅ BOTÃO VOLTAR - CANTO SUPERIOR DIREITO -->
+        <button class="btn-voltar" onclick="voltarPagina()">⬅ Voltar</button>
+        
         <h1>👥 Clientes</h1>
         <p class="subtitle">Gestão Completa de Clientes</p>
         
@@ -32,7 +35,7 @@
             
             <!-- Dropdown Ordenação -->
             <div class="dropdown" onclick="toggleDropdown(event, this)">
-                <button class="btn btn-filtros">🔄 Ordenar ▼</button>
+                <button class="btn btn-ordenacao">🔄 Ordenar ▼</button>
                 <div class="dropdown-content">
                     <a href="#" onclick="aplicarOrdenacao('razao_social')">Por Razão Social</a>
                     <a href="#" onclick="aplicarOrdenacao('data_criacao')">Ordem de Digitação</a>
@@ -210,5 +213,11 @@
     </div>
 
     <script src="js/clientes.js"></script>
+    <script>
+        // ✅ Função Voltar para Dashboard
+        function voltarPagina() {
+            window.location.href = 'dashboard.html';
+        }
+    </script>
 </body>
 </html>

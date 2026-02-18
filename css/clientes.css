@@ -25,7 +25,8 @@ body {
     background: white; 
     border-radius: 15px; 
     padding: 30px; 
-    box-shadow: 0 20px 60px rgba(0,0,0,0.3); 
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    position: relative; /* ✅ Para posicionar o botão voltar */
 }
 
 /* Títulos */
@@ -41,6 +42,30 @@ h1 {
     color: #666; 
     margin-bottom: 30px; 
     font-size: 1.2em; 
+}
+
+/* ✅ BOTÃO VOLTAR - Canto Superior Direito */
+.btn-voltar {
+    position: absolute;
+    top: 30px;
+    right: 30px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-voltar:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
 }
 
 /* Remover spinner dos inputs numéricos */
@@ -61,8 +86,11 @@ input[type="number"] {
     flex-wrap: wrap; 
 }
 
+/* ✅ BOTÕES EM DEGRADÊ AZUL - PADRÃO PRODUTOS */
+
+/* Novo Cliente - Azul Mais Forte */
 .btn { 
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+    background: linear-gradient(135deg, #4a5fd6 0%, #5b3d9c 100%); 
     color: white; 
     border: none; 
     padding: 12px 24px; 
@@ -78,12 +106,19 @@ input[type="number"] {
     box-shadow: 0 5px 15px rgba(0,0,0,0.3); 
 }
 
-.btn-filtros { 
-    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); 
+/* Ordenação - Azul Médio/Forte */
+.btn-ordenacao { 
+    background: linear-gradient(135deg, #5a73e8 0%, #6a56b8 100%); 
 }
 
+/* Filtros - Azul Médio */
+.btn-filtros { 
+    background: linear-gradient(135deg, #6b85f5 0%, #7d70c7 100%); 
+}
+
+/* Relatórios - Azul Mais Suave */
 .btn-relatorio { 
-    background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); 
+    background: linear-gradient(135deg, #8a9dfc 0%, #9e8ed6 100%); 
 }
 
 /* Dropdown */
@@ -112,7 +147,7 @@ input[type="number"] {
 }
 
 .dropdown-content a:hover { 
-    background-color: #f093fb; 
+    background-color: #667eea; 
     color: white; 
 }
 
@@ -122,7 +157,7 @@ input[type="number"] {
 
 /* Filtro Ativo */
 .filtro-ativo { 
-    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); 
+    background: linear-gradient(135deg, #6b85f5 0%, #7d70c7 100%); 
     color: white; 
     padding: 12px 20px; 
     border-radius: 8px; 
@@ -134,7 +169,7 @@ input[type="number"] {
 
 .btn-limpar-filtro { 
     background: white; 
-    color: #f5576c; 
+    color: #667eea; 
     border: none; 
     padding: 6px 12px; 
     border-radius: 6px; 
@@ -173,7 +208,7 @@ tbody tr:hover {
     background-color: #f9f9f9; 
 }
 
-/* Botões pequenos da tabela */
+/* ✅ BOTÕES PEQUENOS DA TABELA - PADRÃO PRODUTOS */
 .btn-small { 
     padding: 6px 12px; 
     font-size: 12px; 
@@ -421,6 +456,12 @@ tbody tr:hover {
     border: none; 
     border-radius: 6px; 
     cursor: pointer; 
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.pagination button:hover:not(:disabled) {
+    opacity: 0.9;
 }
 
 .pagination button:disabled { 
@@ -453,6 +494,15 @@ tbody tr:hover {
 @media (max-width: 768px) {
     .container { padding: 15px; }
     h1 { font-size: 1.8em; }
+    
+    /* ✅ Botão voltar responsivo */
+    .btn-voltar {
+        top: 15px;
+        right: 15px;
+        padding: 8px 16px;
+        font-size: 14px;
+    }
+    
     .menu-toggle { display: block; }
     .btn-toolbar { flex-direction: column; }
     .dropdown-content { 
