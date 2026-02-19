@@ -1,244 +1,464 @@
-// =====================================================
-// SIRIUS WEB - PDV - JavaScript
-// =====================================================
+/* ================================================================
+   SIRIUS WEB - PDV.JS
+   Lógica completa do PDV com 3 abas e navegação por teclado
+   ================================================================ */
 
-// ===== CONFIGURAÇÕES GLOBAIS =====
-const isDev = window.location.hostname === 'localhost' 
+'use strict';
+
+// ================================================================
+// CONFIGURAÇÃO DA API (dual: local + Vercel)
+// ================================================================
+const isDev = window.location.hostname === 'localhost'
            || window.location.hostname === '127.0.0.1'
            || window.location.hostname === ''
            || window.location.protocol === 'file:';
 
-const API_URL = isDev ? 'http://localhost:3000' : 'https://sirius-web-api-adonis.vercel.app';
+// Local: http://localhost:3000  |  Produção: API separada no Vercel
+const API_URL = isDev
+    ? 'http://localhost:3000'
+    : 'https://sirius-web-api-adonis.vercel.app';
 
 console.log('📍 Ambiente:', isDev ? 'DESENVOLVIMENTO' : 'PRODUÇÃO');
 console.log('📡 API URL:', API_URL);
 
-// ===== ESTADO DA APLICAÇÃO =====
-let pedidoAtual = {
-    numero: null,
-    cliente: null,
-    itens: [],
-    pagamentos: [],
-    valor_bruto: 0,
-    desconto: 0,
-    acrescimo: 0,
-    valor_liquido: 0,
-    observacoes: ''
-};
-
-let formasPagamento = [];
-let itemEmEdicao = null;
+// ================================================================
+// ESTADO GLOBAL
+// ================================================================
 let empresaId = null;
+let formasPagamento = [];
+let parametros = {};          // parâmetros do sistema
+let pedidoAtual = novoPedidoObj();
+let itemEmEdicao = null;      // índice do item sendo editado no modal qtd
+let abatual = 'cliente';      // aba visível: 'cliente' | 'produtos' | 'pagamentos'
 
-// =====================================================
-// ✅ PARÂMETROS GLOBAIS (CARREGADOS UMA VEZ)
-// Performance: ZERO consultas ao banco durante uso!
-// =====================================================
-let PARAMETROS = {};
-
-function carregarParametros() {
-    try {
-        const parametrosStr = localStorage.getItem('sirius_parametros');
-        if (parametrosStr) {
-            PARAMETROS = JSON.parse(parametrosStr);
-            console.log('✅ Parâmetros carregados:', PARAMETROS);
-            console.log(`📊 Total de parâmetros: ${Object.keys(PARAMETROS).length}`);
-        } else {
-            console.warn('⚠️ Nenhum parâmetro encontrado no localStorage');
-            PARAMETROS = {};
-        }
-    } catch (error) {
-        console.error('❌ Erro ao carregar parâmetros:', error);
-        PARAMETROS = {};
-    }
+function novoPedidoObj() {
+    return {
+        numero: null,
+        cliente: null,
+        itens: [],
+        pagamentos: [],
+        valor_bruto: 0,
+        desconto: 0,
+        acrescimo: 0,
+        valor_liquido: 0,
+        observacoes: ''
+    };
 }
 
-// ===== INICIALIZAÇÃO =====
-document.addEventListener('DOMContentLoaded', async () => {
-    console.log('🚀 PDV carregado');
-    
-    // ✅ CARREGAR PARÂMETROS PRIMEIRO (ANTES DE TUDO!)
-    carregarParametros();
-    
-    const token = checkAuth();
-    if (!token) return;
-    
-    // Carregar dados do usuário e empresa
-    const usuario = JSON.parse(localStorage.getItem('sirius_usuario'));
-    const empresas = JSON.parse(localStorage.getItem('sirius_empresas') || '[]');
-    
-    if (empresas.length > 0) {
-        empresaId = empresas[0].id;
-        console.log('✅ Empresa ID:', empresaId);
-    } else {
-        showMessage('Nenhuma empresa encontrada. Faça login novamente.', 'error');
-        return;
-    }
-    
-    // ✅ CORREÇÃO: NÃO tenta mais atualizar userName (não existe no HTML)
-    // A linha abaixo foi REMOVIDA pois causava erro:
-    // document.getElementById('userName').textContent = usuario.nome;
-    
-    // Inicializar pedido
-    await inicializarPedido();
-    
-    // Configurar eventos
-    configurarEventos();
-});
-
-// ===== AUTENTICAÇÃO =====
-function checkAuth() {
+// ================================================================
+// INICIALIZAÇÃO
+// ================================================================
+document.addEventListener('DOMContentLoaded', () => {
+    // Verificar autenticação
     const token = localStorage.getItem('sirius_token');
     if (!token) {
         window.location.href = 'index.html';
-        return null;
+        return;
     }
-    return token;
-}
 
-function logout() {
-    localStorage.removeItem('sirius_token');
-    localStorage.removeItem('sirius_usuario');
-    localStorage.removeItem('sirius_empresas');
-    localStorage.removeItem('sirius_parametros'); // ✅ Limpar parâmetros também
-    window.location.href = 'index.html';
-}
-
-// ===== INICIALIZAÇÃO DO PEDIDO =====
-async function inicializarPedido() {
     try {
-        // Obter próximo número
-        const numeroResp = await fetch(`${API_URL}/pdv/proximo-numero`, {
+        const empresasStr = localStorage.getItem('sirius_empresas');
+        if (!empresasStr) {
+            console.error('❌ sirius_empresas não encontrado no localStorage');
+            window.location.href = 'index.html';
+            return;
+        }
+
+        const empresas = JSON.parse(empresasStr);
+        // Suporte a array ou objeto direto
+        const empresa = Array.isArray(empresas) ? empresas[0] : empresas;
+        // Suporte a id_empresa ou id
+        empresaId = empresa.id_empresa || empresa.id || empresa.empresa_id;
+
+        console.log('🏢 empresaId carregado:', empresaId, '| estrutura:', JSON.stringify(empresa).substring(0, 100));
+
+        if (!empresaId) {
+            console.error('❌ empresaId não encontrado. Estrutura recebida:', empresa);
+            window.location.href = 'index.html';
+            return;
+        }
+    } catch (e) {
+        console.error('❌ Erro ao parsear sirius_empresas:', e);
+        window.location.href = 'index.html';
+        return;
+    }
+
+    // Mostrar tela inicial e configurar eventos globais
+    mostrarTelaInicial();
+    configurarEventosGlobais();
+});
+
+// ================================================================
+// TELA INICIAL
+// ================================================================
+function mostrarTelaInicial() {
+    document.getElementById('tela-inicial').style.display = 'block';
+    document.getElementById('tela-pdv').style.display = 'none';
+    // Focar no botão "Novo Pedido"
+    setTimeout(() => {
+        const btn = document.getElementById('btn-novo-pedido');
+        if (btn) btn.focus();
+    }, 100);
+}
+
+function voltarDashboard() {
+    window.location.href = 'dashboard.html';
+}
+
+// ================================================================
+// INICIAR NOVO PEDIDO → vai para aba Cliente
+// ================================================================
+async function iniciarNovoPedido() {
+    // Resetar estado
+    pedidoAtual = novoPedidoObj();
+
+    // Mostrar tela PDV
+    document.getElementById('tela-inicial').style.display = 'none';
+    document.getElementById('tela-pdv').style.display = 'flex';
+
+    // Atualizar data no header
+    const agora = new Date();
+    document.getElementById('dataPedido').textContent = agora.toLocaleString('pt-BR', {
+        day: '2-digit', month: '2-digit', year: 'numeric',
+        hour: '2-digit', minute: '2-digit'
+    });
+
+    // Carregar dados em paralelo
+    await Promise.all([
+        carregarProximoNumero(),
+        carregarClientePadrao(),
+        carregarFormasPagamento(),
+        carregarParametros()
+    ]);
+
+    // Ir para aba Cliente
+    irParaAba('cliente');
+}
+
+// ================================================================
+// NAVEGAÇÃO ENTRE ABAS
+// ================================================================
+function irParaAba(aba) {
+    abatual = aba;
+
+    // Esconder todas as abas
+    document.querySelectorAll('.pdv-tab').forEach(t => t.style.display = 'none');
+
+    // Atualizar steps no header
+    const steps = { cliente: 1, produtos: 2, pagamentos: 3 };
+    const numAba = steps[aba];
+
+    document.querySelectorAll('.pdv-step').forEach(s => {
+        const num = steps[s.dataset.tab];
+        s.classList.remove('ativo', 'concluido');
+        if (num < numAba) s.classList.add('concluido');
+        if (num === numAba) s.classList.add('ativo');
+    });
+
+    // Mostrar aba atual
+    document.getElementById(`tab-${aba}`).style.display = 'block';
+
+    // Foco inicial por aba
+    setTimeout(() => {
+        if (aba === 'cliente') {
+            document.getElementById('inputBuscaCliente').focus();
+        } else if (aba === 'produtos') {
+            document.getElementById('buscaProduto').focus();
+        } else if (aba === 'pagamentos') {
+            document.getElementById('formaPagamento').focus();
+        }
+    }, 80);
+}
+
+function voltarAba(aba) {
+    irParaAba(aba);
+}
+
+// ================================================================
+// CONFIRMAR CLIENTE → ir para Produtos
+// ================================================================
+function confirmarCliente() {
+    if (!pedidoAtual.cliente) {
+        showMessage('Nenhum cliente selecionado. Selecione um cliente ou use o Consumidor Final.', 'warning');
+        return;
+    }
+    // Atualizar badge do cliente na aba Produtos
+    const nomeCliente = pedidoAtual.cliente.razao_social || 'Consumidor Final';
+    document.getElementById('clienteBadge').textContent = `👤 ${nomeCliente}`;
+    document.getElementById('clienteBadgePag').textContent = nomeCliente;
+
+    irParaAba('produtos');
+}
+
+// ================================================================
+// CONFIRMAR PRODUTOS → ir para Pagamentos
+// ================================================================
+function confirmarProdutos() {
+    if (pedidoAtual.itens.length === 0) {
+        showMessage('Adicione pelo menos um produto antes de continuar.', 'warning');
+        return;
+    }
+
+    // Atualizar resumo na aba pagamentos
+    document.getElementById('pagItensQtd').textContent = pedidoAtual.itens.length;
+    document.getElementById('pagTotalPedido').textContent = `R$ ${pedidoAtual.valor_liquido.toFixed(2)}`;
+    atualizarStatusPagamento();
+
+    irParaAba('pagamentos');
+}
+
+// ================================================================
+// CANCELAR VENDA
+// ================================================================
+function cancelarVendaConfirmar() {
+    document.getElementById('modalConfirmacao').style.display = 'flex';
+    setTimeout(() => {
+        document.getElementById('btnConfirmarAcao').focus();
+    }, 100);
+}
+
+function fecharModalConfirmacao() {
+    document.getElementById('modalConfirmacao').style.display = 'none';
+}
+
+function executarCancelamento() {
+    fecharModalConfirmacao();
+    mostrarTelaInicial();
+}
+
+// ================================================================
+// CARREGAR PRÓXIMO NÚMERO
+// ================================================================
+async function carregarProximoNumero() {
+    try {
+        const response = await fetch(`${API_URL}/pdv/proximo-numero`, {
             headers: {
                 'Authorization': `Bearer ${localStorage.getItem('sirius_token')}`,
                 'X-Empresa-Id': empresaId
             }
         });
-        const numeroData = await numeroResp.json();
-        
-        if (numeroData.success) {
-            pedidoAtual.numero = numeroData.data.numero;
-            document.getElementById('numeroPedido').textContent = numeroData.data.numero;
-        } else {
-            console.error('Erro ao obter número:', numeroData);
-            showMessage(numeroData.message || 'Erro ao obter número do pedido', 'error');
+        const data = await response.json();
+        if (data.success) {
+            pedidoAtual.numero = data.data.numero;
+            document.getElementById('numeroPedido').textContent = data.data.numero;
         }
-        
-        // Obter cliente padrão
-        const clienteResp = await fetch(`${API_URL}/pdv/cliente-padrao`, {
-            headers: {
-                'Authorization': `Bearer ${localStorage.getItem('sirius_token')}`,
-                'X-Empresa-Id': empresaId
-            }
-        });
-        const clienteData = await clienteResp.json();
-        
-        if (clienteData.success) {
-            pedidoAtual.cliente = clienteData.data;
-            renderizarCliente();
-        } else {
-            console.error('Erro ao obter cliente:', clienteData);
-            document.getElementById('clienteInfo').innerHTML = `
-                <div style="color: #ef4444; padding: 12px; background: #fee; border-radius: 6px;">
-                    ⚠️ ${clienteData.message || 'Erro ao carregar cliente padrão'}<br>
-                    <small>Clique no ícone 🔍 para selecionar um cliente</small>
-                </div>
-            `;
-        }
-        
-        // Carregar formas de pagamento
-        await carregarFormasPagamento();
-        
-        // Atualizar data
-        const now = new Date();
-        document.getElementById('dataPedido').textContent = 
-            now.toLocaleDateString('pt-BR', { 
-                day: '2-digit', 
-                month: '2-digit', 
-                year: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
-            });
-        
-    } catch (error) {
-        console.error('Erro ao inicializar pedido:', error);
-        showMessage('Erro ao inicializar pedido', 'error');
+    } catch (e) {
+        console.error('Erro ao obter número do pedido:', e);
     }
 }
 
-// ===== CONFIGURAR EVENTOS =====
-function configurarEventos() {
-    // Busca de produto
-    const inputBusca = document.getElementById('buscaProduto');
-    let timeoutBusca;
-    
-    inputBusca.addEventListener('input', (e) => {
-        clearTimeout(timeoutBusca);
-        const termo = e.target.value.trim();
-        
-        if (termo.length < 2) {
-            document.getElementById('resultadosBusca').innerHTML = '';
-            return;
-        }
-        
-        timeoutBusca = setTimeout(() => {
-            buscarProdutos(termo);
-        }, 300);
-    });
-    
-    // Enter no input de busca
-    inputBusca.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') {
-            e.preventDefault();
-            const resultados = document.querySelectorAll('.resultado-item');
-            if (resultados.length === 1) {
-                resultados[0].click();
-            }
-        }
-    });
-    
-    // Busca de cliente no modal
-    const inputBuscaCliente = document.getElementById('inputBuscaCliente');
-    let timeoutBuscaCliente;
-    
-    inputBuscaCliente.addEventListener('input', (e) => {
-        clearTimeout(timeoutBuscaCliente);
-        const termo = e.target.value.trim();
-        
-        if (termo.length < 2) {
-            document.getElementById('resultadosBuscaCliente').innerHTML = '';
-            return;
-        }
-        
-        timeoutBuscaCliente = setTimeout(() => {
-            buscarClientes(termo);
-        }, 300);
-    });
-    
-    // Fechar modais ao clicar fora
-    document.querySelectorAll('.modal').forEach(modal => {
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) {
-                modal.classList.remove('show');
+// ================================================================
+// CARREGAR PARÂMETROS DO SISTEMA
+// ================================================================
+async function carregarParametros() {
+    try {
+        const response = await fetch(`${API_URL}/pdv/parametros`, {
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('sirius_token')}`,
+                'X-Empresa-Id': empresaId
             }
         });
-    });
-    
-    // Monitorar mudança de forma de pagamento
-    document.getElementById('formaPagamento').addEventListener('change', (e) => {
-        const formaSelecionada = formasPagamento.find(f => f.id_forma_pagamento == e.target.value);
-        if (formaSelecionada && formaSelecionada.permite_troco) {
-            document.getElementById('trocoGroup').style.display = 'block';
-        } else {
-            document.getElementById('trocoGroup').style.display = 'none';
+        const data = await response.json();
+        if (data.success && data.data) {
+            parametros = {};
+            data.data.forEach(p => {
+                parametros[p.codigo] = p.valor;
+            });
         }
-    });
-    
-    // Calcular troco automaticamente
-    document.getElementById('valorPagamento').addEventListener('input', calcularTroco);
+    } catch (e) {
+        console.warn('Parâmetros não disponíveis:', e.message);
+        parametros = {};
+    }
 }
 
-// ===== BUSCAR PRODUTOS =====
+// Helpers para parâmetros
+function paramAtivo(codigo) {
+    const v = (parametros[codigo] || '').toString().toUpperCase();
+    return v === 'S' || v === '1' || v === 'TRUE';
+}
+
+// ================================================================
+// CLIENTE PADRÃO (Consumidor Final)
+// ================================================================
+async function carregarClientePadrao() {
+    try {
+        const response = await fetch(`${API_URL}/pdv/cliente-padrao`, {
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('sirius_token')}`,
+                'X-Empresa-Id': empresaId
+            }
+        });
+        const data = await response.json();
+        if (data.success && data.data) {
+            pedidoAtual.cliente = data.data;
+        } else {
+            pedidoAtual.cliente = { id: 0, razao_social: 'Consumidor Final', documento: '' };
+        }
+    } catch (e) {
+        pedidoAtual.cliente = { id: 0, razao_social: 'Consumidor Final', documento: '' };
+    }
+    renderizarClienteSelecionado();
+}
+
+function renderizarClienteSelecionado() {
+    const container = document.getElementById('clienteInfo');
+    if (!pedidoAtual.cliente) {
+        container.innerHTML = '<div class="cliente-loading">Nenhum cliente selecionado</div>';
+        return;
+    }
+    const c = pedidoAtual.cliente;
+    container.innerHTML = `
+        <div class="cliente-nome">${c.razao_social}</div>
+        ${c.documento ? `<div class="cliente-doc">${c.documento}</div>` : ''}
+        ${!c.documento && !c.id ? '<div class="cliente-consumidor">⚡ Cliente padrão do sistema</div>' : ''}
+    `;
+}
+
+function limparBuscaCliente() {
+    document.getElementById('inputBuscaCliente').value = '';
+    document.getElementById('resultadosBuscaCliente').innerHTML = '';
+    document.getElementById('btnLimparBuscaCliente').style.display = 'none';
+    document.getElementById('inputBuscaCliente').focus();
+}
+
+// ================================================================
+// BUSCAR CLIENTES
+// ================================================================
+
+// Array auxiliar para guardar os objetos cliente sem passar pelo HTML
+let _clientesResultado = [];
+
+async function buscarClientes(termo) {
+    if (!termo || termo.trim().length < 2) {
+        document.getElementById('resultadosBuscaCliente').innerHTML =
+            '<div class="empty-message">Digite pelo menos 2 caracteres e tecle Enter</div>';
+        return;
+    }
+
+    console.log('🔍 Buscando clientes | termo:', termo, '| empresaId:', empresaId, '| API_URL:', API_URL);
+
+    // Indicador visual de carregando
+    document.getElementById('resultadosBuscaCliente').innerHTML =
+        '<div class="empty-message">Buscando...</div>';
+
+    try {
+        const token = localStorage.getItem('sirius_token');
+        const url = `${API_URL}/pdv/clientes/buscar?termo=${encodeURIComponent(termo)}`;
+
+        const response = await fetch(url, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'X-Empresa-Id': String(empresaId)
+            }
+        });
+
+        console.log('📡 Resposta clientes | status:', response.status);
+
+        const data = await response.json();
+        console.log('📦 Dados clientes:', data);
+
+        if (data.success) {
+            renderizarResultadosClientes(data.data);
+        } else {
+            document.getElementById('resultadosBuscaCliente').innerHTML =
+                `<div class="empty-message">Nenhum resultado: ${data.message || ''}</div>`;
+        }
+    } catch (e) {
+        console.error('❌ Erro ao buscar clientes:', e);
+        document.getElementById('resultadosBuscaCliente').innerHTML =
+            '<div class="empty-message">Erro de conexão ao buscar clientes</div>';
+    }
+}
+
+function renderizarResultadosClientes(clientes) {
+    const container = document.getElementById('resultadosBuscaCliente');
+    _clientesResultado = clientes || [];
+
+    if (_clientesResultado.length === 0) {
+        container.innerHTML = '<div class="empty-message">Nenhum cliente encontrado</div>';
+        return;
+    }
+
+    container.innerHTML = _clientesResultado.map((c, idx) => `
+        <div
+            class="resultado-item"
+            tabindex="0"
+            data-idx="${idx}"
+            onclick="selecionarClientePorIdx(${idx})"
+            onkeydown="teclaResultadoCliente(event, ${idx})"
+        >
+            <div class="resultado-nome">${c.razao_social}</div>
+            <div class="resultado-info">
+                ${c.nome_fantasia ? `<span>${c.nome_fantasia}</span>` : ''}
+                ${c.documento ? `<span>${c.documento}</span>` : ''}
+            </div>
+        </div>
+    `).join('');
+}
+
+function selecionarClientePorIdx(idx) {
+    selecionarCliente(_clientesResultado[idx]);
+}
+
+function selecionarCliente(cliente) {
+    pedidoAtual.cliente = cliente;
+    renderizarClienteSelecionado();
+    // Limpar busca
+    document.getElementById('inputBuscaCliente').value = '';
+    document.getElementById('resultadosBuscaCliente').innerHTML = '';
+    document.getElementById('btnLimparBuscaCliente').style.display = 'none';
+    // Focar no botão confirmar
+    document.getElementById('btnConfirmarCliente').focus();
+}
+
+function teclaResultadoCliente(event, idx) {
+    if (event.key === 'Enter') {
+        event.preventDefault();
+        selecionarClientePorIdx(idx);
+    } else if (event.key === 'ArrowDown') {
+        event.preventDefault();
+        const next = event.target.nextElementSibling;
+        if (next) next.focus();
+    } else if (event.key === 'ArrowUp') {
+        event.preventDefault();
+        const prev = event.target.previousElementSibling;
+        if (prev) prev.focus();
+        else document.getElementById('inputBuscaCliente').focus();
+    }
+}
+
+// ================================================================
+// FORMAS DE PAGAMENTO
+// ================================================================
+async function carregarFormasPagamento() {
+    try {
+        const response = await fetch(`${API_URL}/pdv/formas-pagamento`, {
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('sirius_token')}`,
+                'X-Empresa-Id': empresaId
+            }
+        });
+        const data = await response.json();
+        if (data.success) {
+            formasPagamento = data.data;
+            const select = document.getElementById('formaPagamento');
+            select.innerHTML = '<option value="">Selecione...</option>' +
+                formasPagamento.map(f =>
+                    `<option value="${f.id}">${f.descricao}</option>`
+                ).join('');
+        }
+    } catch (e) {
+        console.error('Erro ao carregar formas de pagamento:', e);
+    }
+}
+
+// ================================================================
+// BUSCAR PRODUTOS
+// ================================================================
+
+// Array auxiliar para guardar os objetos produto sem passar pelo HTML
+let _produtosResultado = [];
+
 async function buscarProdutos(termo) {
     try {
         const response = await fetch(
@@ -250,75 +470,105 @@ async function buscarProdutos(termo) {
                 }
             }
         );
-        
+
         const data = await response.json();
-        
+
         if (data.success) {
             renderizarResultadosProdutos(data.data);
         } else {
             console.error('Erro ao buscar produtos:', data);
         }
-    } catch (error) {
-        console.error('Erro ao buscar produtos:', error);
+    } catch (e) {
+        console.error('Erro ao buscar produtos:', e);
     }
 }
 
 function renderizarResultadosProdutos(produtos) {
     const container = document.getElementById('resultadosBusca');
-    
-    if (produtos.length === 0) {
+    _produtosResultado = produtos || [];
+
+    if (_produtosResultado.length === 0) {
         container.innerHTML = '<div class="empty-message">Nenhum produto encontrado</div>';
         return;
     }
-    
-    container.innerHTML = produtos.map(p => `
-        <div class="resultado-item" onclick='adicionarProdutoAoPedido(${JSON.stringify(p).replace(/'/g, "&#39;")})'>
-            <div class="resultado-nome">${p.descricao}</div>
-            <div class="resultado-info">
-                ${p.codigo ? `<span>Cód: ${p.codigo}</span>` : ''}
-                ${p.ean ? `<span>EAN: ${p.ean}</span>` : ''}
-                <span>Estoque: ${parseFloat(p.estoque).toFixed(3)}</span>
-                <span class="resultado-preco">R$ ${parseFloat(p.preco).toFixed(2)}</span>
+
+    container.innerHTML = _produtosResultado.map((p, idx) => {
+        const estoque = parseFloat(p.estoque) || 0;
+        const estoqueClass = estoque <= 0 ? 'resultado-estoque-zero' : 'resultado-estoque';
+        return `
+            <div
+                class="resultado-item"
+                tabindex="0"
+                data-idx="${idx}"
+                onclick="adicionarProdutoPorIdx(${idx})"
+                onkeydown="teclaResultadoProduto(event, ${idx})"
+            >
+                <div class="resultado-nome">${p.descricao}</div>
+                <div class="resultado-info">
+                    ${p.codigo ? `<span>Cód: ${p.codigo}</span>` : ''}
+                    ${p.ean ? `<span>EAN: ${p.ean}</span>` : ''}
+                    <span class="${estoqueClass}">Estq: ${estoque.toFixed(3)}</span>
+                    <span class="resultado-preco">R$ ${parseFloat(p.preco).toFixed(2)}</span>
+                </div>
             </div>
-        </div>
-    `).join('');
+        `;
+    }).join('');
 }
 
-// =====================================================
-// ✅ ADICIONAR PRODUTO COM PARÂMETRO 1
-// PEDIDO_PERGUNTA_QUANTIDADE
-// =====================================================
-async function adicionarProdutoAoPedido(produto) {
-    console.log('🛒 Adicionando produto:', produto.descricao);
-    
-    // ✅ LER PARÂMETRO 1 (da memória, ZERO consultas!)
-    const perguntaQtd = PARAMETROS.PEDIDO_PERGUNTA_QUANTIDADE || 'N';
-    console.log(`📊 PEDIDO_PERGUNTA_QUANTIDADE = ${perguntaQtd}`);
-    
-    if (perguntaQtd === 'S') {
-        // ✅ PARÂMETRO = S: Abrir modal perguntando quantidade
-        console.log('💬 Abrindo modal de quantidade...');
-        await abrirModalQuantidade(produto);
-    } else {
-        // ✅ PARÂMETRO = N: Adicionar direto com quantidade 1
-        console.log('➕ Adicionando direto com quantidade 1');
-        adicionarItemComQuantidade(produto, 1);
+function adicionarProdutoPorIdx(idx) {
+    adicionarProduto(_produtosResultado[idx]);
+}
+
+function teclaResultadoProduto(event, idx) {
+    if (event.key === 'Enter') {
+        event.preventDefault();
+        adicionarProdutoPorIdx(idx);
+    } else if (event.key === 'ArrowDown') {
+        event.preventDefault();
+        const next = event.target.nextElementSibling;
+        if (next) next.focus();
+    } else if (event.key === 'ArrowUp') {
+        event.preventDefault();
+        const prev = event.target.previousElementSibling;
+        if (prev) prev.focus();
+        else document.getElementById('buscaProduto').focus();
     }
 }
 
-// =====================================================
-// ✅ ADICIONAR ITEM COM QUANTIDADE ESPECÍFICA
-// =====================================================
-function adicionarItemComQuantidade(produto, quantidade) {
-    // Verificar se já existe
+// ================================================================
+// ADICIONAR PRODUTO
+// ================================================================
+function adicionarProduto(produto) {
+    const estoque = parseFloat(produto.estoque) || 0;
+
+    // Verificar estoque (conforme parâmetro)
+    const permiteSemEstoque = paramAtivo('PDV_PERMITE_VENDA_SEM_ESTOQUE');
+    if (!permiteSemEstoque && estoque <= 0) {
+        showMessage(`Produto "${produto.descricao}" sem saldo em estoque!`, 'error');
+        return;
+    }
+
+    // Verificar se parâmetro exige informar quantidade manualmente
+    const pedirQuantidade = paramAtivo('PDV_PEDIR_QUANTIDADE');
     const itemExistente = pedidoAtual.itens.find(i => i.id_produto === produto.id);
-    
-    if (itemExistente) {
-        // Incrementar quantidade
-        itemExistente.quantidade += quantidade;
+
+    if (pedirQuantidade && !itemExistente) {
+        // Abrir modal de quantidade
+        abrirModalQuantidade(produto);
+    } else if (itemExistente) {
+        // Incrementar quantidade do item existente
+        const novaQtd = itemExistente.quantidade + 1;
+        if (!permiteSemEstoque && novaQtd > itemExistente.estoque) {
+            showMessage(
+                `Estoque insuficiente para "${produto.descricao}". Disponível: ${itemExistente.estoque.toFixed(3)}`,
+                'error'
+            );
+            return;
+        }
+        itemExistente.quantidade = novaQtd;
         itemExistente.valor_total = itemExistente.quantidade * itemExistente.valor_unitario;
     } else {
-        // Adicionar novo item
+        // Novo item com quantidade 1
         pedidoAtual.itens.push({
             id_produto: produto.id,
             codigo: produto.codigo,
@@ -326,567 +576,325 @@ function adicionarItemComQuantidade(produto, quantidade) {
             descricao: produto.descricao,
             descricao_complemento: produto.descricao_complemento,
             unidade: produto.unidade,
-            quantidade: quantidade,
+            quantidade: 1,
             valor_unitario: parseFloat(produto.preco),
-            valor_total: quantidade * parseFloat(produto.preco),
-            estoque: parseFloat(produto.estoque)
+            valor_total: parseFloat(produto.preco),
+            estoque: estoque
         });
     }
-    
-    // Limpar busca
+
+    // Limpar busca e focar novamente
     document.getElementById('buscaProduto').value = '';
     document.getElementById('resultadosBusca').innerHTML = '';
-    
-    // Atualizar interface
+
     renderizarItens();
     calcularTotais();
-    
-    // Focar novamente no input de busca
-    setTimeout(() => {
-        document.getElementById('buscaProduto').focus();
-    }, 100);
-    
-    console.log(`✅ Produto adicionado: ${produto.descricao} - Qtd: ${quantidade}`);
+
+    setTimeout(() => document.getElementById('buscaProduto').focus(), 80);
 }
 
-// =====================================================
-// ✅ MODAL DE QUANTIDADE (PARÂMETRO 1)
-// VERSÃO DEFINITIVA: Remoção direta garantida
-// =====================================================
-async function abrirModalQuantidade(produto) {
-    return new Promise((resolve) => {
-        // Criar estrutura do modal
-        const modalOverlay = document.createElement('div');
-        modalOverlay.id = 'modalQuantidade';
-        modalOverlay.style.cssText = `
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 10000;
-        `;
-        
-        modalOverlay.innerHTML = `
-            <div class="modal-content" style="
-                max-width: 400px;
-                background: white;
-                border-radius: 12px;
-                padding: 0;
-                box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            ">
-                <div style="padding: 20px; border-bottom: 1px solid #e5e7eb;">
-                    <h3 style="margin: 0; font-size: 20px;">📦 Quantidade</h3>
-                </div>
-                <div style="padding: 20px;">
-                    <p style="margin-bottom: 16px; font-weight: 600;">
-                        ${produto.descricao}
-                    </p>
-                    <p style="color: #6b7280; margin-bottom: 16px; font-size: 14px;">
-                        Estoque disponível: <strong>${parseFloat(produto.estoque).toFixed(3)}</strong>
-                    </p>
-                    <label style="display: block; margin-bottom: 8px; font-weight: 600; font-size: 14px;">
-                        Quantidade:
-                    </label>
-                    <input 
-                        type="number" 
-                        id="inputQuantidadeModal" 
-                        value="1" 
-                        min="0.001"
-                        step="0.001"
-                        style="
-                            width: 100%;
-                            padding: 12px;
-                            border: 2px solid #2563eb;
-                            border-radius: 8px;
-                            font-size: 18px;
-                            text-align: center;
-                            font-family: inherit;
-                        "
-                    >
-                </div>
-                <div style="
-                    padding: 20px;
-                    border-top: 1px solid #e5e7eb;
-                    display: flex;
-                    gap: 12px;
-                    justify-content: flex-end;
-                ">
-                    <button id="btnCancelarModal" style="
-                        padding: 10px 20px;
-                        background: #6b7280;
-                        color: white;
-                        border: none;
-                        border-radius: 6px;
-                        cursor: pointer;
-                        font-size: 14px;
-                        font-weight: 600;
-                    ">
-                        Cancelar
-                    </button>
-                    <button id="btnConfirmarModal" style="
-                        padding: 10px 20px;
-                        background: #2563eb;
-                        color: white;
-                        border: none;
-                        border-radius: 6px;
-                        cursor: pointer;
-                        font-size: 14px;
-                        font-weight: 600;
-                    ">
-                        ✅ Confirmar
-                    </button>
-                </div>
-            </div>
-        `;
-        
-        // Adicionar ao body
-        document.body.appendChild(modalOverlay);
-        
-        // ✅ FUNÇÃO PARA FECHAR MODAL - REMOÇÃO DIRETA!
-        const fecharModalDefinitivo = (confirmado) => {
-            const input = document.getElementById('inputQuantidadeModal');
-            const qtd = input ? parseFloat(input.value) : 1;
-            
-            console.log('🔒 Fechando modal...');
-            
-            // ✅ REMOÇÃO DIRETA usando a referência que criamos!
-            try {
-                document.body.removeChild(modalOverlay);
-                console.log('✅ Modal removido com sucesso!');
-            } catch (e) {
-                console.error('❌ Erro ao remover modal:', e);
-                // Tenta forçar display none
-                modalOverlay.style.display = 'none';
-            }
-            
-            // Adicionar item se confirmado
-            if (confirmado) {
-                if (isNaN(qtd) || qtd <= 0) {
-                    showMessage('Quantidade inválida!', 'error');
-                    resolve(null);
-                    return;
-                }
-                
-                console.log(`✅ Confirmado com quantidade: ${qtd}`);
-                adicionarItemComQuantidade(produto, qtd);
-                resolve(qtd);
-            } else {
-                console.log('❌ Cancelado');
-                resolve(null);
-            }
-        };
-        
-        // Event listeners
-        setTimeout(() => {
-            const input = document.getElementById('inputQuantidadeModal');
-            const btnConfirmar = document.getElementById('btnConfirmarModal');
-            const btnCancelar = document.getElementById('btnCancelarModal');
-            
-            if (input) {
-                input.focus();
-                input.select();
-                
-                // Enter para confirmar
-                input.addEventListener('keypress', (e) => {
-                    if (e.key === 'Enter') {
-                        e.preventDefault();
-                        fecharModalDefinitivo(true);
-                    }
-                });
-            }
-            
-            if (btnConfirmar) {
-                btnConfirmar.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    fecharModalDefinitivo(true);
-                });
-            }
-            
-            if (btnCancelar) {
-                btnCancelar.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    fecharModalDefinitivo(false);
-                });
-            }
-            
-            // Fechar ao clicar fora
-            modalOverlay.addEventListener('click', (e) => {
-                if (e.target === modalOverlay) {
-                    fecharModalDefinitivo(false);
-                }
-            });
-        }, 100);
-    });
-}
-
-// ===== RENDERIZAR ITENS =====
+// ================================================================
+// RENDERIZAR ITENS
+// ================================================================
 function renderizarItens() {
     const tbody = document.getElementById('itensTabela');
-    
+    const qtdSpan = document.getElementById('quantidadeItens');
+
     if (pedidoAtual.itens.length === 0) {
         tbody.innerHTML = `
-            <tr class="empty-state">
-                <td colspan="6">
-                    <div class="empty-message">Nenhum item adicionado</div>
-                </td>
+            <tr class="linha-vazia">
+                <td colspan="6"><div class="empty-itens">Nenhum item adicionado</div></td>
             </tr>
         `;
-        document.getElementById('quantidadeItens').textContent = '0 itens';
+        qtdSpan.textContent = '0 itens';
         return;
     }
-    
-    tbody.innerHTML = pedidoAtual.itens.map((item, index) => `
+
+    qtdSpan.textContent = `${pedidoAtual.itens.length} ${pedidoAtual.itens.length === 1 ? 'item' : 'itens'}`;
+
+    tbody.innerHTML = pedidoAtual.itens.map((item, idx) => `
         <tr>
-            <td class="item-seq">${index + 1}</td>
+            <td class="item-seq">${idx + 1}</td>
             <td>
                 <div class="item-nome">${item.descricao}</div>
-                ${item.codigo ? `<div class="item-codigo">Cód: ${item.codigo}</div>` : ''}
+                ${item.codigo ? `<div class="item-sub">Cód: ${item.codigo}</div>` : ''}
             </td>
-            <td class="item-qtd">${item.quantidade.toFixed(3)}</td>
-            <td class="item-valor">R$ ${item.valor_unitario.toFixed(2)}</td>
-            <td class="item-valor">R$ ${item.valor_total.toFixed(2)}</td>
-            <td class="item-acoes">
-                <button class="btn-action" onclick="editarQuantidade(${index})" title="Editar Quantidade">✏️</button>
-                <button class="btn-action" onclick="removerItem(${index})" title="Remover">🗑️</button>
+            <td>
+                <button
+                    class="item-qtd-btn"
+                    onclick="abrirEdicaoQuantidade(${idx})"
+                    title="Editar quantidade"
+                >
+                    ${parseFloat(item.quantidade).toFixed(3)} ${item.unidade}
+                </button>
+            </td>
+            <td>R$ ${item.valor_unitario.toFixed(2)}</td>
+            <td class="item-total">R$ ${item.valor_total.toFixed(2)}</td>
+            <td>
+                <button class="btn-remover-item" onclick="removerItem(${idx})" title="Remover">🗑️</button>
             </td>
         </tr>
     `).join('');
-    
-    document.getElementById('quantidadeItens').textContent = `${pedidoAtual.itens.length} ${pedidoAtual.itens.length === 1 ? 'item' : 'itens'}`;
 }
 
-// ===== EDITAR QUANTIDADE =====
-function editarQuantidade(index) {
-    const item = pedidoAtual.itens[index];
-    itemEmEdicao = index;
-    
-    document.getElementById('nomeProdutoModal').textContent = item.descricao;
-    document.getElementById('estoqueProdutoModal').textContent = `Estoque disponível: ${item.estoque.toFixed(3)} ${item.unidade}`;
-    document.getElementById('novaQuantidade').value = item.quantidade;
-    
-    document.getElementById('modalQuantidade').classList.add('show');
-    document.getElementById('novaQuantidade').focus();
-    document.getElementById('novaQuantidade').select();
+// ================================================================
+// CALCULAR TOTAIS
+// ================================================================
+function calcularTotais() {
+    pedidoAtual.valor_bruto = pedidoAtual.itens.reduce((s, i) => s + i.valor_total, 0);
+    pedidoAtual.valor_liquido = pedidoAtual.valor_bruto - pedidoAtual.desconto + pedidoAtual.acrescimo;
+
+    document.getElementById('subtotal').textContent = `R$ ${pedidoAtual.valor_bruto.toFixed(2)}`;
+    document.getElementById('desconto').textContent = `R$ ${pedidoAtual.desconto.toFixed(2)}`;
+    document.getElementById('acrescimo').textContent = `R$ ${pedidoAtual.acrescimo.toFixed(2)}`;
+    document.getElementById('totalGeral').textContent = `R$ ${pedidoAtual.valor_liquido.toFixed(2)}`;
+
+    // Exibir/ocultar linhas de desconto e acréscimo
+    document.getElementById('linhDesconto').style.display =
+        pedidoAtual.desconto > 0 ? 'flex' : 'none';
+    document.getElementById('linhaAcrescimo').style.display =
+        pedidoAtual.acrescimo > 0 ? 'flex' : 'none';
+
+    // Mini-total no header
+    document.getElementById('totalMini').textContent = `R$ ${pedidoAtual.valor_liquido.toFixed(2)}`;
+}
+
+// ================================================================
+// MODAL: QUANTIDADE DO PRODUTO
+// ================================================================
+
+// Guardar produto do modal em variável, não no dataset
+let _produtoModalQuantidade = null;
+
+function abrirModalQuantidade(produto, indice = null) {
+    itemEmEdicao = indice;
+    _produtoModalQuantidade = produto;
+
+    const modal = document.getElementById('modalQuantidade');
+    const infoEl = document.getElementById('produtoInfoModal');
+    const inputEl = document.getElementById('inputQuantidade');
+
+    // Título e info
+    document.getElementById('modalQuantidadeTitulo').textContent =
+        indice !== null ? 'Editar Quantidade' : 'Informar Quantidade';
+
+    const preco = parseFloat(produto.preco || produto.valor_unitario || 0);
+    const estoque = parseFloat(produto.estoque) || 0;
+    infoEl.textContent = `${produto.descricao} — R$ ${preco.toFixed(2)} | Estoque: ${estoque.toFixed(3)}`;
+
+    // Valor inicial
+    const qtdAtual = indice !== null ? pedidoAtual.itens[indice].quantidade : 1;
+    inputEl.value = qtdAtual;
+
+    modal.style.display = 'flex';
+    setTimeout(() => {
+        inputEl.focus();
+        inputEl.select();
+    }, 80);
+}
+
+function abrirEdicaoQuantidade(indice) {
+    const item = pedidoAtual.itens[indice];
+    const produtoRef = {
+        id: item.id_produto,
+        descricao: item.descricao,
+        valor_unitario: item.valor_unitario,
+        preco: item.valor_unitario,
+        estoque: item.estoque,
+        unidade: item.unidade
+    };
+    abrirModalQuantidade(produtoRef, indice);
 }
 
 function confirmarQuantidade() {
-    const novaQtd = parseFloat(document.getElementById('novaQuantidade').value);
-    
+    const inputEl = document.getElementById('inputQuantidade');
+    const novaQtd = parseFloat(inputEl.value);
+
     if (!novaQtd || novaQtd <= 0) {
-        showMessage('Quantidade inválida', 'error');
+        showMessage('Informe uma quantidade válida maior que zero.', 'warning');
+        inputEl.focus();
         return;
     }
-    
-    const item = pedidoAtual.itens[itemEmEdicao];
-    
-    if (novaQtd > item.estoque) {
-        showMessage(`Estoque insuficiente. Disponível: ${item.estoque.toFixed(3)}`, 'error');
+
+    const produto = _produtoModalQuantidade;
+    if (!produto) {
+        fecharModalQuantidade();
         return;
     }
-    
-    item.quantidade = novaQtd;
-    item.valor_total = item.quantidade * item.valor_unitario;
-    
+
+    const estoque = parseFloat(produto.estoque) || 0;
+    const permiteSemEstoque = paramAtivo('PDV_PERMITE_VENDA_SEM_ESTOQUE');
+
+    if (!permiteSemEstoque && estoque > 0 && novaQtd > estoque) {
+        showMessage(
+            `Estoque insuficiente. Disponível: ${estoque.toFixed(3)}`,
+            'error'
+        );
+        inputEl.focus();
+        return;
+    }
+
+    if (itemEmEdicao !== null) {
+        // Editar item existente
+        const item = pedidoAtual.itens[itemEmEdicao];
+        item.quantidade = novaQtd;
+        item.valor_total = novaQtd * item.valor_unitario;
+    } else {
+        // Adicionar novo item
+        const preco = parseFloat(produto.preco || produto.valor_unitario || 0);
+        const itemExistente = pedidoAtual.itens.find(i => i.id_produto === produto.id);
+        if (itemExistente) {
+            itemExistente.quantidade = novaQtd;
+            itemExistente.valor_total = novaQtd * itemExistente.valor_unitario;
+        } else {
+            pedidoAtual.itens.push({
+                id_produto: produto.id,
+                codigo: produto.codigo,
+                ean: produto.ean,
+                descricao: produto.descricao,
+                descricao_complemento: produto.descricao_complemento,
+                unidade: produto.unidade,
+                quantidade: novaQtd,
+                valor_unitario: preco,
+                valor_total: novaQtd * preco,
+                estoque: estoque
+            });
+        }
+    }
+
+    fecharModalQuantidade();
     renderizarItens();
     calcularTotais();
-    fecharModalQuantidade();
+    setTimeout(() => document.getElementById('buscaProduto').focus(), 80);
 }
 
 function fecharModalQuantidade() {
-    document.getElementById('modalQuantidade').classList.remove('show');
+    document.getElementById('modalQuantidade').style.display = 'none';
     itemEmEdicao = null;
+    _produtoModalQuantidade = null;
 }
 
-// ===== REMOVER ITEM =====
+function teclaModalQuantidade(event) {
+    if (event.key === 'Enter') {
+        event.preventDefault();
+        confirmarQuantidade();
+    } else if (event.key === 'Escape') {
+        fecharModalQuantidade();
+    }
+}
+
+// ================================================================
+// REMOVER ITEM
+// ================================================================
 function removerItem(index) {
     pedidoAtual.itens.splice(index, 1);
     renderizarItens();
     calcularTotais();
 }
 
-// ===== CALCULAR TOTAIS =====
-function calcularTotais() {
-    pedidoAtual.valor_bruto = pedidoAtual.itens.reduce((sum, item) => sum + item.valor_total, 0);
-    pedidoAtual.valor_liquido = pedidoAtual.valor_bruto - pedidoAtual.desconto + pedidoAtual.acrescimo;
-    
-    document.getElementById('subtotal').textContent = `R$ ${pedidoAtual.valor_bruto.toFixed(2)}`;
-    document.getElementById('desconto').textContent = `R$ ${pedidoAtual.desconto.toFixed(2)}`;
-    document.getElementById('acrescimo').textContent = `R$ ${pedidoAtual.acrescimo.toFixed(2)}`;
-    document.getElementById('totalGeral').textContent = `R$ ${pedidoAtual.valor_liquido.toFixed(2)}`;
-    
-    atualizarStatusPagamento();
-}
+// ================================================================
+// PAGAMENTOS
+// ================================================================
+function onFormaChange() {
+    const idForma = document.getElementById('formaPagamento').value;
+    const forma = formasPagamento.find(f => f.id == idForma);
+    const trocoGroup = document.getElementById('trocoGroup');
 
-// ===== BUSCAR CLIENTES =====
-async function buscarClientes(termo) {
-    try {
-        if (!termo || termo.trim().length < 2) {
-            document.getElementById('resultadosBuscaCliente').innerHTML = 
-                '<div class="empty-message">Digite pelo menos 2 caracteres para buscar</div>';
-            return;
-        }
-        
-        const response = await fetch(
-            `${API_URL}/pdv/clientes/buscar?termo=${encodeURIComponent(termo)}`,
-            {
-                headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('sirius_token')}`,
-                    'X-Empresa-Id': empresaId
-                }
-            }
-        );
-        
-        const data = await response.json();
-        
-        if (data.success) {
-            renderizarResultadosClientes(data.data);
-        } else {
-            console.error('Erro ao buscar clientes:', data);
-            document.getElementById('resultadosBuscaCliente').innerHTML = 
-                '<div class="empty-message">Erro ao buscar clientes</div>';
-        }
-    } catch (error) {
-        console.error('Erro ao buscar clientes:', error);
-        document.getElementById('resultadosBuscaCliente').innerHTML = 
-            '<div class="empty-message">Erro ao buscar clientes</div>';
+    if (forma && forma.permite_troco) {
+        trocoGroup.style.display = 'flex';
+    } else {
+        trocoGroup.style.display = 'none';
+        document.getElementById('valorTroco').value = '';
     }
+
+    // Preencher valor faltante automaticamente
+    const faltante = Math.max(0,
+        pedidoAtual.valor_liquido -
+        pedidoAtual.pagamentos.reduce((s, p) => s + p.valor, 0)
+    );
+    document.getElementById('valorPagamento').value = faltante > 0 ? faltante.toFixed(2) : '';
+
+    calcularTroco();
 }
 
-function renderizarResultadosClientes(clientes) {
-    const container = document.getElementById('resultadosBuscaCliente');
-    
-    if (clientes.length === 0) {
-        container.innerHTML = '<div class="empty-message">Nenhum cliente encontrado</div>';
+function calcularTroco() {
+    const idForma = document.getElementById('formaPagamento').value;
+    const forma = formasPagamento.find(f => f.id == idForma);
+
+    if (!forma || !forma.permite_troco) {
+        document.getElementById('valorTroco').value = '';
         return;
     }
-    
-    container.innerHTML = clientes.map(c => `
-        <div class="resultado-item" onclick="selecionarCliente(${JSON.stringify(c).replace(/"/g, '&quot;')})">
-            <div class="resultado-nome">${c.razao_social}</div>
-            <div class="resultado-info">
-                ${c.nome_fantasia ? `<span>${c.nome_fantasia}</span>` : ''}
-                ${c.documento ? `<span>${c.documento}</span>` : ''}
-            </div>
-        </div>
-    `).join('');
+
+    const valorPago = parseFloat(document.getElementById('valorPagamento').value) || 0;
+    const totalPagoAtual = pedidoAtual.pagamentos.reduce((s, p) => s + p.valor, 0);
+    const faltante = pedidoAtual.valor_liquido - totalPagoAtual;
+    const troco = Math.max(0, valorPago - faltante);
+    document.getElementById('valorTroco').value = troco.toFixed(2);
 }
 
-function selecionarCliente(cliente) {
-    pedidoAtual.cliente = cliente;
-    renderizarCliente();
-    fecharModalCliente();
-}
+function adicionarPagamento() {
+    const idForma = document.getElementById('formaPagamento').value;
+    const valor = parseFloat(document.getElementById('valorPagamento').value);
 
-function renderizarCliente() {
-    const container = document.getElementById('clienteInfo');
-    
-    if (!pedidoAtual.cliente) {
-        container.innerHTML = '<div class="loading">Nenhum cliente selecionado</div>';
+    if (!idForma) {
+        showMessage('Selecione uma forma de pagamento.', 'warning');
+        document.getElementById('formaPagamento').focus();
         return;
     }
-    
-    container.innerHTML = `
-        <div class="cliente-nome">${pedidoAtual.cliente.razao_social}</div>
-        ${pedidoAtual.cliente.documento ? `<div class="cliente-doc">${pedidoAtual.cliente.documento}</div>` : ''}
-    `;
-}
 
-// ===== MODALS =====
-function abrirBuscaCliente() {
-    document.getElementById('inputBuscaCliente').value = '';
-    document.getElementById('resultadosBuscaCliente').innerHTML = '';
-    document.getElementById('modalBuscaCliente').classList.add('show');
-    setTimeout(() => {
-        document.getElementById('inputBuscaCliente').focus();
-    }, 100);
-}
-
-function fecharModalCliente() {
-    document.getElementById('modalBuscaCliente').classList.remove('show');
-}
-
-// ===== FORMAS DE PAGAMENTO =====
-async function carregarFormasPagamento() {
-    try {
-        const response = await fetch(`${API_URL}/pdv/formas-pagamento`, {
-            headers: {
-                'Authorization': `Bearer ${localStorage.getItem('sirius_token')}`,
-                'X-Empresa-Id': empresaId
-            }
-        });
-        
-        const data = await response.json();
-        
-        if (data.success) {
-            formasPagamento = data.data;
-            
-            console.log('✅ Formas de pagamento carregadas:', formasPagamento.length);
-            console.log('Primeira forma:', formasPagamento[0]);
-            
-            const select = document.getElementById('formaPagamento');
-            select.innerHTML = '<option value="">Selecione...</option>' + 
-                formasPagamento.map(f => 
-                    `<option value="${f.id_forma_pagamento}">${f.descricao}</option>`
-                ).join('');
-        } else {
-            console.error('Erro ao carregar formas de pagamento:', data);
-        }
-    } catch (error) {
-        console.error('Erro ao carregar formas de pagamento:', error);
-    }
-}
-
-// ===== PAGAMENTOS =====
-function abrirModalPagamento() {
-    if (pedidoAtual.itens.length === 0) {
-        showMessage('Adicione itens ao pedido antes de adicionar pagamentos', 'error');
+    if (!valor || valor <= 0) {
+        showMessage('Informe um valor válido.', 'warning');
+        document.getElementById('valorPagamento').focus();
         return;
     }
-    
-    // ✅ VERIFICAR SE SELECT TEM OPTIONS
-    const select = document.getElementById('formaPagamento');
-    if (select && select.options.length <= 1) {
-        console.warn('⚠️ Select vazio! Recarregando formas de pagamento...');
-        carregarFormasPagamento();
-    }
-    
-    const valorRestante = pedidoAtual.valor_liquido - 
-        pedidoAtual.pagamentos.reduce((sum, p) => sum + p.valor, 0);
-    
-    document.getElementById('valorPagamento').value = valorRestante.toFixed(2);
-    document.getElementById('valorTroco').value = '';
-    document.getElementById('formaPagamento').value = '';
-    document.getElementById('trocoGroup').style.display = 'none';
-    
-    const modal = document.getElementById('modalPagamento');
-    modal.classList.add('show');
-    
-    console.log('✅ Modal de pagamento aberto');
-}
 
-function fecharModalPagamento() {
-    const modal = document.getElementById('modalPagamento');
-    
-    if (!modal) {
-        console.error('❌ Modal de pagamento não encontrado!');
+    const forma = formasPagamento.find(f => f.id == idForma);
+    if (!forma) {
+        showMessage('Forma de pagamento inválida.', 'error');
         return;
     }
-    
-    console.log('🔒 Fechando modal de pagamento...');
-    
-    // Método 1: classList.remove
-    try {
-        modal.classList.remove('show');
-        console.log('✅ Modal de pagamento fechado (classList.remove)');
-    } catch (e) {
-        console.error('❌ Erro ao remover classe show:', e);
-        // Método 2: forçar display none
-        try {
-            modal.style.display = 'none';
-            console.log('✅ Modal de pagamento fechado (display none)');
-        } catch (e2) {
-            console.error('❌ Erro ao esconder modal:', e2);
-        }
-    }
-    
-    // Limpar campos
+
+    const troco = forma.permite_troco
+        ? (parseFloat(document.getElementById('valorTroco').value) || 0)
+        : 0;
+
+    pedidoAtual.pagamentos.push({
+        id_forma_pagamento: parseInt(idForma),
+        descricao: forma.descricao,
+        valor: valor,
+        troco: troco,
+        permite_troco: forma.permite_troco
+    });
+
+    // Limpar formulário
     document.getElementById('formaPagamento').value = '';
     document.getElementById('valorPagamento').value = '';
     document.getElementById('valorTroco').value = '';
     document.getElementById('trocoGroup').style.display = 'none';
-}
 
-function calcularTroco() {
-    const formaSelecionada = formasPagamento.find(f => f.id_forma_pagamento == document.getElementById('formaPagamento').value);
-    
-    if (!formaSelecionada || !formaSelecionada.permite_troco) {
-        return;
-    }
-    
-    const valorRestante = pedidoAtual.valor_liquido - 
-        pedidoAtual.pagamentos.reduce((sum, p) => sum + p.valor, 0);
-    
-    const valorPago = parseFloat(document.getElementById('valorPagamento').value) || 0;
-    const troco = valorPago - valorRestante;
-    
-    document.getElementById('valorTroco').value = troco > 0 ? troco.toFixed(2) : '0.00';
-}
-
-function adicionarPagamento() {
-    const select = document.getElementById('formaPagamento');
-    const idForma = select ? select.value : undefined;
-    const valorStr = document.getElementById('valorPagamento').value;
-    
-    console.log('🔍 Adicionando pagamento...');
-    console.log('Select encontrado:', !!select);
-    console.log('Quantidade de options:', select ? select.options.length : 0);
-    console.log('ID Forma selecionada:', idForma);
-    console.log('Formas disponíveis no array:', formasPagamento.length);
-    
-    if (!select || select.options.length <= 1) {
-        showMessage('Erro: Formas de pagamento não carregadas. Aguarde ou recarregue a página.', 'error');
-        console.error('❌ Select vazio ou não encontrado!');
-        return;
-    }
-    
-    if (!idForma || idForma === '') {
-        showMessage('Selecione uma forma de pagamento', 'error');
-        return;
-    }
-    
-    const valor = parseFloat(valorStr);
-    if (!valor || valor <= 0) {
-        showMessage('Valor inválido', 'error');
-        return;
-    }
-    
-    // ✅ CORREÇÃO: Validar se forma existe ANTES de usar
-    const forma = formasPagamento.find(f => f.id_forma_pagamento == idForma);
-    if (!forma) {
-        showMessage('Forma de pagamento não encontrada. Recarregue a página.', 'error');
-        console.error('❌ Forma de pagamento não encontrada:', idForma);
-        console.error('Formas disponíveis:', formasPagamento);
-        console.error('IDs disponíveis:', formasPagamento.map(f => f.id_forma_pagamento));
-        return;
-    }
-    
-    const troco = forma.permite_troco ? parseFloat(document.getElementById('valorTroco').value) || 0 : 0;
-    
-    pedidoAtual.pagamentos.push({
-        id_forma_pagamento: forma.id_forma_pagamento,
-        descricao: forma.descricao,
-        valor: valor,
-        troco: troco
-    });
-    
-    console.log('✅ Pagamento adicionado:', forma.descricao, '-', valor);
-    
     renderizarPagamentos();
-    calcularTotais();
-    fecharModalPagamento();
+    atualizarStatusPagamento();
+
+    document.getElementById('formaPagamento').focus();
 }
 
 function renderizarPagamentos() {
     const container = document.getElementById('pagamentosLista');
-    
+
     if (pedidoAtual.pagamentos.length === 0) {
-        container.innerHTML = '<div class="empty-message">Nenhum pagamento adicionado</div>';
+        container.innerHTML = '<div class="empty-pagamentos">Nenhum pagamento adicionado</div>';
         return;
     }
-    
-    container.innerHTML = pedidoAtual.pagamentos.map((pag, index) => `
+
+    container.innerHTML = pedidoAtual.pagamentos.map((pag, idx) => `
         <div class="pagamento-item">
             <div>
                 <div class="pagamento-desc">${pag.descricao}</div>
                 <div class="pagamento-valor">R$ ${pag.valor.toFixed(2)}</div>
                 ${pag.troco > 0 ? `<div class="pagamento-troco">Troco: R$ ${pag.troco.toFixed(2)}</div>` : ''}
             </div>
-            <button class="btn-action" onclick="removerPagamento(${index})" title="Remover">🗑️</button>
+            <button class="btn-remover-pag" onclick="removerPagamento(${idx})" title="Remover">🗑️</button>
         </div>
     `).join('');
 }
@@ -894,76 +902,72 @@ function renderizarPagamentos() {
 function removerPagamento(index) {
     pedidoAtual.pagamentos.splice(index, 1);
     renderizarPagamentos();
-    calcularTotais();
+    atualizarStatusPagamento();
 }
 
 function atualizarStatusPagamento() {
-    const totalPago = pedidoAtual.pagamentos.reduce((sum, p) => sum + p.valor, 0);
+    const totalPago = pedidoAtual.pagamentos.reduce((s, p) => s + p.valor, 0);
     const faltante = pedidoAtual.valor_liquido - totalPago;
-    
+
     document.getElementById('totalPago').textContent = `R$ ${totalPago.toFixed(2)}`;
     document.getElementById('valorFaltante').textContent = `R$ ${Math.max(0, faltante).toFixed(2)}`;
-    
+    document.getElementById('pagTotalPedido').textContent = `R$ ${pedidoAtual.valor_liquido.toFixed(2)}`;
+    document.getElementById('pagItensQtd').textContent = pedidoAtual.itens.length;
+
     const btnFinalizar = document.getElementById('btnFinalizar');
-    if (faltante > 0.01) {
-        btnFinalizar.disabled = true;
-        btnFinalizar.style.opacity = '0.5';
-    } else {
-        btnFinalizar.disabled = false;
-        btnFinalizar.style.opacity = '1';
-    }
+    const pago = faltante <= 0.01 && pedidoAtual.itens.length > 0;
+    btnFinalizar.disabled = !pago;
 }
 
-// ===== FINALIZAR PEDIDO =====
+// ================================================================
+// FINALIZAR PEDIDO
+// ================================================================
 async function finalizarPedido() {
-    // Validações
+    // Validações finais
+    if (!pedidoAtual.cliente || pedidoAtual.cliente.id === undefined) {
+        showMessage('Nenhum cliente selecionado.', 'error');
+        return;
+    }
+
     if (pedidoAtual.itens.length === 0) {
-        showMessage('Adicione itens ao pedido', 'error');
+        showMessage('Nenhum item no pedido.', 'error');
         return;
     }
-    
-    const totalPago = pedidoAtual.pagamentos.reduce((sum, p) => sum + p.valor, 0);
-    const faltante = pedidoAtual.valor_liquido - totalPago;
-    
-    if (faltante > 0.01) {
-        showMessage(`Faltam R$ ${faltante.toFixed(2)} para completar o pagamento`, 'error');
+
+    if (pedidoAtual.pagamentos.length === 0) {
+        showMessage('Adicione pelo menos uma forma de pagamento.', 'error');
         return;
     }
-    
-    // ✅ VALIDAR ESTOQUE COM PARÂMETRO 2
-    // PERMITE_SALDO_NEGATIVO
-    const permiteSaldoNegativo = PARAMETROS.PERMITE_SALDO_NEGATIVO || 'N';
-    console.log(`📊 PERMITE_SALDO_NEGATIVO = ${permiteSaldoNegativo}`);
-    
-    if (permiteSaldoNegativo === 'N') {
-        // ✅ PARÂMETRO = N: VALIDAR estoque (não permite negativo)
-        console.log('🔒 Validando estoque (não permite saldo negativo)...');
-        
+
+    const totalPago = pedidoAtual.pagamentos.reduce((s, p) => s + p.valor, 0);
+    if (Math.abs(totalPago - pedidoAtual.valor_liquido) > 0.01) {
+        showMessage('O total dos pagamentos não confere com o valor do pedido.', 'error');
+        return;
+    }
+
+    // Verificar estoque dos itens (front-end)
+    const permiteSemEstoque = paramAtivo('PDV_PERMITE_VENDA_SEM_ESTOQUE');
+    if (!permiteSemEstoque) {
         for (const item of pedidoAtual.itens) {
             if (item.quantidade > item.estoque) {
                 showMessage(
-                    `Estoque insuficiente para ${item.descricao}. ` +
-                    `Disponível: ${item.estoque.toFixed(3)} - Solicitado: ${item.quantidade.toFixed(3)}`,
+                    `Estoque insuficiente: "${item.descricao}". ` +
+                    `Disponível: ${item.estoque.toFixed(3)} — Solicitado: ${item.quantidade.toFixed(3)}`,
                     'error'
                 );
-                console.error(`❌ Estoque insuficiente: ${item.descricao}`);
                 return;
             }
         }
-        console.log('✅ Estoque validado - tudo OK');
-    } else {
-        // ✅ PARÂMETRO = S: NÃO VALIDAR (permite negativo)
-        console.log('✅ Permite saldo negativo - pulando validação de estoque');
     }
-    
+
     // Coletar observações
     pedidoAtual.observacoes = document.getElementById('observacoes').value;
-    
+
     // Desabilitar botão
     const btnFinalizar = document.getElementById('btnFinalizar');
     btnFinalizar.disabled = true;
     btnFinalizar.textContent = 'Finalizando...';
-    
+
     try {
         const response = await fetch(`${API_URL}/pdv/pedidos/finalizar`, {
             method: 'POST',
@@ -974,206 +978,324 @@ async function finalizarPedido() {
             },
             body: JSON.stringify(pedidoAtual)
         });
-        
+
         const data = await response.json();
-        
+
         if (data.success) {
             mostrarRelatorioPedido(data.data);
         } else {
             throw new Error(data.message || 'Erro ao finalizar pedido');
         }
-        
-    } catch (error) {
-        console.error('Erro ao finalizar pedido:', error);
-        showMessage(error.message || 'Erro ao finalizar pedido', 'error');
+    } catch (e) {
+        console.error('Erro ao finalizar pedido:', e);
+        showMessage(e.message || 'Erro ao finalizar pedido', 'error');
         btnFinalizar.disabled = false;
         btnFinalizar.textContent = '✅ Finalizar Pedido';
     }
 }
 
-// ===== NOVO PEDIDO =====
-async function novoPedido() {
-    // Resetar estado
-    pedidoAtual = {
-        numero: null,
-        cliente: null,
-        itens: [],
-        pagamentos: [],
-        valor_bruto: 0,
-        desconto: 0,
-        acrescimo: 0,
-        valor_liquido: 0,
-        observacoes: ''
-    };
-    
-    // Limpar interface
-    document.getElementById('observacoes').value = '';
-    document.getElementById('buscaProduto').value = '';
-    document.getElementById('resultadosBusca').innerHTML = '';
-    
-    const btnFinalizar = document.getElementById('btnFinalizar');
-    btnFinalizar.disabled = false;
-    btnFinalizar.textContent = '✅ Finalizar Pedido';
-    btnFinalizar.style.opacity = '1';
-    
-    renderizarItens();
-    renderizarPagamentos();
-    calcularTotais();
-    
-    // Reinicializar
-    await inicializarPedido();
-    
-    // Focar no input de busca
-    document.getElementById('buscaProduto').focus();
-}
-
-// ===== RELATÓRIO DO PEDIDO =====
+// ================================================================
+// RELATÓRIO DO PEDIDO (Impressão)
+// ================================================================
 function mostrarRelatorioPedido(pedidoFinalizado) {
-    const dadosPedidoParaRelatorio = {
-        numero: pedidoAtual.numero,
-        cliente: {...pedidoAtual.cliente},
+    // Capturar dados antes de resetar o pedido
+    const dados = {
+        numero: pedidoFinalizado.numero || pedidoAtual.numero,
+        cliente: pedidoAtual.cliente,
         itens: [...pedidoAtual.itens],
         pagamentos: [...pedidoAtual.pagamentos],
         valor_bruto: pedidoAtual.valor_bruto,
         desconto: pedidoAtual.desconto,
         acrescimo: pedidoAtual.acrescimo,
         valor_liquido: pedidoAtual.valor_liquido,
-        observacoes: pedidoAtual.observacoes,
-        created_at: new Date()
+        observacoes: pedidoAtual.observacoes
     };
-    
-    // Limpar pedido atual
-    limparPedidoAtual();
-    
-    const modal = document.getElementById('modalRelatorioPedido');
-    const dados = pedidoFinalizado.pedido || pedidoFinalizado || dadosPedidoParaRelatorio;
-    
-    // Cabeçalho
-    document.getElementById('relatorioNumero').textContent = dados.numero;
-    document.getElementById('relatorioData').textContent = new Date(dados.created_at || new Date()).toLocaleString('pt-BR');
-    
+
+    // Número e data
+    document.getElementById('relatorioNumero').textContent = dados.numero || '-';
+    document.getElementById('relatorioData').textContent = new Date().toLocaleString('pt-BR');
+
     // Cliente
-    const clienteNome = dados.cliente?.razao_social || dadosPedidoParaRelatorio.cliente?.razao_social || 'Cliente não identificado';
-    const clienteDoc = dados.cliente?.documento || dadosPedidoParaRelatorio.cliente?.documento || '';
-    document.getElementById('relatorioCliente').textContent = clienteNome;
-    document.getElementById('relatorioClienteDoc').textContent = clienteDoc ? `(${clienteDoc})` : '';
-    
+    const nomeCliente = dados.cliente ? dados.cliente.razao_social : 'Consumidor Final';
+    const docCliente = dados.cliente && dados.cliente.documento ? ` (${dados.cliente.documento})` : '';
+    document.getElementById('relatorioCliente').textContent = nomeCliente + docCliente;
+
     // Itens
-    const itens = dados.itens || dadosPedidoParaRelatorio.itens;
-    const itensHTML = itens.map(item => `
+    document.getElementById('relatorioItens').innerHTML = dados.itens.map(item => `
         <tr>
             <td>${item.descricao}</td>
-            <td style="text-align: center;">${parseFloat(item.quantidade).toFixed(3)}</td>
-            <td style="text-align: right;">R$ ${parseFloat(item.valor_unitario).toFixed(2)}</td>
-            <td style="text-align: right;"><strong>R$ ${parseFloat(item.valor_total).toFixed(2)}</strong></td>
+            <td style="text-align:center">${parseFloat(item.quantidade).toFixed(3)}</td>
+            <td style="text-align:right">R$ ${parseFloat(item.valor_unitario).toFixed(2)}</td>
+            <td style="text-align:right"><strong>R$ ${parseFloat(item.valor_total).toFixed(2)}</strong></td>
         </tr>
     `).join('');
-    document.getElementById('relatorioItens').innerHTML = itensHTML;
-    
+
     // Totais
-    const valorBruto = dados.valor_bruto || dadosPedidoParaRelatorio.valor_bruto;
-    const desconto = dados.desconto || dadosPedidoParaRelatorio.desconto || 0;
-    const acrescimo = dados.acrescimo || dadosPedidoParaRelatorio.acrescimo || 0;
-    const valorLiquido = dados.valor_liquido || dadosPedidoParaRelatorio.valor_liquido;
-    
-    document.getElementById('relatorioSubtotal').textContent = `R$ ${parseFloat(valorBruto).toFixed(2)}`;
-    document.getElementById('relatorioDesconto').textContent = `R$ ${parseFloat(desconto).toFixed(2)}`;
-    document.getElementById('relatorioAcrescimo').textContent = `R$ ${parseFloat(acrescimo).toFixed(2)}`;
-    document.getElementById('relatorioTotal').textContent = `R$ ${parseFloat(valorLiquido).toFixed(2)}`;
-    
+    document.getElementById('relatorioSubtotal').textContent = `R$ ${parseFloat(dados.valor_bruto).toFixed(2)}`;
+    document.getElementById('relatorioDesconto').textContent = `R$ ${parseFloat(dados.desconto).toFixed(2)}`;
+    document.getElementById('relatorioAcrescimo').textContent = `R$ ${parseFloat(dados.acrescimo).toFixed(2)}`;
+    document.getElementById('relatorioTotal').textContent = `R$ ${parseFloat(dados.valor_liquido).toFixed(2)}`;
+
+    document.getElementById('relatorioLinhaDesconto').style.display =
+        dados.desconto > 0 ? 'flex' : 'none';
+    document.getElementById('relatorioLinhaAcrescimo').style.display =
+        dados.acrescimo > 0 ? 'flex' : 'none';
+
     // Pagamentos
-    const pagamentos = dados.pagamentos || dadosPedidoParaRelatorio.pagamentos;
-    const pagamentosHTML = pagamentos.map(pag => `
+    document.getElementById('relatorioPagamentos').innerHTML = dados.pagamentos.map(pag => `
         <tr>
             <td>${pag.descricao}</td>
-            <td style="text-align: right;">R$ ${parseFloat(pag.valor).toFixed(2)}</td>
-            <td style="text-align: right;">${pag.troco > 0 ? `R$ ${parseFloat(pag.troco).toFixed(2)}` : '-'}</td>
+            <td style="text-align:right">R$ ${parseFloat(pag.valor).toFixed(2)}</td>
+            <td style="text-align:right">${pag.troco > 0 ? `R$ ${parseFloat(pag.troco).toFixed(2)}` : '-'}</td>
         </tr>
     `).join('');
-    document.getElementById('relatorioPagamentos').innerHTML = pagamentosHTML;
-    
+
     // Observações
-    const obs = dados.observacoes || dadosPedidoParaRelatorio.observacoes || '';
-    document.getElementById('relatorioObservacoes').textContent = obs || 'Nenhuma observação';
-    
+    const obsWrapper = document.getElementById('relatorioObsWrapper');
+    if (dados.observacoes && dados.observacoes.trim()) {
+        document.getElementById('relatorioObservacoes').textContent = dados.observacoes;
+        obsWrapper.style.display = 'block';
+    } else {
+        obsWrapper.style.display = 'none';
+    }
+
     // Mostrar modal
-    modal.classList.add('show');
-}
+    document.getElementById('modalRelatorioPedido').style.display = 'flex';
 
-function limparPedidoAtual() {
-    pedidoAtual = {
-        numero: null,
-        cliente: null,
-        itens: [],
-        pagamentos: [],
-        valor_bruto: 0,
-        desconto: 0,
-        acrescimo: 0,
-        valor_liquido: 0,
-        observacoes: ''
-    };
-    
-    document.getElementById('observacoes').value = '';
-    document.getElementById('buscaProduto').value = '';
-    document.getElementById('resultadosBusca').innerHTML = '';
-    
-    renderizarItens();
-    renderizarPagamentos();
-    renderizarCliente();
-    calcularTotais();
-}
-
-function fecharRelatorioPedido() {
-    document.getElementById('modalRelatorioPedido').classList.remove('show');
-    inicializarPedido();
-    document.getElementById('buscaProduto').focus();
+    // Imprimir automaticamente
+    setTimeout(() => {
+        window.print();
+    }, 400);
 }
 
 function imprimirRelatorioPedido() {
     window.print();
 }
 
-// ===== MENSAGENS =====
+function fecharRelatorioPedido() {
+    document.getElementById('modalRelatorioPedido').style.display = 'none';
+    // Voltar à tela inicial
+    mostrarTelaInicial();
+}
+
+// ================================================================
+// MENSAGENS MODAIS
+// ================================================================
 function showMessage(mensagem, tipo = 'info', callback = null) {
     const modal = document.getElementById('modalMensagem');
     const titulo = document.getElementById('mensagemTitulo');
-    const texto = document.getElementById('mensagemTexto');
-    
-    switch(tipo) {
-        case 'success':
-            titulo.textContent = '✅ Sucesso';
-            titulo.style.color = '#10b981';
-            break;
-        case 'error':
-            titulo.textContent = '❌ Erro';
-            titulo.style.color = '#ef4444';
-            break;
-        case 'warning':
-            titulo.textContent = '⚠️ Atenção';
-            titulo.style.color = '#f59e0b';
-            break;
-        default:
-            titulo.textContent = 'ℹ️ Informação';
-            titulo.style.color = '#2563eb';
-    }
-    
-    texto.textContent = mensagem;
-    modal.classList.add('show');
-    
+
+    const config = {
+        success: { texto: '✅ Sucesso', cor: '#10b981' },
+        error:   { texto: '❌ Erro',    cor: '#ef4444' },
+        warning: { texto: '⚠️ Atenção', cor: '#f59e0b' },
+        info:    { texto: 'ℹ️ Informação', cor: '#2563eb' }
+    };
+
+    const c = config[tipo] || config.info;
+    titulo.textContent = c.texto;
+    titulo.style.color = c.cor;
+
+    document.getElementById('mensagemTexto').textContent = mensagem;
+    modal.style.display = 'flex';
+
     if (callback) {
-        modal.dataset.callback = 'temp';
-        window.tempCallback = callback;
+        modal.dataset.hasCallback = '1';
+        window._msgCallback = callback;
+    } else {
+        delete modal.dataset.hasCallback;
+        window._msgCallback = null;
     }
+
+    setTimeout(() => document.getElementById('btnMensagemOK').focus(), 80);
 }
 
 function fecharModalMensagem() {
     const modal = document.getElementById('modalMensagem');
-    modal.classList.remove('show');
-    
-    if (modal.dataset.callback && window.tempCallback) {
-        const cb = window.tempCallback;
-        delete window.tempCallback;
-        delete modal.dataset.callback;
+    modal.style.display = 'none';
+
+    if (modal.dataset.hasCallback && window._msgCallback) {
+        const cb = window._msgCallback;
+        window._msgCallback = null;
+        delete modal.dataset.hasCallback;
         cb();
     }
+}
+
+// ================================================================
+// EVENTOS GLOBAIS (teclado + mouse)
+// ================================================================
+function configurarEventosGlobais() {
+
+    // ----- Busca de Cliente -----
+    const inputCliente = document.getElementById('inputBuscaCliente');
+
+    // Ao digitar: apenas controla o botão limpar (sem busca automática)
+    inputCliente.addEventListener('input', (e) => {
+        const temTexto = e.target.value.trim().length > 0;
+        document.getElementById('btnLimparBuscaCliente').style.display = temTexto ? 'block' : 'none';
+        // Limpa resultados se o campo foi esvaziado
+        if (!temTexto) {
+            document.getElementById('resultadosBuscaCliente').innerHTML = '';
+        }
+    });
+
+    // Enter: disparar busca ou confirmar cliente
+    inputCliente.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            const termo = inputCliente.value.trim();
+
+            if (!termo) {
+                // Campo vazio → confirmar Consumidor Final direto
+                confirmarCliente();
+                return;
+            }
+
+            // Verificar se já há resultados listados
+            const resultados = document.querySelectorAll('#resultadosBuscaCliente .resultado-item');
+            if (resultados.length === 1) {
+                // Um único resultado → selecionar direto
+                resultados[0].click();
+            } else if (resultados.length > 1) {
+                // Vários resultados já listados → ir ao primeiro
+                resultados[0].focus();
+            } else {
+                // Sem resultados ainda → executar a busca
+                buscarClientes(termo);
+            }
+
+        } else if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            const primeiro = document.querySelector('#resultadosBuscaCliente .resultado-item');
+            if (primeiro) primeiro.focus();
+
+        } else if (e.key === 'Tab' && !e.shiftKey) {
+            e.preventDefault();
+            document.getElementById('btnConfirmarCliente').focus();
+
+        } else if (e.key === 'Escape') {
+            inputCliente.value = '';
+            document.getElementById('resultadosBuscaCliente').innerHTML = '';
+            document.getElementById('btnLimparBuscaCliente').style.display = 'none';
+        }
+    });
+
+    // Botão confirmar cliente com Enter
+    document.getElementById('btnConfirmarCliente').addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            confirmarCliente();
+        }
+    });
+
+    // ----- Busca de Produto -----
+    const inputProduto = document.getElementById('buscaProduto');
+    let timeoutProduto;
+
+    inputProduto.addEventListener('input', (e) => {
+        clearTimeout(timeoutProduto);
+        const termo = e.target.value.trim();
+
+        if (termo.length < 2) {
+            document.getElementById('resultadosBusca').innerHTML = '';
+            return;
+        }
+
+        timeoutProduto = setTimeout(() => buscarProdutos(termo), 300);
+    });
+
+    inputProduto.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            const primeiro = document.querySelector('#resultadosBusca .resultado-item');
+            if (primeiro) primeiro.focus();
+        } else if (e.key === 'Enter') {
+            e.preventDefault();
+            const resultados = document.querySelectorAll('#resultadosBusca .resultado-item');
+            if (resultados.length === 1) resultados[0].click();
+        } else if (e.key === 'F5') {
+            e.preventDefault();
+            confirmarProdutos();
+        }
+    });
+
+    // Botão finalizar produtos com F5 ou Enter
+    document.getElementById('btnFinalizarProdutos').addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            confirmarProdutos();
+        }
+    });
+
+    // ----- Pagamentos: Enter na forma de pagamento -----
+    document.getElementById('formaPagamento').addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            document.getElementById('valorPagamento').focus();
+        }
+    });
+
+    document.getElementById('valorPagamento').addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            adicionarPagamento();
+        }
+    });
+
+    // ----- ESC global: fechar modais ou cancelar -----
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            // Fechar qualquer modal aberto
+            const modaisAbertos = document.querySelectorAll('.modal-overlay[style*="flex"]');
+            if (modaisAbertos.length > 0) {
+                const ultimo = modaisAbertos[modaisAbertos.length - 1];
+                if (ultimo.id === 'modalMensagem') fecharModalMensagem();
+                else if (ultimo.id === 'modalQuantidade') fecharModalQuantidade();
+                else if (ultimo.id === 'modalConfirmacao') fecharModalConfirmacao();
+                // Relatório não fecha com ESC (tem que confirmar)
+            } else if (document.getElementById('tela-pdv').style.display !== 'none') {
+                cancelarVendaConfirmar();
+            }
+        }
+
+        // F5 na aba de produtos → finalizar produtos
+        if (e.key === 'F5' && abatual === 'produtos') {
+            e.preventDefault();
+            confirmarProdutos();
+        }
+    });
+
+    // ----- Fechar modal ao clicar no overlay -----
+    ['modalQuantidade', 'modalMensagem', 'modalConfirmacao'].forEach(id => {
+        const el = document.getElementById(id);
+        el.addEventListener('click', (e) => {
+            if (e.target === el) {
+                if (id === 'modalMensagem') fecharModalMensagem();
+                else if (id === 'modalQuantidade') fecharModalQuantidade();
+                else if (id === 'modalConfirmacao') fecharModalConfirmacao();
+            }
+        });
+    });
+
+    // ----- Tela inicial: Enter abre novo pedido -----
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            const telaInicial = document.getElementById('tela-inicial');
+            if (telaInicial.style.display !== 'none' && !telaInicial.style.display) {
+                // Tela inicial visível
+                const focoAtual = document.activeElement;
+                if (focoAtual && focoAtual.id === 'btn-voltar') return; // não fazer nada
+                iniciarNovoPedido();
+            }
+        }
+    });
+}
+
+// ================================================================
+// FUNÇÃO GLOBAL: logout (compatibilidade)
+// ================================================================
+function logout() {
+    localStorage.clear();
+    window.location.href = 'index.html';
 }
