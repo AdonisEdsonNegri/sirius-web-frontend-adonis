@@ -109,8 +109,53 @@ function voltarDashboard() {
 // INICIAR NOVO PEDIDO → vai para aba Cliente
 // ================================================================
 async function iniciarNovoPedido() {
-    // Resetar estado
+    // Resetar estado global
     pedidoAtual = novoPedidoObj();
+
+    // ✅ Limpar DOM dos itens do pedido anterior
+    document.getElementById('itensTabela').innerHTML = `
+        <tr class="linha-vazia">
+            <td colspan="6"><div class="empty-itens">Nenhum item adicionado</div></td>
+        </tr>
+    `;
+    document.getElementById('quantidadeItens').textContent = '0 itens';
+    document.getElementById('subtotal').textContent = 'R$ 0,00';
+    document.getElementById('desconto').textContent = 'R$ 0,00';
+    document.getElementById('acrescimo').textContent = 'R$ 0,00';
+    document.getElementById('totalGeral').textContent = 'R$ 0,00';
+    document.getElementById('totalMini').textContent = 'R$ 0,00';
+    document.getElementById('linhDesconto').style.display = 'none';
+    document.getElementById('linhaAcrescimo').style.display = 'none';
+    document.getElementById('numeroPedido').textContent = '-';
+
+    // ✅ Limpar DOM dos pagamentos do pedido anterior
+    document.getElementById('pagamentosLista').innerHTML =
+        '<div class="empty-pagamentos">Nenhum pagamento adicionado</div>';
+    document.getElementById('totalPago').textContent = 'R$ 0,00';
+    document.getElementById('valorFaltante').textContent = 'R$ 0,00';
+    document.getElementById('pagTotalPedido').textContent = 'R$ 0,00';
+    document.getElementById('pagItensQtd').textContent = '0';
+
+    // ✅ Limpar campos de busca e observações
+    document.getElementById('buscaProduto').value = '';
+    document.getElementById('resultadosBusca').innerHTML = '';
+    document.getElementById('inputBuscaCliente').value = '';
+    document.getElementById('resultadosBuscaCliente').innerHTML = '';
+    document.getElementById('btnLimparBuscaCliente').style.display = 'none';
+    document.getElementById('observacoes').value = '';
+
+    // ✅ Resetar botão finalizar
+    const btnFinalizar = document.getElementById('btnFinalizar');
+    if (btnFinalizar) {
+        btnFinalizar.textContent = '✅ Finalizar Pedido';
+        btnFinalizar.disabled = true;
+    }
+
+    // ✅ Resetar formulário de pagamento
+    document.getElementById('formaPagamento').value = '';
+    document.getElementById('valorPagamento').value = '';
+    document.getElementById('valorTroco').value = '';
+    document.getElementById('trocoGroup').style.display = 'none';
 
     // Mostrar tela PDV
     document.getElementById('tela-inicial').style.display = 'none';
@@ -252,7 +297,8 @@ async function carregarProximoNumero() {
 // ================================================================
 async function carregarParametros() {
     try {
-        const response = await fetch(`${API_URL}/pdv/parametros`, {
+        // ✅ Rota correta: /parametros (não /pdv/parametros)
+        const response = await fetch(`${API_URL}/parametros?modulo=PDV`, {
             headers: {
                 'Authorization': `Bearer ${localStorage.getItem('sirius_token')}`,
                 'X-Empresa-Id': empresaId
@@ -261,9 +307,11 @@ async function carregarParametros() {
         const data = await response.json();
         if (data.success && data.data) {
             parametros = {};
+            // ✅ Campo correto é valor_atual (COALESCE entre customizado e padrão)
             data.data.forEach(p => {
-                parametros[p.codigo] = p.valor;
+                parametros[p.codigo] = p.valor_atual;
             });
+            console.log('✅ Parâmetros carregados:', parametros);
         }
     } catch (e) {
         console.warn('Parâmetros não disponíveis:', e.message);
@@ -542,14 +590,14 @@ function adicionarProduto(produto) {
     const estoque = parseFloat(produto.estoque) || 0;
 
     // Verificar estoque (conforme parâmetro)
-    const permiteSemEstoque = paramAtivo('PDV_PERMITE_VENDA_SEM_ESTOQUE');
+    const permiteSemEstoque = paramAtivo('PERMITE_SALDO_NEGATIVO');
     if (!permiteSemEstoque && estoque <= 0) {
         showMessage(`Produto "${produto.descricao}" sem saldo em estoque!`, 'error');
         return;
     }
 
     // Verificar se parâmetro exige informar quantidade manualmente
-    const pedirQuantidade = paramAtivo('PDV_PEDIR_QUANTIDADE');
+    const pedirQuantidade = paramAtivo('PEDIDO_PERGUNTA_QUANTIDADE');
     const itemExistente = pedidoAtual.itens.find(i => i.id_produto === produto.id);
 
     if (pedirQuantidade && !itemExistente) {
@@ -687,10 +735,12 @@ function abrirModalQuantidade(produto, indice = null) {
     inputEl.value = qtdAtual;
 
     modal.style.display = 'flex';
+    // ✅ Timeout maior garante que o modal esteja visível antes do foco
+    // ✅ select() seleciona o "1" para o usuário substituir digitando
     setTimeout(() => {
         inputEl.focus();
         inputEl.select();
-    }, 80);
+    }, 150);
 }
 
 function abrirEdicaoQuantidade(indice) {
@@ -723,7 +773,7 @@ function confirmarQuantidade() {
     }
 
     const estoque = parseFloat(produto.estoque) || 0;
-    const permiteSemEstoque = paramAtivo('PDV_PERMITE_VENDA_SEM_ESTOQUE');
+    const permiteSemEstoque = paramAtivo('PERMITE_SALDO_NEGATIVO');
 
     if (!permiteSemEstoque && estoque > 0 && novaQtd > estoque) {
         showMessage(
@@ -765,7 +815,13 @@ function confirmarQuantidade() {
     fecharModalQuantidade();
     renderizarItens();
     calcularTotais();
-    setTimeout(() => document.getElementById('buscaProduto').focus(), 80);
+    // ✅ Limpar o campo antes de focar, evitando que a quantidade
+    // digitada no modal apareça no campo de busca
+    setTimeout(() => {
+        const campoBusca = document.getElementById('buscaProduto');
+        campoBusca.value = '';
+        campoBusca.focus();
+    }, 80);
 }
 
 function fecharModalQuantidade() {
@@ -917,6 +973,10 @@ function atualizarStatusPagamento() {
     const btnFinalizar = document.getElementById('btnFinalizar');
     const pago = faltante <= 0.01 && pedidoAtual.itens.length > 0;
     btnFinalizar.disabled = !pago;
+    // ✅ Garantir que o texto do botão está correto sempre que o status é atualizado
+    if (!btnFinalizar.disabled) {
+        btnFinalizar.textContent = '✅ Finalizar Pedido';
+    }
 }
 
 // ================================================================
@@ -939,14 +999,17 @@ async function finalizarPedido() {
         return;
     }
 
-    const totalPago = pedidoAtual.pagamentos.reduce((s, p) => s + p.valor, 0);
-    if (Math.abs(totalPago - pedidoAtual.valor_liquido) > 0.01) {
-        showMessage('O total dos pagamentos não confere com o valor do pedido.', 'error');
+    // ✅ Descontar o troco antes de comparar
+    // Pagamento em dinheiro com troco é válido (ex: R$50 pagos numa compra de R$30)
+    const totalPago  = pedidoAtual.pagamentos.reduce((s, p) => s + p.valor, 0);
+    const totalTroco = pedidoAtual.pagamentos.reduce((s, p) => s + (p.troco || 0), 0);
+    if ((totalPago - totalTroco) < pedidoAtual.valor_liquido - 0.01) {
+        showMessage('O total dos pagamentos não cobre o valor do pedido.', 'error');
         return;
     }
 
     // Verificar estoque dos itens (front-end)
-    const permiteSemEstoque = paramAtivo('PDV_PERMITE_VENDA_SEM_ESTOQUE');
+    const permiteSemEstoque = paramAtivo('PERMITE_SALDO_NEGATIVO');
     if (!permiteSemEstoque) {
         for (const item of pedidoAtual.itens) {
             if (item.quantidade > item.estoque) {
@@ -969,6 +1032,8 @@ async function finalizarPedido() {
     btnFinalizar.textContent = 'Finalizando...';
 
     try {
+        console.log('📤 Enviando pedido ao backend...', { numero: pedidoAtual.numero });
+
         const response = await fetch(`${API_URL}/pdv/pedidos/finalizar`, {
             method: 'POST',
             headers: {
@@ -979,15 +1044,20 @@ async function finalizarPedido() {
             body: JSON.stringify(pedidoAtual)
         });
 
+        console.log('📥 Resposta do backend | status:', response.status);
+
         const data = await response.json();
 
         if (data.success) {
+            // ✅ Restaurar botão ANTES de mostrar relatório
+            btnFinalizar.textContent = '✅ Finalizar Pedido';
+            btnFinalizar.disabled = false;
             mostrarRelatorioPedido(data.data);
         } else {
             throw new Error(data.message || 'Erro ao finalizar pedido');
         }
     } catch (e) {
-        console.error('Erro ao finalizar pedido:', e);
+        console.error('❌ Erro ao finalizar pedido:', e);
         showMessage(e.message || 'Erro ao finalizar pedido', 'error');
         btnFinalizar.disabled = false;
         btnFinalizar.textContent = '✅ Finalizar Pedido';
@@ -1086,10 +1156,10 @@ function showMessage(mensagem, tipo = 'info', callback = null) {
     const titulo = document.getElementById('mensagemTitulo');
 
     const config = {
-        success: { texto: '✅ Sucesso', cor: '#10b981' },
-        error:   { texto: '❌ Erro',    cor: '#ef4444' },
-        warning: { texto: '⚠️ Atenção', cor: '#f59e0b' },
-        info:    { texto: 'ℹ️ Informação', cor: '#2563eb' }
+        success: { texto: '✅ Sucesso',      cor: '#10b981' },
+        error:   { texto: '❌ Erro',          cor: '#ef4444' },
+        warning: { texto: '⚠️ Atenção',      cor: '#f59e0b' },
+        info:    { texto: 'ℹ️ Informação',   cor: '#2563eb' }
     };
 
     const c = config[tipo] || config.info;

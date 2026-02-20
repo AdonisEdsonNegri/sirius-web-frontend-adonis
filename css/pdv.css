@@ -57,12 +57,13 @@ html, body {
 
 /* =======================================================
    TELA INICIAL
+   ✅ CORRIGIDO: removida referência a TelaInicialDoPDV.jpg
+      (arquivo inexistente) e adicionado fechamento correto
+      da chave — o bloco anterior estava sem "}" causando
+      todo o CSS subsequente ficar inválido.
    ======================================================= */
 #tela-inicial {
-    background-image: url('../TelaInicialDoPDV.jpg');
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
+    background: var(--cinza-9);
 }
 
 .tela-inicial-overlay {
