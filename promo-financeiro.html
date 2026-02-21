@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIRIUS WEB – Módulo Financeiro</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:ital,wght@0,300;0,400;0,600;1,300&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        :root { --acento:#10b981; --acento2:#34d399; --acento3:#059669; --vermelho:#f87171; --branco:#fff; --cinza-claro:#d1fae5; }
+        html, body { width:100%; height:100%; overflow:hidden; font-family:'Barlow',sans-serif; cursor:pointer; user-select:none; }
+
+        .fundo {
+            width:100vw; height:100vh;
+            background:
+                radial-gradient(ellipse 70% 55% at 62% 35%, rgba(16,185,129,0.2) 0%, transparent 65%),
+                radial-gradient(ellipse 50% 60% at 20% 75%, rgba(5,150,105,0.1) 0%, transparent 60%),
+                linear-gradient(155deg, #020e08 0%, #051a0e 45%, #020c07 100%);
+            position:relative; display:flex; flex-direction:column; align-items:center; justify-content:center; overflow:hidden;
+        }
+
+        .fundo::before {
+            content:''; position:absolute; inset:-10%;
+            background-image:radial-gradient(circle,rgba(16,185,129,0.28) 1px,transparent 1px);
+            background-size:38px 38px;
+            animation:moverGrade 20s linear infinite; opacity:0.45;
+        }
+        @keyframes moverGrade{0%{transform:translate(0,0);}100%{transform:translate(38px,38px);}}
+
+        .fundo::after {
+            content:''; position:absolute; left:0; top:42%;
+            width:100%; height:1px;
+            background:linear-gradient(90deg,transparent 0%,var(--acento3) 30%,var(--acento2) 60%,transparent 100%);
+            opacity:0.2; filter:blur(2px);
+        }
+
+        /* Gráfico de barras decorativo */
+        .deco-grafico {
+            position:absolute; right:7vw; bottom:15%; 
+            display:flex; align-items:flex-end; gap:8px;
+            height:160px; opacity:0;
+            animation:entrarDeco 0.8s ease 0.5s forwards;
+        }
+        .barra { width:18px; border-radius:4px 4px 0 0; }
+        .barra:nth-child(1){height:60%;background:rgba(16,185,129,0.3);}
+        .barra:nth-child(2){height:80%;background:rgba(16,185,129,0.4);}
+        .barra:nth-child(3){height:45%;background:rgba(248,113,113,0.3);}
+        .barra:nth-child(4){height:90%;background:rgba(16,185,129,0.5);}
+        .barra:nth-child(5){height:70%;background:rgba(16,185,129,0.35);}
+        .barra:nth-child(6){height:100%;background:rgba(52,211,153,0.5);}
+        .barra:nth-child(7){height:55%;background:rgba(16,185,129,0.3);}
+        @keyframes entrarDeco{from{opacity:0;transform:translateY(20px);}to{opacity:0.7;transform:translateY(0);}}
+
+        /* Linha de tendência no gráfico */
+        .deco-linha { position:absolute; right:7vw; bottom:15%; width:184px; height:160px; opacity:0; animation:entrarDeco 0.8s ease 0.7s forwards; }
+        .deco-linha::after { content:''; position:absolute; bottom:70%; left:0; right:0; height:1px; background:linear-gradient(90deg,rgba(52,211,153,0.2),rgba(52,211,153,0.6),rgba(52,211,153,0.2)); }
+
+        .conteudo { position:relative; z-index:10; display:flex; flex-direction:column; align-items:flex-start; padding:0 0 0 10vw; width:100%; }
+
+        .marca { font-family:'Barlow',sans-serif; font-weight:300; font-size:clamp(13px,1.5vw,18px); letter-spacing:8px; text-transform:uppercase; color:rgba(255,255,255,0.3); opacity:0; animation:subir 0.6s ease 0.05s forwards; margin-bottom:2px; }
+        .pre-titulo { font-family:'Barlow',sans-serif; font-weight:600; font-size:clamp(11px,1.2vw,14px); letter-spacing:6px; text-transform:uppercase; color:var(--acento); opacity:0; transform:translateY(16px); animation:subir 0.6s ease 0.2s forwards; margin-bottom:6px; }
+
+        .titulo-modulo {
+            font-family:'Bebas Neue',sans-serif;
+            font-size:clamp(60px,11vw,150px);
+            line-height:0.9; letter-spacing:-2px;
+            color:transparent;
+            background:linear-gradient(130deg,#ffffff 0%,#6ee7b7 40%,var(--acento) 70%,#059669 100%);
+            -webkit-background-clip:text; background-clip:text;
+            opacity:0; transform:translateX(-40px);
+            animation:entrarEsquerda 0.8s cubic-bezier(0.16,1,0.3,1) 0.35s forwards;
+            filter:drop-shadow(0 0 35px rgba(16,185,129,0.45));
+            margin-bottom:20px;
+        }
+
+        .separador { width:0; height:2px; background:linear-gradient(90deg,var(--acento),var(--acento2)); border-radius:2px; opacity:0; animation:expandir 0.7s ease 0.8s forwards; margin-bottom:22px; }
+
+        .linha-texto { display:flex; align-items:center; gap:14px; opacity:0; transform:translateY(12px); }
+        .linha-texto:nth-child(6){animation:subir 0.5s ease 1.0s forwards;}
+        .linha-texto:nth-child(7){animation:subir 0.5s ease 1.13s forwards;}
+        .linha-texto:nth-child(8){animation:subir 0.5s ease 1.26s forwards;}
+        .linha-texto:nth-child(9){animation:subir 0.5s ease 1.39s forwards;}
+
+        .linha-icone { width:6px; height:6px; border-radius:50%; flex-shrink:0; box-shadow:0 0 8px var(--acento); }
+        .linha-icone.verde { background:var(--acento); }
+        .linha-icone.vermelho { background:var(--vermelho); box-shadow:0 0 8px var(--vermelho); }
+
+        .linha-texto span { font-family:'Barlow',sans-serif; font-weight:300; font-size:clamp(15px,2.2vw,28px); letter-spacing:1px; color:var(--cinza-claro); }
+        .linha-texto span em { font-style:italic; color:var(--branco); font-weight:400; }
+
+        .badge { position:absolute; top:28px; right:10vw; background:rgba(16,185,129,0.12); border:1px solid rgba(16,185,129,0.3); color:rgba(16,185,129,0.9); border-radius:20px; padding:5px 14px; font-family:'Barlow',sans-serif; font-size:12px; font-weight:600; letter-spacing:2px; text-transform:uppercase; opacity:0; animation:subir 0.5s ease 0.3s forwards; z-index:20; }
+
+        .rodape { position:absolute; bottom:0; left:0; right:0; z-index:20; display:flex; align-items:center; justify-content:space-between; padding:20px 10vw; background:linear-gradient(0deg,rgba(2,14,8,0.95) 0%,transparent 100%); opacity:0; animation:subir 0.6s ease 1.5s forwards; }
+        .rodape-marca { font-family:'Barlow',sans-serif; font-weight:600; font-size:13px; letter-spacing:3px; text-transform:uppercase; color:rgba(255,255,255,0.2); }
+
+        .btn-fale { display:inline-flex; align-items:center; gap:10px; padding:12px 30px; background:transparent; border:1px solid rgba(16,185,129,0.5); border-radius:40px; color:var(--cinza-claro); font-family:'Barlow',sans-serif; font-weight:600; font-size:14px; letter-spacing:3px; text-transform:uppercase; text-decoration:none; cursor:pointer; transition:all 0.3s ease; position:relative; overflow:hidden; }
+        .btn-fale::before { content:''; position:absolute; inset:0; background:linear-gradient(135deg,var(--acento3),var(--acento2)); opacity:0; transition:opacity 0.3s ease; border-radius:40px; }
+        .btn-fale:hover::before { opacity:1; }
+        .btn-fale span,.btn-seta { position:relative; z-index:1; }
+        .btn-fale:hover { color:#022c16; border-color:transparent; box-shadow:0 0 20px rgba(16,185,129,0.5); outline:none; }
+        .btn-seta { font-size:16px; transition:transform 0.3s ease; }
+        .btn-fale:hover .btn-seta { transform:translateX(4px); }
+
+        @keyframes subir{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+        @keyframes entrarEsquerda{from{opacity:0;transform:translateX(-40px);}to{opacity:1;transform:translateX(0);}}
+        @keyframes expandir{from{width:0;opacity:0;}to{width:180px;opacity:1;}}
+    </style>
+</head>
+<body>
+<div class="fundo" onclick="window.location.href='https://www.softclever.com.br'">
+    <div class="deco-grafico">
+        <div class="barra"></div><div class="barra"></div><div class="barra"></div>
+        <div class="barra"></div><div class="barra"></div><div class="barra"></div><div class="barra"></div>
+    </div>
+    <div class="badge">✓ Gestão Financeira</div>
+    <div class="conteudo">
+        <div class="marca">SIRIUS WEB</div>
+        <div class="pre-titulo">Módulo</div>
+        <h1 class="titulo-modulo">Financeiro</h1>
+        <div class="separador"></div>
+        <div class="linha-texto"><span class="linha-icone verde"></span><span>A receber</span></div>
+        <div class="linha-texto"><span class="linha-icone vermelho"></span><span>A pagar</span></div>
+        <div class="linha-texto"><span class="linha-icone verde"></span><span><em>Fluxo de caixa</em></span></div>
+        <div class="linha-texto"><span class="linha-icone verde"></span><span>Conciliação bancária</span></div>
+    </div>
+    <div class="rodape">
+        <div class="rodape-marca">Soft Clever Informática</div>
+        <a class="btn-fale" href="https://www.softclever.com.br" onclick="event.stopPropagation()">
+            <span>Fale Conosco</span><span class="btn-seta">→</span>
+        </a>
+    </div>
+    <canvas id="particulas" style="position:absolute;inset:0;pointer-events:none;z-index:5;"></canvas>
+</div>
+<script>
+    const canvas=document.getElementById('particulas'),ctx=canvas.getContext('2d');
+    function r(){canvas.width=window.innerWidth;canvas.height=window.innerHeight;}
+    r();window.addEventListener('resize',r);
+    const ps=Array.from({length:28},()=>({x:Math.random()*window.innerWidth,y:Math.random()*window.innerHeight,r:Math.random()*1.8+0.4,vx:(Math.random()-0.5)*0.4,vy:-(Math.random()*0.6+0.2),alpha:Math.random()*0.5+0.1,cor:Math.random()>0.5?'16,185,129':'52,211,153'}));
+    function anim(){ctx.clearRect(0,0,canvas.width,canvas.height);ps.forEach(p=>{p.x+=p.vx;p.y+=p.vy;if(p.y<-10){p.y=canvas.height+10;p.x=Math.random()*canvas.width;}ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle=`rgba(${p.cor},${p.alpha})`;ctx.fill();});requestAnimationFrame(anim);}
+    anim();
+    document.querySelector('.fundo').addEventListener('click',function(e){const d=document.createElement('div');d.style.cssText=`position:fixed;left:${e.clientX-30}px;top:${e.clientY-30}px;width:60px;height:60px;border-radius:50%;background:radial-gradient(circle,rgba(16,185,129,0.5),transparent);pointer-events:none;z-index:9999;animation:ripple 0.5s ease forwards;`;const s=document.createElement('style');s.textContent='@keyframes ripple{from{transform:scale(1);opacity:1}to{transform:scale(6);opacity:0}}';document.head.appendChild(s);document.body.appendChild(d);setTimeout(()=>d.remove(),500);});
+</script>
+</body>
+</html>
