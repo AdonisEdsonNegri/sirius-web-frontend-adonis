@@ -16,11 +16,11 @@
             background: #f9fafb;
         }
 
-        /* Header */
+        /* ─── Header ─── */
         .header {
             background: #2563eb;
             color: white;
-            padding: 16px 24px;
+            padding: 14px 24px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
@@ -30,16 +30,47 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            gap: 16px;
+        }
+
+        .header-esquerda {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        /* Botão Voltar ao Menu */
+        .btn-menu {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            padding: 7px 14px;
+            background: rgba(255,255,255,0.15);
+            border: 1px solid rgba(255,255,255,0.25);
+            color: white;
+            border-radius: 7px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background 0.2s;
+            white-space: nowrap;
+        }
+
+        .btn-menu:hover {
+            background: rgba(255,255,255,0.25);
         }
 
         .header h1 {
-            font-size: 24px;
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
         }
 
         .user-info {
             display: flex;
             align-items: center;
-            gap: 16px;
+            gap: 14px;
         }
 
         .btn-logout {
@@ -57,100 +88,14 @@
             background: rgba(255,255,255,0.3);
         }
 
-        /* Navigation */
-        .nav {
-            background: white;
-            border-bottom: 1px solid #e5e7eb;
-        }
-
-        .nav-content {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: flex;
-            gap: 8px;
-            padding: 0 24px;
-            position: relative;
-        }
-
-        .nav-content a {
-            padding: 16px 20px;
-            color: #6b7280;
-            text-decoration: none;
-            border-bottom: 2px solid transparent;
-            transition: all 0.2s;
-            font-weight: 500;
-        }
-
-        .nav-content a:hover {
-            color: #2563eb;
-            background: #f3f4f6;
-        }
-
-        .nav-content a.active {
-            color: #2563eb;
-            border-bottom-color: #2563eb;
-        }
-
-        /* Dropdown Configurações */
-        .nav-dropdown {
-            position: relative;
-        }
-
-        .nav-dropdown-btn {
-            padding: 16px 20px;
-            background: none;
-            border: none;
-            color: #6b7280;
-            font-weight: 500;
-            cursor: pointer;
-            font-size: 14px;
-            border-bottom: 2px solid transparent;
-            transition: all 0.2s;
-        }
-
-        .nav-dropdown-btn:hover {
-            color: #2563eb;
-            background: #f3f4f6;
-        }
-
-        .nav-dropdown-content {
-            display: none;
-            position: absolute;
-            top: 100%;
-            right: 0;
-            background: white;
-            min-width: 200px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            border-radius: 6px;
-            margin-top: 4px;
-            z-index: 1000;
-        }
-
-        .nav-dropdown:hover .nav-dropdown-content {
-            display: block;
-        }
-
-        .nav-dropdown-content a {
-            display: block;
-            padding: 12px 16px;
-            color: #374151;
-            text-decoration: none;
-            border-bottom: none;
-        }
-
-        .nav-dropdown-content a:hover {
-            background: #f3f4f6;
-            color: #2563eb;
-        }
-
-        /* Container */
+        /* ─── Container ─── */
         .container {
             max-width: 1200px;
             margin: 32px auto;
             padding: 0 24px;
         }
 
-        /* Cards Grid */
+        /* ─── Cards Grid ─── */
         .cards-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -186,7 +131,7 @@
             font-size: 14px;
         }
 
-        /* Empresa Info */
+        /* ─── Empresa Info ─── */
         .empresa-info {
             background: white;
             border-radius: 12px;
@@ -209,19 +154,10 @@
             border-bottom: 1px solid #f3f4f6;
         }
 
-        .info-row:last-child {
-            border-bottom: none;
-        }
+        .info-row:last-child { border-bottom: none; }
 
-        .info-label {
-            color: #6b7280;
-            font-weight: 500;
-        }
-
-        .info-value {
-            color: #374151;
-            font-weight: 600;
-        }
+        .info-label { color: #6b7280; font-weight: 500; }
+        .info-value { color: #374151; font-weight: 600; }
 
         .badge {
             display: inline-block;
@@ -231,23 +167,20 @@
             font-weight: 600;
         }
 
-        .badge-success {
-            background: #d1fae5;
-            color: #065f46;
-        }
+        .badge-success { background: #d1fae5; color: #065f46; }
 
-        .loading {
-            text-align: center;
-            padding: 20px;
-            color: #6b7280;
-        }
+        .loading { text-align: center; padding: 20px; color: #6b7280; }
     </style>
 </head>
 <body>
+
     <!-- Header -->
     <div class="header">
         <div class="header-content">
-            <h1>SIRIUS WEB</h1>
+            <div class="header-esquerda">
+                <a href="menu-principal.html" class="btn-menu">☰ Menu</a>
+                <h1>SIRIUS WEB — Dashboard</h1>
+            </div>
             <div class="user-info">
                 <span id="userName">Carregando...</span>
                 <button class="btn-logout" onclick="logout()">Sair</button>
@@ -255,56 +188,42 @@
         </div>
     </div>
 
-    <!-- Navigation -->
-    <div class="nav">
-        <div class="nav-content">
-            <a href="dashboard.html" class="active">Dashboard</a>
-            <a href="produtos.html">Produtos</a>
-            <a href="clientes.html">Clientes</a>
-            <a href="pdv.html">PDV</a>
-            <a href="pedidos.html">Pedidos</a>
-            
-            <!-- Dropdown Configurações -->
-            <div class="nav-dropdown">
-                <button class="nav-dropdown-btn">⚙️ Configurações ▼</button>
-                <div class="nav-dropdown-content">
-                    <a href="vendedores.html">👨‍💼 Vendedores</a>
-                    <a href="formas-pagamento.html">💳 Formas de Pagamento</a>
-                    <a href="regimes-tributarios.html">📋 Regimes Tributários</a>
-                    <a href="#" onclick="showMessage('Módulo Caixas Cadastradas em desenvolvimento!'); return false;">💰 Caixas Cadastradas</a>
-                    <a href="#" onclick="showMessage('Módulo Usuários em desenvolvimento!'); return false;">👥 Usuários</a>
-                </div>
-            </div>
-
-            <a href="manual.html" style="color: #059669; font-weight: 600;">📚 Manual</a>
-            
-        </div>
-    </div>
-
     <!-- Container -->
     <div class="container">
+
         <!-- Cards de Estatísticas -->
         <div class="cards-grid">
+
             <div class="card">
                 <h3>Plano Atual</h3>
                 <div class="card-value" id="plano">-</div>
                 <div class="card-info">Gratuito com limites</div>
             </div>
-       
+
             <div class="card">
                 <h3>Acessos Rápidos</h3>
                 <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 16px;">
-                    <a href="produtos.html" style="display: block; padding: 8px 16px; background: #2563eb; color: white; text-decoration: none; border-radius: 6px; text-align: center; font-weight: 500; transition: background 0.2s;" onmouseover="this.style.background='#1e40af'" onmouseout="this.style.background='#2563eb'">
+                    <a href="produtos.html"
+                       style="display:block;padding:8px 16px;background:#2563eb;color:white;text-decoration:none;border-radius:6px;text-align:center;font-weight:500;transition:background 0.2s;"
+                       onmouseover="this.style.background='#1e40af'"
+                       onmouseout="this.style.background='#2563eb'">
                         📦 Produtos
                     </a>
-                    <a href="pdv.html" style="display: block; padding: 8px 16px; background: #10b981; color: white; text-decoration: none; border-radius: 6px; text-align: center; font-weight: 500; transition: background 0.2s;" onmouseover="this.style.background='#059669'" onmouseout="this.style.background='#10b981'">
+                    <a href="pdv.html"
+                       style="display:block;padding:8px 16px;background:#10b981;color:white;text-decoration:none;border-radius:6px;text-align:center;font-weight:500;transition:background 0.2s;"
+                       onmouseover="this.style.background='#059669'"
+                       onmouseout="this.style.background='#10b981'">
                         🛒 PDV
                     </a>
-                    <a href="pedidos.html" style="display: block; padding: 8px 16px; background: #8b5cf6; color: white; text-decoration: none; border-radius: 6px; text-align: center; font-weight: 500; transition: background 0.2s;" onmouseover="this.style.background='#7c3aed'" onmouseout="this.style.background='#8b5cf6'">
+                    <a href="pedidos.html"
+                       style="display:block;padding:8px 16px;background:#8b5cf6;color:white;text-decoration:none;border-radius:6px;text-align:center;font-weight:500;transition:background 0.2s;"
+                       onmouseover="this.style.background='#7c3aed'"
+                       onmouseout="this.style.background='#8b5cf6'">
                         📋 Pedidos
                     </a>
                 </div>
             </div>
+
         </div>
 
         <!-- Informações da Empresa -->
@@ -314,61 +233,55 @@
                 Carregando informações...
             </div>
         </div>
+
     </div>
 
     <!-- Modal de Aviso Personalizado -->
-    <div id="modalAviso" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9999; align-items: center; justify-content: center;">
-        <div style="background: white; border-radius: 12px; padding: 24px; max-width: 400px; margin: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-                <h3 style="color: #2563eb; margin: 0;">ℹ️ Informação</h3>
-                <span onclick="closeMessage()" style="cursor: pointer; font-size: 24px; color: #6b7280;">&times;</span>
+    <div id="modalAviso"
+         style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:9999;align-items:center;justify-content:center;">
+        <div style="background:white;border-radius:12px;padding:24px;max-width:400px;margin:20px;box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+                <h3 style="color:#2563eb;margin:0;">ℹ️ Informação</h3>
+                <span onclick="closeMessage()" style="cursor:pointer;font-size:24px;color:#6b7280;">&times;</span>
             </div>
-            <p id="mensagemAviso" style="color: #374151; margin-bottom: 20px;"></p>
-            <button onclick="closeMessage()" style="background: #2563eb; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; width: 100%; font-size: 16px; font-weight: 500;">OK</button>
+            <p id="mensagemAviso" style="color:#374151;margin-bottom:20px;"></p>
+            <button onclick="closeMessage()"
+                    style="background:#2563eb;color:white;border:none;padding:10px 20px;border-radius:6px;cursor:pointer;width:100%;font-size:16px;font-weight:500;">
+                OK
+            </button>
         </div>
     </div>
 
     <script>
-        // Funções do modal de aviso
-        function showMessage(mensagem) {
-            document.getElementById('mensagemAviso').textContent = mensagem;
+        /* ── Modal ── */
+        function showMessage(msg) {
+            document.getElementById('mensagemAviso').textContent = msg;
             document.getElementById('modalAviso').style.display = 'flex';
         }
-
         function closeMessage() {
             document.getElementById('modalAviso').style.display = 'none';
         }
-
-        // Fechar modal ao clicar fora
         document.getElementById('modalAviso')?.addEventListener('click', function(e) {
-            if (e.target === this) {
-                closeMessage();
-            }
+            if (e.target === this) closeMessage();
         });
 
-        // Detecta se está em desenvolvimento (local) ou produção (Vercel)
-        const isDev = window.location.hostname === 'localhost' 
-                   || window.location.hostname === '127.0.0.1'
-                   || window.location.hostname === ''
+        /* ── Ambiente ── */
+        const isDev = ['localhost','127.0.0.1',''].includes(window.location.hostname)
                    || window.location.protocol === 'file:';
+        const API_URL = isDev
+            ? 'http://localhost:3000'
+            : 'https://sirius-web-api-adonis.vercel.app';
 
-        // Configuração da API (automática: local em dev, Vercel em produção)
-        const API_URL = isDev ? 'http://localhost:3000' : 'https://sirius-web-api-adonis.vercel.app';
-        
-        console.log('🔍 Ambiente:', isDev ? 'DESENVOLVIMENTO' : 'PRODUÇÃO');
+        console.log('🔍 Ambiente:', isDev ? 'DEV' : 'PROD');
         console.log('📡 API URL:', API_URL);
 
-        // Verificar autenticação
+        /* ── Autenticação ── */
         function checkAuth() {
             const token = localStorage.getItem('sirius_token');
-            if (!token) {
-                window.location.href = 'index.html';
-                return null;
-            }
+            if (!token) { window.location.href = 'index.html'; return null; }
             return token;
         }
 
-        // Logout
         function logout() {
             localStorage.removeItem('sirius_token');
             localStorage.removeItem('sirius_usuario');
@@ -376,37 +289,27 @@
             window.location.href = 'index.html';
         }
 
-        // Carregar dados
+        /* ── Carregar dados ── */
         async function loadData() {
             const token = checkAuth();
             if (!token) return;
 
-            // Dados do usuário
-            const usuario = JSON.parse(localStorage.getItem('sirius_usuario'));
-            const empresas = JSON.parse(localStorage.getItem('sirius_empresas'));
+            const usuario  = JSON.parse(localStorage.getItem('sirius_usuario') || '{}');
+            const empresas = JSON.parse(localStorage.getItem('sirius_empresas') || '[]');
+            const empresa  = Array.isArray(empresas) ? empresas[0] : empresas;
 
-            // Atualizar nome
-            document.getElementById('userName').textContent = usuario.nome;
+            document.getElementById('userName').textContent = usuario.nome || 'Usuário';
+            document.getElementById('plano').textContent    = empresa?.plano || '-';
 
-            // Pegar primeira empresa
-            const empresa = empresas[0];
-
-            // Atualizar plano
-            document.getElementById('plano').textContent = empresa.plano;
-            
-            // Buscar dados completos da empresa
             try {
-                const response = await fetch(`${API_URL}/empresas/${empresa.id}`, {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
+                const id = empresa?.id_empresa || empresa?.id || empresa?.empresa_id;
+                const response = await fetch(`${API_URL}/empresas/${id}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
                 });
-
                 const data = await response.json();
 
                 if (response.ok && data.success) {
                     const emp = data.data;
-                    
                     document.getElementById('empresaContent').innerHTML = `
                         <div class="info-row">
                             <span class="info-label">Razão Social:</span>
@@ -438,63 +341,15 @@
                 } else {
                     throw new Error('Erro ao carregar dados');
                 }
-
             } catch (error) {
                 console.error('Erro:', error);
-                document.getElementById('empresaContent').innerHTML = `
-                    <p style="color: #ef4444;">Erro ao carregar dados da empresa.</p>
-                `;
+                document.getElementById('empresaContent').innerHTML =
+                    '<p style="color:#ef4444;">Erro ao carregar dados da empresa.</p>';
             }
         }
 
-        // Inicializar
+        /* ── Inicializar ── */
         loadData();
-        
-        // Verificar se usuário é admin e mostrar link de Parâmetros
-        function verificarSeEhAdmin() {
-            try {
-                const empresas = JSON.parse(localStorage.getItem('sirius_empresas') || '[]');
-                
-                if (empresas.length > 0 && empresas[0].is_admin) {
-                    // Usuário é ADMIN - mostrar link de Parâmetros
-                    const dropdown = document.querySelector('.nav-dropdown-content');
-                    
-                    if (dropdown) {
-                        // Verificar se já existe o link (evita duplicação)
-                        const linkExiste = Array.from(dropdown.children).some(a => 
-                            a.textContent.includes('Parâmetros')
-                        );
-                        
-                        if (!linkExiste) {
-                            // Criar link de parâmetros
-                            const linkParametros = document.createElement('a');
-                            linkParametros.href = 'parametros-config.html';
-                            linkParametros.innerHTML = '⚙️ Parâmetros';
-                            
-                            // Adicionar ANTES do link "Caixas Cadastradas" (último link)
-                            const links = dropdown.children;
-                            if (links.length >= 3) {
-                                dropdown.insertBefore(linkParametros, links[3]); // Antes de "Caixas"
-                            } else {
-                                dropdown.appendChild(linkParametros);
-                            }
-                            
-                            console.log('✅ Link de Parâmetros adicionado (admin)');
-                        }
-                    }
-                } else {
-                    console.log('👤 Usuário não é admin - link de Parâmetros oculto');
-                }
-                
-            } catch (error) {
-                console.error('Erro ao verificar admin:', error);
-            }
-        }
-
-        // ✅ CHAMAR A FUNÇÃO (adicione esta linha logo após loadData(); )
-        verificarSeEhAdmin();
-
-
         console.log('🚀 Dashboard carregado');
     </script>
 </body>

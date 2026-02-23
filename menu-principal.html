@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIRIUS WEB - Menu Principal</title>
+    <style>
+        /* ============================================================
+           RESET E BASE
+           ============================================================ */
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+            overflow: hidden;
+            font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+            background: #050e22;
+        }
+
+        /* ============================================================
+           LAYOUT PRINCIPAL: SIDEBAR + CONTEÚDO
+           ============================================================ */
+        .app-layout {
+            display: flex;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        /* ============================================================
+           SIDEBAR ESQUERDA
+           ============================================================ */
+        .sidebar {
+            width: 270px;
+            min-width: 270px;
+            background: linear-gradient(180deg, #0a1628 0%, #0d1f3c 60%, #0a1628 100%);
+            border-right: 1px solid rgba(37, 99, 235, 0.25);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            z-index: 10;
+            box-shadow: 4px 0 24px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Linha decorativa lateral */
+        .sidebar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 2px;
+            height: 100%;
+            background: linear-gradient(180deg,
+                transparent 0%,
+                #2563eb 20%,
+                #00e5a0 50%,
+                #2563eb 80%,
+                transparent 100%
+            );
+            opacity: 0.5;
+        }
+
+        /* --- Logo / Cabeçalho da Sidebar --- */
+        .sidebar-logo {
+            padding: 28px 24px 24px;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+
+        .logo-marca {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 6px;
+        }
+
+        .logo-icone {
+            width: 38px;
+            height: 38px;
+            background: linear-gradient(135deg, #2563eb, #1e40af);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            box-shadow: 0 0 14px rgba(37, 99, 235, 0.5);
+        }
+
+        .logo-texto {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .logo-titulo {
+            color: #fff;
+            font-size: 20px;
+            font-weight: 800;
+            letter-spacing: 2px;
+            line-height: 1;
+        }
+
+        .logo-subtitulo {
+            color: #64748b;
+            font-size: 10px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-top: 2px;
+        }
+
+        .logo-versao {
+            color: rgba(37, 99, 235, 0.7);
+            font-size: 10px;
+            letter-spacing: 1px;
+        }
+
+        /* --- Informação do usuário --- */
+        .sidebar-user {
+            padding: 14px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .user-avatar {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #2563eb, #7c3aed);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 14px;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .user-info-sidebar {
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .user-nome {
+            color: #e2e8f0;
+            font-size: 13px;
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .user-plano {
+            color: #10b981;
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* --- Navegação (itens do menu) --- */
+        .sidebar-nav {
+            flex: 1;
+            padding: 16px 12px;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        .sidebar-nav::-webkit-scrollbar { width: 4px; }
+        .sidebar-nav::-webkit-scrollbar-track { background: transparent; }
+        .sidebar-nav::-webkit-scrollbar-thumb { background: rgba(37,99,235,0.3); border-radius: 4px; }
+
+        .nav-label {
+            color: #334155;
+            font-size: 9px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            padding: 8px 12px 4px;
+        }
+
+        /* Item de menu */
+        .nav-item {
+            position: relative;
+            margin-bottom: 2px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 11px 14px;
+            border-radius: 10px;
+            color: #94a3b8;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 1px solid transparent;
+            user-select: none;
+        }
+
+        .nav-link:hover {
+            background: rgba(37, 99, 235, 0.12);
+            color: #e2e8f0;
+            border-color: rgba(37, 99, 235, 0.2);
+        }
+
+        .nav-link.ativo {
+            background: rgba(37, 99, 235, 0.18);
+            color: #60a5fa;
+            border-color: rgba(37, 99, 235, 0.3);
+        }
+
+        .nav-link .nav-icone {
+            font-size: 17px;
+            min-width: 22px;
+            text-align: center;
+        }
+
+        .nav-link .nav-texto {
+            flex: 1;
+            white-space: nowrap;
+        }
+
+        .nav-link .nav-seta {
+            font-size: 11px;
+            transition: transform 0.25s;
+            opacity: 0.6;
+        }
+
+        .nav-link.aberto .nav-seta {
+            transform: rotate(90deg);
+        }
+
+        /* Submenu de Configurações */
+        .submenu {
+            display: none;
+            padding-left: 18px;
+            overflow: hidden;
+        }
+
+        .submenu.aberto {
+            display: block;
+        }
+
+        .submenu-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 9px 12px;
+            border-radius: 8px;
+            color: #64748b;
+            text-decoration: none;
+            font-size: 13px;
+            transition: all 0.18s;
+            cursor: pointer;
+        }
+
+        .submenu-link:hover {
+            background: rgba(37, 99, 235, 0.1);
+            color: #93c5fd;
+        }
+
+        .submenu-link .sub-icone {
+            font-size: 14px;
+            min-width: 18px;
+            text-align: center;
+        }
+
+        /* Separador */
+        .nav-separador {
+            height: 1px;
+            background: rgba(255,255,255,0.05);
+            margin: 10px 12px;
+        }
+
+        /* --- Botão de destaque: Outros Módulos --- */
+        .nav-link.destaque {
+            background: linear-gradient(135deg, rgba(37,99,235,0.15), rgba(124,58,237,0.15));
+            color: #a78bfa;
+            border-color: rgba(124,58,237,0.3);
+        }
+
+        .nav-link.destaque:hover {
+            background: linear-gradient(135deg, rgba(37,99,235,0.25), rgba(124,58,237,0.25));
+            color: #c4b5fd;
+        }
+
+        /* --- Rodapé da Sidebar --- */
+        .sidebar-footer {
+            padding: 14px 16px;
+            border-top: 1px solid rgba(255,255,255,0.06);
+        }
+
+        .btn-logout {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            padding: 10px 14px;
+            background: rgba(239, 68, 68, 0.08);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            border-radius: 9px;
+            color: #f87171;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-logout:hover {
+            background: rgba(239, 68, 68, 0.15);
+            border-color: rgba(239, 68, 68, 0.4);
+        }
+
+        /* ============================================================
+           ÁREA PRINCIPAL (direita) - ILUSTRAÇÃO ERP
+           ============================================================ */
+        .main-area {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+            background: radial-gradient(ellipse at 60% 50%, #0d1f3c 0%, #050e22 70%);
+        }
+
+        /* Grid de fundo sutil */
+        .main-area::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(37,99,235,0.04) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(37,99,235,0.04) 1px, transparent 1px);
+            background-size: 50px 50px;
+            pointer-events: none;
+        }
+
+        /* --- Conteúdo da área principal --- */
+        .main-content {
+            position: relative;
+            z-index: 2;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+        }
+
+        /* Tagline */
+        .main-tagline {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .main-tagline h2 {
+            color: rgba(255,255,255,0.85);
+            font-size: 28px;
+            font-weight: 300;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .main-tagline h2 strong {
+            color: #60a5fa;
+            font-weight: 700;
+        }
+
+        .main-tagline p {
+            color: #475569;
+            font-size: 14px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        /* ============================================================
+           ILUSTRAÇÃO ERP (SVG + CSS ANIMADO)
+           ============================================================ */
+        .erp-illustration {
+            position: relative;
+            width: 480px;
+            height: 380px;
+        }
+
+        /* Nó central */
+        .erp-hub {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 110px;
+            height: 110px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #1e3a8a, #2563eb);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow:
+                0 0 0 8px rgba(37,99,235,0.1),
+                0 0 0 16px rgba(37,99,235,0.05),
+                0 0 40px rgba(37,99,235,0.4);
+            z-index: 10;
+            animation: hub-pulse 3s ease-in-out infinite;
+        }
+
+        @keyframes hub-pulse {
+            0%, 100% { box-shadow: 0 0 0 8px rgba(37,99,235,0.1), 0 0 0 16px rgba(37,99,235,0.05), 0 0 40px rgba(37,99,235,0.4); }
+            50% { box-shadow: 0 0 0 12px rgba(37,99,235,0.15), 0 0 0 24px rgba(37,99,235,0.07), 0 0 60px rgba(37,99,235,0.6); }
+        }
+
+        .hub-icone {
+            font-size: 28px;
+            margin-bottom: 2px;
+        }
+
+        .hub-titulo {
+            color: #fff;
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 2px;
+        }
+
+        .hub-sub {
+            color: rgba(255,255,255,0.5);
+            font-size: 8px;
+            letter-spacing: 1px;
+        }
+
+        /* Nós satélite */
+        .erp-node {
+            position: absolute;
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: default;
+            transition: transform 0.3s ease;
+            z-index: 5;
+        }
+
+        .erp-node:hover {
+            transform: scale(1.12);
+        }
+
+        .erp-node .node-icone {
+            font-size: 20px;
+            margin-bottom: 2px;
+        }
+
+        .erp-node .node-label {
+            font-size: 8px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            text-align: center;
+            line-height: 1.2;
+        }
+
+        /* Posicionamento dos nós (círculo em torno do hub) */
+        /* Topo */
+        .node-pdv    { top: 10px;  left: 50%; transform: translateX(-50%); background: linear-gradient(135deg,#064e3b,#10b981); box-shadow: 0 0 20px rgba(16,185,129,0.35); color: #a7f3d0; }
+        /* Topo-direita */
+        .node-nfe    { top: 60px;  right: 30px; background: linear-gradient(135deg,#1e1b4b,#7c3aed); box-shadow: 0 0 20px rgba(124,58,237,0.35); color: #ddd6fe; }
+        /* Baixo-direita */
+        .node-fin    { bottom: 60px; right: 20px; background: linear-gradient(135deg,#7c2d12,#ea580c); box-shadow: 0 0 20px rgba(234,88,12,0.35); color: #fed7aa; }
+        /* Baixo */
+        .node-est    { bottom: 10px; left: 50%; transform: translateX(-50%); background: linear-gradient(135deg,#1e3a5f,#0284c7); box-shadow: 0 0 20px rgba(2,132,199,0.35); color: #bae6fd; }
+        /* Baixo-esquerda */
+        .node-cli    { bottom: 60px; left: 20px; background: linear-gradient(135deg,#4a1942,#a21caf); box-shadow: 0 0 20px rgba(162,28,175,0.35); color: #f5d0fe; }
+        /* Topo-esquerda */
+        .node-rel    { top: 60px;  left: 30px; background: linear-gradient(135deg,#1c3636,#0d9488); box-shadow: 0 0 20px rgba(13,148,136,0.35); color: #99f6e4; }
+
+        /* SVG das linhas de conexão */
+        .connections-svg {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .conn-line {
+            stroke: rgba(37,99,235,0.25);
+            stroke-width: 1.5;
+            fill: none;
+            stroke-dasharray: 6 4;
+            animation: dash-flow 2.5s linear infinite;
+        }
+
+        @keyframes dash-flow {
+            to { stroke-dashoffset: -20; }
+        }
+
+        /* Pulsos nas linhas */
+        .conn-pulse {
+            r: 3;
+            fill: #60a5fa;
+            opacity: 0;
+        }
+
+        /* --- Rodapé da ilustração --- */
+        .main-footer {
+            margin-top: 36px;
+            text-align: center;
+        }
+
+        .footer-stats {
+            display: flex;
+            gap: 32px;
+            justify-content: center;
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+        }
+
+        .stat-numero {
+            color: #60a5fa;
+            font-size: 22px;
+            font-weight: 800;
+        }
+
+        .stat-desc {
+            color: #475569;
+            font-size: 10px;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+        }
+
+        .stat-divisor {
+            width: 1px;
+            background: rgba(255,255,255,0.06);
+            align-self: stretch;
+        }
+
+        /* ============================================================
+           MODAL DE AVISO
+           ============================================================ */
+        #modalAviso {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.7);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #modalAviso.visivel {
+            display: flex;
+        }
+
+        .modal-box {
+            background: #0d1f3c;
+            border: 1px solid rgba(37,99,235,0.3);
+            border-radius: 14px;
+            padding: 28px;
+            max-width: 380px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+        }
+
+        .modal-titulo {
+            color: #60a5fa;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .modal-fechar {
+            color: #64748b;
+            font-size: 22px;
+            cursor: pointer;
+            line-height: 1;
+            transition: color 0.15s;
+        }
+
+        .modal-fechar:hover { color: #e2e8f0; }
+
+        .modal-mensagem {
+            color: #94a3b8;
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .modal-ok {
+            width: 100%;
+            padding: 11px;
+            background: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .modal-ok:hover { background: #1e40af; }
+    </style>
+</head>
+<body>
+
+<div class="app-layout">
+
+    <!-- ============================================================
+         SIDEBAR ESQUERDA
+         ============================================================ -->
+    <aside class="sidebar">
+
+        <!-- Logo -->
+        <div class="sidebar-logo">
+            <div class="logo-marca">
+                <div class="logo-icone">⭐</div>
+                <div class="logo-texto">
+                    <span class="logo-titulo">SIRIUS</span>
+                    <span class="logo-subtitulo">Web ERP</span>
+                </div>
+            </div>
+            <div class="logo-versao">Versão Gratuita</div>
+        </div>
+
+        <!-- Usuário -->
+        <div class="sidebar-user">
+            <div class="user-avatar" id="userAvatar">?</div>
+            <div class="user-info-sidebar">
+                <span class="user-nome" id="userName">Carregando...</span>
+                <span class="user-plano" id="userPlano">gratuito</span>
+            </div>
+        </div>
+
+        <!-- Navegação -->
+        <nav class="sidebar-nav">
+
+            <div class="nav-label">Principal</div>
+
+            <!-- Dashboard -->
+            <div class="nav-item">
+                <a href="dashboard.html" class="nav-link">
+                    <span class="nav-icone">📊</span>
+                    <span class="nav-texto">Dashboard</span>
+                </a>
+            </div>
+
+            <!-- Produtos -->
+            <div class="nav-item">
+                <a href="produtos.html" class="nav-link">
+                    <span class="nav-icone">📦</span>
+                    <span class="nav-texto">Produtos</span>
+                </a>
+            </div>
+
+            <!-- Clientes -->
+            <div class="nav-item">
+                <a href="clientes.html" class="nav-link">
+                    <span class="nav-icone">👥</span>
+                    <span class="nav-texto">Clientes</span>
+                </a>
+            </div>
+
+            <!-- PDV -->
+            <div class="nav-item">
+                <a href="pdv.html" class="nav-link">
+                    <span class="nav-icone">🛒</span>
+                    <span class="nav-texto">PDV</span>
+                </a>
+            </div>
+
+            <!-- Pedidos -->
+            <div class="nav-item">
+                <a href="pedidos.html" class="nav-link">
+                    <span class="nav-icone">📋</span>
+                    <span class="nav-texto">Pedidos</span>
+                </a>
+            </div>
+
+            <div class="nav-separador"></div>
+            <div class="nav-label">Sistema</div>
+
+            <!-- Configurações (com submenu) -->
+            <div class="nav-item">
+                <div class="nav-link" id="btnConfiguracoes" onclick="toggleSubmenu()">
+                    <span class="nav-icone">⚙️</span>
+                    <span class="nav-texto">Configurações</span>
+                    <span class="nav-seta">›</span>
+                </div>
+                <div class="submenu" id="submenuConfiguracoes">
+                    <a href="vendedores.html" class="submenu-link">
+                        <span class="sub-icone">👨‍💼</span> Vendedores
+                    </a>
+                    <a href="formas-pagamento.html" class="submenu-link">
+                        <span class="sub-icone">💳</span> Formas de Pagamento
+                    </a>
+                    <a href="regimes-tributarios.html" class="submenu-link">
+                        <span class="sub-icone">📋</span> Regimes Tributários
+                    </a>
+                    <a href="#" onclick="showMessage('Módulo Caixas Cadastradas em desenvolvimento!'); return false;" class="submenu-link">
+                        <span class="sub-icone">💰</span> Caixas Cadastradas
+                    </a>
+                    <a href="#" onclick="showMessage('Módulo Usuários em desenvolvimento!'); return false;" class="submenu-link" id="linkUsuarios">
+                        <span class="sub-icone">🔒</span> Usuários
+                    </a>
+                    <!-- Link de Parâmetros: só aparece para admin -->
+                    <a href="parametros-config.html" class="submenu-link" id="linkParametros" style="display:none;">
+                        <span class="sub-icone">🛠️</span> Parâmetros
+                    </a>
+                </div>
+            </div>
+
+            <!-- Outros Módulos -->
+            <div class="nav-item">
+                <a href="outros-modulos.html" class="nav-link destaque">
+                    <span class="nav-icone">🚀</span>
+                    <span class="nav-texto">Outros Módulos</span>
+                </a>
+            </div>
+
+            <!-- Manual -->
+            <div class="nav-item">
+                <a href="manual.html" class="nav-link">
+                    <span class="nav-icone">📚</span>
+                    <span class="nav-texto">Manual</span>
+                </a>
+            </div>
+
+        </nav>
+
+        <!-- Rodapé / Logout -->
+        <div class="sidebar-footer">
+            <button class="btn-logout" onclick="logout()">
+                <span>🚪</span>
+                <span>Sair do Sistema</span>
+            </button>
+        </div>
+
+    </aside>
+
+    <!-- ============================================================
+         ÁREA PRINCIPAL - ILUSTRAÇÃO ERP
+         ============================================================ -->
+    <main class="main-area">
+        <div class="main-content">
+
+            <!-- Tagline -->
+            <div class="main-tagline">
+                <h2>Bem-vindo ao <strong>SIRIUS Web ERP</strong></h2>
+                <p>Gestão empresarial completa &nbsp;·&nbsp; Simples &nbsp;·&nbsp; Eficiente</p>
+            </div>
+
+            <!-- Ilustração dos módulos interconectados -->
+            <div class="erp-illustration">
+
+                <!-- Linhas de conexão (SVG) -->
+                <svg class="connections-svg" viewBox="0 0 480 380">
+                    <!-- Linhas do hub para cada nó -->
+                    <!-- Hub: 240, 190 -->
+                    <!-- PDV: 240, 46 -->
+                    <line class="conn-line" x1="240" y1="190" x2="240" y2="82" />
+                    <!-- NF-e: 408, 96 -->
+                    <line class="conn-line" x1="240" y1="190" x2="372" y2="132" style="animation-delay:-0.4s" />
+                    <!-- Financeiro: 420, 284 -->
+                    <line class="conn-line" x1="240" y1="190" x2="376" y2="280" style="animation-delay:-0.8s" />
+                    <!-- Estoque: 240, 334 -->
+                    <line class="conn-line" x1="240" y1="190" x2="240" y2="298" style="animation-delay:-1.2s" />
+                    <!-- Clientes: 56, 284 -->
+                    <line class="conn-line" x1="240" y1="190" x2="92" y2="280" style="animation-delay:-1.6s" />
+                    <!-- Relatórios: 66, 96 -->
+                    <line class="conn-line" x1="240" y1="190" x2="102" y2="132" style="animation-delay:-2.0s" />
+                </svg>
+
+                <!-- Hub central -->
+                <div class="erp-hub">
+                    <div class="hub-icone">⭐</div>
+                    <div class="hub-titulo">SIRIUS</div>
+                    <div class="hub-sub">ERP</div>
+                </div>
+
+                <!-- Nós satélite -->
+                <div class="erp-node node-pdv">
+                    <div class="node-icone">🛒</div>
+                    <div class="node-label">PDV</div>
+                </div>
+
+                <div class="erp-node node-nfe">
+                    <div class="node-icone">📄</div>
+                    <div class="node-label">NF-e / Fiscal</div>
+                </div>
+
+                <div class="erp-node node-fin">
+                    <div class="node-icone">💰</div>
+                    <div class="node-label">Financeiro</div>
+                </div>
+
+                <div class="erp-node node-est">
+                    <div class="node-icone">📦</div>
+                    <div class="node-label">Estoque</div>
+                </div>
+
+                <div class="erp-node node-cli">
+                    <div class="node-icone">👥</div>
+                    <div class="node-label">Clientes</div>
+                </div>
+
+                <div class="erp-node node-rel">
+                    <div class="node-icone">📊</div>
+                    <div class="node-label">Relatórios</div>
+                </div>
+            </div>
+
+            <!-- Estatísticas -->
+            <div class="main-footer">
+                <div class="footer-stats">
+                    <div class="stat-item">
+                        <span class="stat-numero">30+</span>
+                        <span class="stat-desc">Anos de mercado</span>
+                    </div>
+                    <div class="stat-divisor"></div>
+                    <div class="stat-item">
+                        <span class="stat-numero">12K+</span>
+                        <span class="stat-desc">Usuários atendidos</span>
+                    </div>
+                    <div class="stat-divisor"></div>
+                    <div class="stat-item">
+                        <span class="stat-numero">3.700+</span>
+                        <span class="stat-desc">Projetos executados</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+</div>
+
+<!-- Modal de Aviso -->
+<div id="modalAviso">
+    <div class="modal-box">
+        <div class="modal-header">
+            <span class="modal-titulo">ℹ️ Informação</span>
+            <span class="modal-fechar" onclick="closeMessage()">&times;</span>
+        </div>
+        <p class="modal-mensagem" id="mensagemAviso"></p>
+        <button class="modal-ok" onclick="closeMessage()">OK</button>
+    </div>
+</div>
+
+<script>
+    /* ============================================================
+       CONFIGURAÇÃO DE AMBIENTE
+       ============================================================ */
+    const isDev = ['localhost','127.0.0.1',''].includes(window.location.hostname)
+               || window.location.protocol === 'file:';
+    const API_URL = isDev
+        ? 'http://localhost:3000'
+        : 'https://sirius-web-api-adonis.vercel.app';
+
+    /* ============================================================
+       AUTENTICAÇÃO
+       ============================================================ */
+    function checkAuth() {
+        const token = localStorage.getItem('sirius_token');
+        if (!token) { window.location.href = 'index.html'; return null; }
+        return token;
+    }
+
+    function logout() {
+        localStorage.removeItem('sirius_token');
+        localStorage.removeItem('sirius_usuario');
+        localStorage.removeItem('sirius_empresas');
+        window.location.href = 'index.html';
+    }
+
+    /* ============================================================
+       CARREGAR DADOS DO USUÁRIO
+       ============================================================ */
+    function carregarUsuario() {
+        const token = checkAuth();
+        if (!token) return;
+
+        try {
+            const usuario  = JSON.parse(localStorage.getItem('sirius_usuario') || '{}');
+            const empresas = JSON.parse(localStorage.getItem('sirius_empresas') || '[]');
+            const empresa  = Array.isArray(empresas) ? empresas[0] : empresas;
+
+            // Nome
+            const nome = usuario.nome || 'Usuário';
+            document.getElementById('userName').textContent = nome;
+
+            // Avatar (iniciais)
+            const iniciais = nome.split(' ').map(p => p[0]).slice(0,2).join('').toUpperCase();
+            document.getElementById('userAvatar').textContent = iniciais || '?';
+
+            // Plano
+            const plano = empresa?.plano || 'Gratuito';
+            document.getElementById('userPlano').textContent = plano;
+
+            // Verificar admin → mostrar Parâmetros
+            if (empresa?.is_admin) {
+                document.getElementById('linkParametros').style.display = 'flex';
+            }
+
+        } catch (e) {
+            console.error('Erro ao carregar usuário:', e);
+        }
+    }
+
+    /* ============================================================
+       SUBMENU CONFIGURAÇÕES
+       ============================================================ */
+    function toggleSubmenu() {
+        const btn     = document.getElementById('btnConfiguracoes');
+        const submenu = document.getElementById('submenuConfiguracoes');
+
+        const estaAberto = submenu.classList.contains('aberto');
+
+        if (estaAberto) {
+            submenu.classList.remove('aberto');
+            btn.classList.remove('aberto');
+        } else {
+            submenu.classList.add('aberto');
+            btn.classList.add('aberto');
+        }
+    }
+
+    /* ============================================================
+       MODAL DE AVISO
+       ============================================================ */
+    function showMessage(msg) {
+        document.getElementById('mensagemAviso').textContent = msg;
+        document.getElementById('modalAviso').classList.add('visivel');
+    }
+
+    function closeMessage() {
+        document.getElementById('modalAviso').classList.remove('visivel');
+    }
+
+    document.getElementById('modalAviso').addEventListener('click', function(e) {
+        if (e.target === this) closeMessage();
+    });
+
+    /* ============================================================
+       INICIALIZAÇÃO
+       ============================================================ */
+    carregarUsuario();
+    console.log('✅ Menu Principal carregado |', isDev ? 'DEV' : 'PROD');
+</script>
+</body>
+</html>

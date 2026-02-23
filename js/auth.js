@@ -117,7 +117,7 @@ function checkAuth() {
     const token = localStorage.getItem('sirius_token');
     if (token && window.location.pathname.includes('index.html')) {
         // Já está logado e está na página de login, redireciona para dashboard
-        window.location.href = 'dashboard.html';
+        window.location.href = 'menu-principal.html';
     }
 }
 
