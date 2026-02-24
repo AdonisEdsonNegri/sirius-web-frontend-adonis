@@ -376,7 +376,7 @@ html, body {
    ======================================================= */
 .tab-cliente-layout {
     display: grid;
-    grid-template-columns: 1fr 380px;
+    grid-template-columns: 1fr;
     height: 100%;
     gap: 0;
 }
@@ -1553,6 +1553,97 @@ html, body {
     display: flex;
     flex-direction: column;
     gap: 4px;
+}
+
+/* =======================================================
+   SPINNER CUSTOMIZADO (+1 / -1)
+   Oculta as setas nativas e usa botões próprios
+   ======================================================= */
+
+/* Ocultar setas nativas do input number */
+.input-sem-seta::-webkit-outer-spin-button,
+.input-sem-seta::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+.input-sem-seta[type=number] {
+    -moz-appearance: textfield;
+}
+
+/* Wrapper do campo quantidade no modal */
+.input-spinner-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.input-spinner-wrapper .input-grande {
+    flex: 1;
+}
+
+/* Wrapper do campo valor pagamento */
+.input-valor-spinner {
+    gap: 0;
+}
+
+.input-valor-spinner .moeda-prefix {
+    border-radius: 0;
+}
+
+.input-valor-spinner input {
+    flex: 1;
+    border-radius: 0;
+}
+
+/* Botões +/- inline (valor pagamento) */
+.spinner-btn {
+    width: 40px;
+    height: 100%;
+    min-height: 44px;
+    background: var(--cinza-2);
+    border: 1px solid var(--cinza-3);
+    color: var(--cinza-7);
+    font-size: 20px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all var(--transicao);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    flex-shrink: 0;
+    user-select: none;
+}
+
+.spinner-menos {
+    border-radius: var(--raio-sm) 0 0 var(--raio-sm);
+    border-right: none;
+}
+
+.spinner-mais {
+    border-radius: 0 var(--raio-sm) var(--raio-sm) 0;
+    border-left: none;
+}
+
+/* Botões do modal de quantidade: arredondados e maiores */
+.input-spinner-wrapper .spinner-btn {
+    border-radius: var(--raio-sm);
+    border: 1px solid var(--cinza-3);
+    width: 48px;
+    min-height: 56px;
+    font-size: 24px;
+}
+
+.spinner-btn:hover {
+    background: var(--azul-light);
+    border-color: var(--azul);
+    color: var(--azul);
+}
+
+.spinner-btn:active {
+    background: var(--azul);
+    color: white;
+    transform: scale(0.95);
 }
 
 /* =======================================================

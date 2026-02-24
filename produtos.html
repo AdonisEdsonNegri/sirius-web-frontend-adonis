@@ -5,250 +5,617 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SIRIUS WEB - Produtos</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 20px; }
-        .container { max-width: 1400px; margin: 0 auto; background: white; border-radius: 15px; padding: 30px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); position: relative; }
-        h1 { color: #667eea; text-align: center; margin-bottom: 10px; font-size: 2.5em; }
-        .subtitle { text-align: center; color: #666; margin-bottom: 30px; font-size: 1.2em; }
-        
-        /* Botão Voltar - Canto Superior Direito */
-        .btn-voltar {
-            position: absolute;
-            top: 30px;
-            right: 30px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: bold;
-            transition: all 0.3s;
+        /* ============================================================
+           RESET E BASE
+           ============================================================ */
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            /* Fundo escuro navy — mesmo tom do menu-principal.html */
+            background: linear-gradient(180deg, #050e22 0%, #0a1628 60%, #050e22 100%);
+            min-height: 100vh;
+            padding: 0;
+        }
+
+        /* ============================================================
+           BARRA DE TOPO (identidade visual do menu-principal)
+           ============================================================ */
+        .topbar {
+            background: linear-gradient(90deg, #0a1628 0%, #0d1f3c 100%);
+            border-bottom: 1px solid rgba(37, 99, 235, 0.3);
+            padding: 0 24px;
+            height: 56px;
             display: flex;
             align-items: center;
-            gap: 8px;
+            justify-content: space-between;
+            box-shadow: 0 2px 16px rgba(0, 0, 0, 0.5);
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
-        
+
+        /* Linha decorativa inferior da topbar */
+        .topbar::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg,
+                transparent 0%,
+                #2563eb 20%,
+                #60a5fa 50%,
+                #2563eb 80%,
+                transparent 100%
+            );
+            opacity: 0.6;
+        }
+
+        .topbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .topbar-icone {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, #2563eb, #1e40af);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+            box-shadow: 0 0 10px rgba(37, 99, 235, 0.45);
+        }
+
+        .topbar-nome {
+            color: #e2e8f0;
+            font-size: 16px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+        }
+
+        .topbar-nome span {
+            color: #60a5fa;
+        }
+
+        .topbar-modulo {
+            color: #64748b;
+            font-size: 11px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-top: 1px;
+        }
+
+        /* Botão Voltar na topbar */
+        .btn-voltar {
+            background: rgba(37, 99, 235, 0.15);
+            color: #93c5fd;
+            border: 1px solid rgba(37, 99, 235, 0.35);
+            padding: 8px 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            transition: all 0.2s ease;
+            letter-spacing: 0.3px;
+        }
+
         .btn-voltar:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            background: rgba(37, 99, 235, 0.28);
+            color: #ffffff;
+            border-color: rgba(37, 99, 235, 0.6);
+            transform: translateX(-2px);
         }
-        
+
+        /* ============================================================
+           CONTAINER PRINCIPAL (card sobre fundo escuro)
+           ============================================================ */
+        .page-wrapper {
+            padding: 28px 24px 40px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.55),
+                        0 0 0 1px rgba(37, 99, 235, 0.12);
+            position: relative;
+        }
+
+        /* ============================================================
+           CABEÇALHO DO MÓDULO
+           ============================================================ */
+        h1 {
+            color: #1e40af;
+            text-align: center;
+            margin-bottom: 6px;
+            font-size: 2.2em;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #64748b;
+            margin-bottom: 28px;
+            font-size: 1.1em;
+        }
+
+        /* ============================================================
+           TOOLBAR — BOTÕES EM DEGRADÊ AZUL (#2563eb base)
+           ============================================================ */
+        .btn-toolbar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
         /* Remover spinner dos inputs numéricos */
         input[type="number"]::-webkit-inner-spin-button,
         input[type="number"]::-webkit-outer-spin-button {
             -webkit-appearance: none;
             margin: 0;
         }
-        input[type="number"] {
-            -moz-appearance: textfield;
+        input[type="number"] { -moz-appearance: textfield; }
+
+        /* Novo Produto — Azul mais forte */
+        .btn {
+            background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 700;
+            transition: all 0.25s;
         }
-        
-        /* Toolbar - BOTÕES EM DEGRADÊ AZUL */
-        .btn-toolbar { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
-        
-        /* Novo Produto - Azul Mais Forte */
-        .btn { 
-            background: linear-gradient(135deg, #4a5fd6 0%, #5b3d9c 100%); 
-            color: white; 
-            border: none; 
-            padding: 12px 24px; 
-            border-radius: 8px; 
-            cursor: pointer; 
-            font-size: 16px; 
-            font-weight: bold; 
-            transition: all 0.3s; 
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 18px rgba(37, 99, 235, 0.4);
         }
-        .btn:hover { 
-            transform: translateY(-2px); 
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3); 
+
+        /* Ordenação — Azul médio/forte */
+        .btn-ordenacao {
+            background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
         }
-        
-        /* Ordenação - Azul Médio/Forte */
-        .btn-ordenacao { 
-            background: linear-gradient(135deg, #5a73e8 0%, #6a56b8 100%); 
+
+        /* Filtros — Azul médio */
+        .btn-filtros {
+            background: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%);
         }
-        
-        /* Filtros - Azul Médio */
-        .btn-filtros { 
-            background: linear-gradient(135deg, #6b85f5 0%, #7d70c7 100%); 
+
+        /* Relatórios — Azul mais suave */
+        .btn-relatorio {
+            background: linear-gradient(135deg, #60a5fa 0%, #93c5fd 100%);
+            color: #1e3a8a;
         }
-        
-        /* Relatórios - Azul Mais Suave */
-        .btn-relatorio { 
-            background: linear-gradient(135deg, #8a9dfc 0%, #9e8ed6 100%); 
-        }
-        
-        /* Dropdown */
+
+        /* ============================================================
+           DROPDOWN
+           ============================================================ */
         .dropdown { position: relative; display: inline-block; }
-        .dropdown-content { display: none; position: absolute; background-color: white; min-width: 220px; box-shadow: 0px 8px 16px rgba(0,0,0,0.2); z-index: 1; border-radius: 8px; overflow: hidden; }
-        .dropdown-content a { color: black; padding: 12px 16px; text-decoration: none; display: block; transition: background 0.3s; }
-        .dropdown-content a:hover { background-color: #667eea; color: white; }
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #ffffff;
+            min-width: 220px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+            z-index: 100;
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid rgba(37, 99, 235, 0.15);
+        }
+        .dropdown-content a {
+            color: #1e293b;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            font-size: 14px;
+            transition: background 0.2s;
+        }
+        .dropdown-content a:hover {
+            background-color: #eff6ff;
+            color: #1d4ed8;
+        }
         .dropdown:hover .dropdown-content { display: block; }
-        
-        /* Filtro Ativo */
-        .filtro-ativo { background: linear-gradient(135deg, #6b85f5 0%, #7d70c7 100%); color: white; padding: 12px 20px; border-radius: 8px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
-        .btn-limpar-filtro { background: white; color: #667eea; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; }
-        
-        /* Tabela */
-        table { width: 100%; border-collapse: collapse; margin-bottom: 20px; background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
-        thead { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
-        th, td { padding: 15px 10px; text-align: left; font-size: 14px; }
-        tbody tr { border-bottom: 1px solid #eee; transition: background 0.3s; }
-        tbody tr:hover { background-color: #f9f9f9; }
-        tbody tr.estoque-baixo { background-color: #fff3cd !important; }
-        tbody tr.estoque-baixo:hover { background-color: #ffe69c !important; }
-        
-        .btn-small { padding: 6px 12px; font-size: 12px; margin: 2px; border-radius: 5px; border: none; cursor: pointer; transition: all 0.3s; white-space: nowrap; }
-        .btn-edit { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; }
-        .btn-delete { background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); color: white; }
-        .btn-ficha { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; }
-        .btn-movimentacoes { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); color: white; }
-        .btn-small:hover { transform: translateY(-2px); box-shadow: 0 3px 10px rgba(0,0,0,0.2); }
-        
-        /* Modal */
-        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.5); }
-        .modal-content { background-color: white; margin: 2% auto; padding: 0; border-radius: 15px; width: 90%; max-width: 900px; box-shadow: 0 10px 40px rgba(0,0,0,0.3); max-height: 90vh; overflow: hidden; display: flex; flex-direction: column; }
-        
-        .modal-header { padding: 20px 30px; border-bottom: 2px solid #eee; display: flex; justify-content: space-between; align-items: center; }
-        .form-title { color: #667eea; font-size: 1.8em; margin: 0; }
-        .close { color: #aaa; font-size: 28px; font-weight: bold; cursor: pointer; line-height: 1; }
-        .close:hover { color: #000; }
-        
-        /* Abas */
-        .tabs { display: flex; border-bottom: 2px solid #eee; background: #f8f9fa; }
-        .tab-button { flex: 1; padding: 15px 20px; border: none; background: transparent; cursor: pointer; font-size: 16px; transition: all 0.3s; color: #666; font-weight: bold; }
-        .tab-button.active { background: white; color: #667eea; border-bottom: 3px solid #667eea; }
-        .tab-button:hover { background: #e9ecef; }
-        
-        .modal-body { padding: 30px; overflow-y: auto; max-height: calc(90vh - 200px); }
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
-        
+
+        /* ============================================================
+           FILTRO ATIVO
+           ============================================================ */
+        .filtro-ativo {
+            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+            border: 1px solid #bfdbfe;
+            color: #1e40af;
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .btn-limpar-filtro {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 6px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+        }
+        .btn-limpar-filtro:hover { background: #1d4ed8; }
+
+        /* ============================================================
+           TABELA
+           ============================================================ */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
+        }
+        thead {
+            background: linear-gradient(135deg, #1e40af 0%, #2563eb 100%);
+            color: white;
+        }
+        th, td {
+            padding: 14px 10px;
+            text-align: left;
+            font-size: 14px;
+        }
+        tbody tr { border-bottom: 1px solid #f1f5f9; transition: background 0.2s; }
+        tbody tr:hover { background-color: #f8faff; }
+        tbody tr.estoque-baixo  { background-color: #fff7ed !important; }
+        tbody tr.estoque-baixo:hover { background-color: #fed7aa !important; }
+
+        /* Botões de ação na tabela */
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 12px;
+            margin: 2px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .btn-edit        { background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%); color: white; }
+        .btn-delete      { background: linear-gradient(135deg, #ef4444 0%, #f87171 100%); color: white; }
+        .btn-ficha       { background: linear-gradient(135deg, #0ea5e9 0%, #38bdf8 100%); color: white; }
+        .btn-movimentacoes { background: linear-gradient(135deg, #059669 0%, #10b981 100%); color: white; }
+        .btn-small:hover { transform: translateY(-1px); box-shadow: 0 3px 8px rgba(0,0,0,0.18); }
+
+        /* ============================================================
+           MODAL
+           ============================================================ */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0; top: 0;
+            width: 100%; height: 100%;
+            overflow: auto;
+            background-color: rgba(5, 14, 34, 0.75);
+            backdrop-filter: blur(2px);
+        }
+        .modal-content {
+            background-color: white;
+            margin: 2% auto;
+            padding: 0;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 900px;
+            box-shadow: 0 16px 60px rgba(0, 0, 0, 0.45);
+            max-height: 90vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        .modal-header {
+            padding: 20px 30px;
+            border-bottom: 2px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(135deg, #f8faff 0%, #eff6ff 100%);
+        }
+        .form-title { color: #1e40af; font-size: 1.6em; margin: 0; }
+        .close {
+            color: #94a3b8;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            line-height: 1;
+            transition: color 0.2s;
+        }
+        .close:hover { color: #1e293b; }
+
+        /* Abas do modal */
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid #e2e8f0;
+            background: #f8faff;
+        }
+        .tab-button {
+            flex: 1;
+            padding: 14px 18px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 600;
+            color: #64748b;
+            transition: all 0.25s;
+        }
+        .tab-button.active {
+            background: white;
+            color: #2563eb;
+            border-bottom: 3px solid #2563eb;
+        }
+        .tab-button:hover:not(.active) { background: #eff6ff; color: #1d4ed8; }
+
+        .modal-body {
+            padding: 30px;
+            overflow-y: auto;
+            max-height: calc(90vh - 200px);
+        }
+        .tab-content         { display: none; }
+        .tab-content.active  { display: block; }
+
         /* Formulário */
-        .form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 15px; }
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
         .form-group { display: flex; flex-direction: column; }
-        .form-group label { margin-bottom: 5px; font-weight: bold; color: #333; }
-        .form-group input, .form-group select { padding: 10px; border: 2px solid #ddd; border-radius: 5px; font-size: 14px; }
-        .form-group input:focus, .form-group select:focus { outline: none; border-color: #667eea; }
-        
+        .form-group label {
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #334155;
+            font-size: 13px;
+        }
+        .form-group input,
+        .form-group select {
+            padding: 10px 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 7px;
+            font-size: 14px;
+            transition: border-color 0.2s;
+        }
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
         /* Checkbox */
         .checkbox-group { display: flex; align-items: center; gap: 10px; }
-        .checkbox-group input[type="checkbox"] { width: 20px; height: 20px; cursor: pointer; }
-        
-        /* Botões do Formulário */
-        .form-buttons { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; padding-top: 20px; border-top: 2px solid #eee; }
-        .btn-submit { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 12px 30px; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold; }
-        .btn-cancel { background: #6c757d; color: white; border: none; padding: 12px 30px; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold; }
-        .btn-submit:hover, .btn-cancel:hover { opacity: 0.9; }
-        
-        /* Paginação */
-        .pagination { display: flex; justify-content: center; align-items: center; gap: 20px; margin-top: 20px; }
-        .pagination button { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: bold; }
-        .pagination button:hover:not(:disabled) { opacity: 0.9; }
-        .pagination button:disabled { opacity: 0.5; cursor: not-allowed; }
-        .pagination span { font-size: 16px; font-weight: bold; color: #333; }
-        
-        /* Loading e Mensagens */
-        .loading, .mensagem { padding: 15px; margin-bottom: 20px; border-radius: 8px; text-align: center; font-weight: bold; }
-        .loading { background-color: #e3f2fd; color: #1976d2; }
-        .mensagem.success { background-color: #d4edda; color: #155724; }
-        .mensagem.error { background-color: #f8d7da; color: #721c24; }
+        .checkbox-group input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; accent-color: #2563eb; }
+
+        /* Subtítulos de seção dentro do modal */
+        .section-title {
+            color: #1e40af;
+            margin-top: 20px;
+            margin-bottom: 15px;
+            font-size: 1rem;
+            font-weight: 700;
+            padding-bottom: 6px;
+            border-bottom: 1px solid #dbeafe;
+        }
+
+        /* Botões do formulário */
+        .form-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px solid #e2e8f0;
+        }
+        .btn-submit {
+            background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%);
+            color: white;
+            border: none;
+            padding: 12px 28px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 700;
+        }
+        .btn-cancel {
+            background: #64748b;
+            color: white;
+            border: none;
+            padding: 12px 28px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 600;
+        }
+        .btn-submit:hover { background: linear-gradient(135deg, #1e40af 0%, #1d4ed8 100%); }
+        .btn-cancel:hover { background: #475569; }
+
+        /* ============================================================
+           PAGINAÇÃO
+           ============================================================ */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .pagination button {
+            background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%);
+            color: white;
+            border: none;
+            padding: 10px 22px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 700;
+            transition: all 0.2s;
+        }
+        .pagination button:hover:not(:disabled) {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35);
+        }
+        .pagination button:disabled { opacity: 0.45; cursor: not-allowed; }
+        .pagination span { font-size: 15px; font-weight: 600; color: #334155; }
+
+        /* ============================================================
+           LOADING E MENSAGENS
+           ============================================================ */
+        .loading, .mensagem {
+            padding: 14px;
+            margin-bottom: 18px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 600;
+        }
+        .loading              { background: #eff6ff; color: #1d4ed8; }
+        .mensagem.success     { background: #d1fae5; color: #065f46; }
+        .mensagem.error       { background: #fee2e2; color: #991b1b; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <!-- ✅ BOTÃO VOLTAR CORRIGIDO - VAI DIRETO PARA DASHBOARD -->
-        <button class="btn-voltar" onclick="voltarPagina()">⬅ Voltar</button>
-        
-        <h1>📦 Gestão de Produtos</h1>
-        <p class="subtitle">Cadastro e controle de estoque</p>
-        
-        <div class="btn-toolbar">
-            <button class="btn" onclick="abrirModal()">➕ Novo Produto</button>
-            
-            <div class="dropdown" onclick="toggleDropdown(event, this)">
-                <button class="btn btn-ordenacao">📊 Ordenação</button>
-                <div class="dropdown-content">
-                    <a href="#" onclick="aplicarOrdenacao('codigo')">🔢 Por Código</a>
-                    <a href="#" onclick="aplicarOrdenacao('descricao')">📝 Por Descrição</a>
-                    <a href="#" onclick="aplicarOrdenacao('data_criacao')">📅 Ordem de Inserção</a>
-                    <a href="#" onclick="aplicarOrdenacao('ultimos')">⏱️ Últimos Lançamentos</a>
-                </div>
-            </div>
-            
-            <div class="dropdown" onclick="toggleDropdown(event, this)">
-                <button class="btn btn-filtros">🔍 Filtros</button>
-                <div class="dropdown-content">
-                    <a href="#" onclick="aplicarFiltro('codigo')">🔢 Por Código</a>
-                    <a href="#" onclick="aplicarFiltro('descricao')">📝 Por Descrição</a>
-                    <a href="#" onclick="aplicarFiltro('ean')">📊 Por EAN/Barras</a>
-                    <a href="#" onclick="aplicarFiltro('estoque_zero')">⚠️ Estoque Zero</a>
-                    <a href="#" onclick="aplicarFiltro('estoque_baixo')">📉 Estoque Abaixo do Mínimo</a>
-                </div>
-            </div>
 
-            <div class="dropdown" onclick="toggleDropdown(event, this)">
-                <button class="btn btn-relatorio">📄 Relatórios</button>
-                <div class="dropdown-content">
-                    <a href="#" onclick="gerarRelatorio()">📊 Produtos sob Filtro</a>
-                </div>
+    <!-- ============================================================
+         BARRA DE TOPO — identidade visual do menu-principal
+         ============================================================ -->
+    <div class="topbar">
+        <div class="topbar-brand">
+            <div class="topbar-icone">📦</div>
+            <div>
+                <div class="topbar-nome">SIRIUS <span>WEB</span></div>
+                <div class="topbar-modulo">Gestão de Produtos</div>
             </div>
         </div>
-        
-        <div id="filtroAtivo" class="filtro-ativo" style="display:none;">
-            <div><strong>Filtro ativo:</strong> <span id="textoFiltro"></span></div>
-            <button class="btn-limpar-filtro" onclick="limparFiltro()">✖ Limpar</button>
-        </div>
-        
-        <div id="mensagem" class="mensagem"></div>
-        <div id="loading" class="loading" style="display:none;">Carregando produtos...</div>
-        
-        <div id="tabelaContainer">
-            <table id="tabelaProdutos">
-                <thead>
-                    <tr>
-                        <th>Código</th>
-                        <th>Descrição</th>
-                        <th>Unidade</th>
-                        <th>Estoque</th>
-                        <th>Preço Custo</th>
-                        <th>Preço Venda</th>
-                        <th>Status</th>
-                        <th>Ações</th>
-                    </tr>
-                </thead>
-                <tbody id="tbody"></tbody>
-            </table>
-        </div>
-        
-        <div class="pagination">
-            <button id="btnPrev" onclick="mudarPagina(-1)">◀ Anterior</button>
-            <span id="paginaInfo">Página 1 de 1</span>
-            <button id="btnNext" onclick="mudarPagina(1)">Próximo ▶</button>
-        </div>
+
+        <!-- Botão Voltar — agora aponta para menu-principal.html -->
+        <button class="btn-voltar" onclick="voltarPagina()">
+            ← Voltar ao Menu
+        </button>
     </div>
 
-    <!-- Modal de Cadastro/Edição -->
+    <!-- ============================================================
+         CONTEÚDO PRINCIPAL
+         ============================================================ -->
+    <div class="page-wrapper">
+        <div class="container">
+
+            <h1>📦 Gestão de Produtos</h1>
+            <p class="subtitle">Cadastro e controle de estoque</p>
+
+            <div class="btn-toolbar">
+                <button class="btn" onclick="abrirModal()">➕ Novo Produto</button>
+
+                <div class="dropdown" onclick="toggleDropdown(event, this)">
+                    <button class="btn btn-ordenacao">📊 Ordenação</button>
+                    <div class="dropdown-content">
+                        <a href="#" onclick="aplicarOrdenacao('codigo')">🔢 Por Código</a>
+                        <a href="#" onclick="aplicarOrdenacao('descricao')">📝 Por Descrição</a>
+                        <a href="#" onclick="aplicarOrdenacao('data_criacao')">📅 Ordem de Inserção</a>
+                        <a href="#" onclick="aplicarOrdenacao('ultimos')">⏱️ Últimos Lançamentos</a>
+                    </div>
+                </div>
+
+                <div class="dropdown" onclick="toggleDropdown(event, this)">
+                    <button class="btn btn-filtros">🔍 Filtros</button>
+                    <div class="dropdown-content">
+                        <a href="#" onclick="aplicarFiltro('codigo')">🔢 Por Código</a>
+                        <a href="#" onclick="aplicarFiltro('descricao')">📝 Por Descrição</a>
+                        <a href="#" onclick="aplicarFiltro('ean')">📊 Por EAN/Barras</a>
+                        <a href="#" onclick="aplicarFiltro('estoque_zero')">⚠️ Estoque Zero</a>
+                        <a href="#" onclick="aplicarFiltro('estoque_baixo')">📉 Estoque Abaixo do Mínimo</a>
+                    </div>
+                </div>
+
+                <div class="dropdown" onclick="toggleDropdown(event, this)">
+                    <button class="btn btn-relatorio">📄 Relatórios</button>
+                    <div class="dropdown-content">
+                        <a href="#" onclick="gerarRelatorio()">📊 Produtos sob Filtro</a>
+                    </div>
+                </div>
+            </div>
+
+            <div id="filtroAtivo" class="filtro-ativo" style="display:none;">
+                <div><strong>Filtro ativo:</strong> <span id="textoFiltro"></span></div>
+                <button class="btn-limpar-filtro" onclick="limparFiltro()">✖ Limpar</button>
+            </div>
+
+            <div id="mensagem" class="mensagem"></div>
+            <div id="loading" class="loading" style="display:none;">Carregando produtos...</div>
+
+            <div id="tabelaContainer">
+                <table id="tabelaProdutos">
+                    <thead>
+                        <tr>
+                            <th>Código</th>
+                            <th>Descrição</th>
+                            <th>Unidade</th>
+                            <th>Estoque</th>
+                            <th>Preço Custo</th>
+                            <th>Preço Venda</th>
+                            <th>Status</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbody"></tbody>
+                </table>
+            </div>
+
+            <div class="pagination">
+                <button id="btnPrev" onclick="mudarPagina(-1)">◀ Anterior</button>
+                <span id="paginaInfo">Página 1 de 1</span>
+                <button id="btnNext" onclick="mudarPagina(1)">Próximo ▶</button>
+            </div>
+
+        </div><!-- /.container -->
+    </div><!-- /.page-wrapper -->
+
+    <!-- ============================================================
+         MODAL DE CADASTRO / EDIÇÃO
+         ============================================================ -->
     <div id="modal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
                 <h2 id="modalTitle" class="form-title">Novo Produto</h2>
                 <span class="close" onclick="fecharModal()">&times;</span>
             </div>
-            
+
             <!-- Abas -->
             <div class="tabs">
-                <button class="tab-button active" data-tab="basico" onclick="mudarAba('basico')">📋 Dados Básicos</button>
-                <button class="tab-button" data-tab="estoque" onclick="mudarAba('estoque')">📦 Estoque</button>
-                <button class="tab-button" data-tab="fiscais" onclick="mudarAba('fiscais')">🧾 Dados Fiscais</button>
-                <button class="tab-button" data-tab="config" onclick="mudarAba('config')">⚙️ Configurações</button>
+                <button class="tab-button active" data-tab="basico"  onclick="mudarAba('basico')">📋 Dados Básicos</button>
+                <button class="tab-button"         data-tab="estoque" onclick="mudarAba('estoque')">📦 Estoque</button>
+                <button class="tab-button"         data-tab="fiscais" onclick="mudarAba('fiscais')">🧾 Dados Fiscais</button>
+                <button class="tab-button"         data-tab="config"  onclick="mudarAba('config')">⚙️ Configurações</button>
             </div>
-            
+
             <div class="modal-body">
                 <form id="produtoForm" onsubmit="salvarProduto(event)">
-                    
+
                     <!-- Aba: Dados Básicos -->
                     <div id="tab-basico" class="tab-content active">
                         <div class="form-row">
@@ -300,7 +667,7 @@
                             </div>
                             <div class="form-group">
                                 <label>Preço de Venda *</label>
-                                <input type="number" id="valor_venda" step="0.01" min="0" required>
+                                <input type="number" id="valor_venda" step="0.01" min="0.01" required>
                             </div>
                         </div>
                     </div>
@@ -310,9 +677,9 @@
                         <div class="form-row">
                             <div class="form-group">
                                 <label>Estoque Atual (Somente Leitura)</label>
-                                <input type="number" id="saldo" step="0.001" min="0" placeholder="0,000" 
-                                       readonly 
-                                       style="background-color: #f3f4f6; cursor: not-allowed; color: #6b7280;">
+                                <input type="number" id="saldo" step="0.001" min="0" placeholder="0,000"
+                                       readonly
+                                       style="background-color: #f1f5f9; cursor: not-allowed; color: #64748b;">
                                 <small style="color: #ef4444; font-size: 12px; display: block; margin-top: 4px;">
                                     ⚠️ O saldo só pode ser alterado através de movimentações de estoque
                                 </small>
@@ -360,7 +727,7 @@
                             </div>
                         </div>
 
-                        <h3 style="color: #667eea; margin-top: 20px; margin-bottom: 15px;">ICMS</h3>
+                        <h3 class="section-title">ICMS</h3>
                         <div class="form-row">
                             <div class="form-group">
                                 <label>CST ICMS</label>
@@ -372,7 +739,7 @@
                             </div>
                         </div>
 
-                        <h3 style="color: #667eea; margin-top: 20px; margin-bottom: 15px;">PIS</h3>
+                        <h3 class="section-title">PIS</h3>
                         <div class="form-row">
                             <div class="form-group">
                                 <label>CST PIS</label>
@@ -384,7 +751,7 @@
                             </div>
                         </div>
 
-                        <h3 style="color: #667eea; margin-top: 20px; margin-bottom: 15px;">COFINS</h3>
+                        <h3 class="section-title">COFINS</h3>
                         <div class="form-row">
                             <div class="form-group">
                                 <label>CST COFINS</label>
@@ -423,6 +790,7 @@
                         <button type="button" class="btn-cancel" onclick="fecharModal()">Cancelar</button>
                         <button type="submit" class="btn-submit">💾 Salvar Produto</button>
                     </div>
+
                 </form>
             </div>
         </div>
@@ -430,9 +798,11 @@
 
     <script src="js/produtos.js"></script>
     <script>
-        // ✅ CORREÇÃO: Função voltarPagina() agora vai DIRETO para dashboard.html
+        /**
+         * ✅ Botão Voltar — retorna para menu-principal.html
+         */
         function voltarPagina() {
-            window.location.href = 'dashboard.html';
+            window.location.href = 'menu-principal.html';
         }
     </script>
 </body>

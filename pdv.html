@@ -111,25 +111,6 @@
                     <div id="resultadosBuscaCliente" class="resultados-lista"></div>
                 </div>
 
-                <!-- Painel de cliente selecionado -->
-                <div class="cliente-painel-selecionado">
-                    <div class="cliente-selecionado-titulo">Cliente Selecionado</div>
-                    <div id="clienteInfo" class="cliente-card-info">
-                        <div class="cliente-loading">Carregando cliente padrão...</div>
-                    </div>
-
-                    <div class="cliente-acoes">
-                        <button
-                            id="btnConfirmarCliente"
-                            class="btn-confirmar-aba"
-                            onclick="confirmarCliente()"
-                            tabindex="1"
-                        >
-                            Confirmar Cliente e Ir para Produtos
-                            <span class="btn-tecla">Tab + Enter</span>
-                        </button>
-                    </div>
-                </div>
             </div>
         </div>
 
@@ -272,17 +253,20 @@
 
                         <div class="form-grupo">
                             <label for="valorPagamento">Valor</label>
-                            <div class="input-valor-wrapper">
+                            <div class="input-valor-wrapper input-valor-spinner">
+                                <button type="button" class="spinner-btn spinner-menos" onclick="spinnerAjustar('valorPagamento', -1)" tabindex="-1">&#8722;</button>
                                 <span class="moeda-prefix">R$</span>
                                 <input
                                     type="number"
                                     id="valorPagamento"
-                                    step="0.01"
+                                    step="any"
                                     min="0.01"
                                     placeholder="0,00"
                                     tabindex="1"
+                                    class="input-sem-seta"
                                     oninput="calcularTroco()"
                                 >
+                                <button type="button" class="spinner-btn spinner-mais" onclick="spinnerAjustar('valorPagamento', 1)" tabindex="-1">+</button>
                             </div>
                         </div>
 
@@ -351,14 +335,18 @@
             <div class="produto-info-modal" id="produtoInfoModal"></div>
             <div class="form-grupo">
                 <label for="inputQuantidade">Quantidade</label>
-                <input
-                    type="number"
-                    id="inputQuantidade"
-                    step="0.001"
-                    min="0.001"
-                    class="input-grande"
-                    onkeydown="teclaModalQuantidade(event)"
-                >
+                <div class="input-spinner-wrapper">
+                    <button type="button" class="spinner-btn spinner-menos" onclick="spinnerAjustar('inputQuantidade', -1)" tabindex="-1">&#8722;</button>
+                    <input
+                        type="number"
+                        id="inputQuantidade"
+                        step="any"
+                        min="0.001"
+                        class="input-grande input-sem-seta"
+                        onkeydown="teclaModalQuantidade(event)"
+                    >
+                    <button type="button" class="spinner-btn spinner-mais" onclick="spinnerAjustar('inputQuantidade', 1)" tabindex="-1">+</button>
+                </div>
             </div>
             <div class="modal-acoes">
                 <button class="btn-modal-cancelar" onclick="fecharModalQuantidade()">Cancelar</button>

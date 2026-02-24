@@ -205,7 +205,11 @@ function renderizarTabela(produtos) {
                 <td style="white-space: nowrap;">
                     <button class="btn-small btn-edit" onclick="editarProduto(${p.id})" title="Editar">✏️</button>
                     <button class="btn-small btn-movimentacoes" onclick="window.location.href='produtos-movimentacoes.html?id=${p.id}'" title="Movimentações">📊</button>
-                    <button class="btn-small btn-delete" onclick="confirmarExclusao(${p.id}, '${p.descricao.replace(/'/g, "\\'")})" title="Inativar">🗑️</button>
+                    <button class="btn-small btn-delete"
+                            onclick="confirmarToggleStatus(${p.id}, '${p.descricao.replace(/'/g, "\\'")}', '${p.ativo}')"
+                            title="${p.ativo === 'S' ? 'Inativar' : 'Ativar'}">
+                        ${p.ativo === 'S' ? '🔴' : '🟢'}
+                    </button>
                 </td>
             </tr>
         `;
@@ -629,86 +633,72 @@ async function editarProduto(id) {
 // =====================================================
 // EXCLUIR PRODUTO (INATIVAR)
 // =====================================================
-function confirmarExclusao(id, descricao) {
+function confirmarToggleStatus(id, descricao, ativoAtual) {
     const existente = document.getElementById('alertSirius');
     if (existente) existente.remove();
-    
+
+    const estaAtivo   = ativoAtual === 'S';
+    const acao        = estaAtivo ? 'inativar' : 'ativar';
+    const acaoLabel   = estaAtivo ? 'Inativar' : 'Ativar';
+    const corBotao    = estaAtivo
+        ? 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)'
+        : 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)';
+
     const overlay = document.createElement('div');
     overlay.id = 'alertSirius';
     overlay.style.cssText = `
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
+        position: fixed; top: 0; left: 0;
+        width: 100%; height: 100%;
         background: rgba(0,0,0,0.6);
         z-index: 99999;
-        display: flex;
-        align-items: center;
-        justify-content: center;
+        display: flex; align-items: center; justify-content: center;
     `;
-    
+
     const box = document.createElement('div');
     box.style.cssText = `
-        background: white;
-        padding: 30px;
-        border-radius: 15px;
+        background: white; padding: 30px; border-radius: 15px;
         box-shadow: 0 10px 40px rgba(0,0,0,0.3);
-        max-width: 500px;
-        width: 90%;
+        max-width: 500px; width: 90%;
     `;
-    
+
     box.innerHTML = `
         <h3 style="color: #667eea; margin: 0 0 20px 0; font-size: 1.5em;">🏢 Sirius Web informa:</h3>
-        <p style="color: #333; font-size: 1.1em; margin: 0 0 25px 0; line-height: 1.5;">Deseja realmente inativar o produto:<br><strong>"${descricao}"</strong>?</p>
+        <p style="color: #333; font-size: 1.1em; margin: 0 0 25px 0; line-height: 1.5;">
+            Deseja realmente <strong>${acao}</strong> o produto:<br><strong>"${descricao}"</strong>?
+        </p>
         <div style="display: flex; gap: 10px;">
-            <button onclick="document.getElementById('alertSirius').remove()" 
-                    style="background: #6c757d; 
-                           color: white; 
-                           border: none; 
-                           padding: 12px 30px; 
-                           border-radius: 8px; 
-                           cursor: pointer; 
-                           font-size: 16px;
-                           font-weight: bold;
-                           flex: 1;">
+            <button onclick="document.getElementById('alertSirius').remove()"
+                    style="background: #6c757d; color: white; border: none;
+                           padding: 12px 30px; border-radius: 8px; cursor: pointer;
+                           font-size: 16px; font-weight: bold; flex: 1;">
                 Cancelar
             </button>
-            <button onclick="document.getElementById('alertSirius').remove(); excluirProduto(${id});" 
-                    style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); 
-                           color: white; 
-                           border: none; 
-                           padding: 12px 30px; 
-                           border-radius: 8px; 
-                           cursor: pointer; 
-                           font-size: 16px;
-                           font-weight: bold;
-                           flex: 1;">
-                Inativar
+            <button onclick="document.getElementById('alertSirius').remove(); toggleStatusProduto(${id});"
+                    style="background: ${corBotao}; color: white; border: none;
+                           padding: 12px 30px; border-radius: 8px; cursor: pointer;
+                           font-size: 16px; font-weight: bold; flex: 1;">
+                ${acaoLabel}
             </button>
         </div>
     `;
-    
+
     overlay.appendChild(box);
     document.body.appendChild(overlay);
-    
-    overlay.addEventListener('click', (e) => {
-        if (e.target === overlay) overlay.remove();
-    });
+    overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
 }
 
-async function excluirProduto(id) {
+async function toggleStatusProduto(id) {
     try {
-        const response = await fetch(`${API_URL}/produtos/${id}`, {
-            method: 'DELETE',
+        const response = await fetch(`${API_URL}/produtos/${id}/toggle-status`, {
+            method: 'PATCH',
             headers: {
                 'Authorization': `Bearer ${token}`,
                 'X-Empresa-Id': empresaId
             }
         });
-        
+
         const data = await response.json();
-        
+
         if (data.success) {
             mostrarMensagem(data.message, 'success');
             carregarProdutos(paginaAtual);
@@ -717,7 +707,7 @@ async function excluirProduto(id) {
         }
     } catch (error) {
         console.error('❌ Erro:', error);
-        mostrarMensagem('Erro ao excluir produto', 'error');
+        mostrarMensagem('Erro ao alterar status do produto', 'error');
     }
 }
 

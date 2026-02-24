@@ -349,17 +349,8 @@ async function carregarClientePadrao() {
 }
 
 function renderizarClienteSelecionado() {
-    const container = document.getElementById('clienteInfo');
-    if (!pedidoAtual.cliente) {
-        container.innerHTML = '<div class="cliente-loading">Nenhum cliente selecionado</div>';
-        return;
-    }
-    const c = pedidoAtual.cliente;
-    container.innerHTML = `
-        <div class="cliente-nome">${c.razao_social}</div>
-        ${c.documento ? `<div class="cliente-doc">${c.documento}</div>` : ''}
-        ${!c.documento && !c.id ? '<div class="cliente-consumidor">⚡ Cliente padrão do sistema</div>' : ''}
-    `;
+    // Painel de cliente selecionado removido da interface.
+    // Função mantida para compatibilidade com carregarClientePadrao().
 }
 
 function limparBuscaCliente() {
@@ -450,13 +441,12 @@ function selecionarClientePorIdx(idx) {
 
 function selecionarCliente(cliente) {
     pedidoAtual.cliente = cliente;
-    renderizarClienteSelecionado();
     // Limpar busca
     document.getElementById('inputBuscaCliente').value = '';
     document.getElementById('resultadosBuscaCliente').innerHTML = '';
     document.getElementById('btnLimparBuscaCliente').style.display = 'none';
-    // Focar no botão confirmar
-    document.getElementById('btnConfirmarCliente').focus();
+    // Avançar diretamente para a aba de produtos
+    confirmarCliente();
 }
 
 function teclaResultadoCliente(event, idx) {
@@ -822,6 +812,22 @@ function confirmarQuantidade() {
         campoBusca.value = '';
         campoBusca.focus();
     }, 80);
+}
+
+// ================================================================
+// SPINNER CUSTOMIZADO: incrementa/decrementa por 1 inteiro
+// mantendo a digitação livre de decimais
+// ================================================================
+function spinnerAjustar(inputId, delta) {
+    const input = document.getElementById(inputId);
+    if (!input) return;
+    const atual = parseFloat(input.value) || 0;
+    const novo  = atual + delta;
+    const minimo = parseFloat(input.min) || 0;
+    input.value  = Math.max(minimo, novo);
+    // Disparar evento input para callbacks (ex: calcularTroco)
+    input.dispatchEvent(new Event('input', { bubbles: true }));
+    input.focus();
 }
 
 function fecharModalQuantidade() {
@@ -1240,22 +1246,10 @@ function configurarEventosGlobais() {
             const primeiro = document.querySelector('#resultadosBuscaCliente .resultado-item');
             if (primeiro) primeiro.focus();
 
-        } else if (e.key === 'Tab' && !e.shiftKey) {
-            e.preventDefault();
-            document.getElementById('btnConfirmarCliente').focus();
-
         } else if (e.key === 'Escape') {
             inputCliente.value = '';
             document.getElementById('resultadosBuscaCliente').innerHTML = '';
             document.getElementById('btnLimparBuscaCliente').style.display = 'none';
-        }
-    });
-
-    // Botão confirmar cliente com Enter
-    document.getElementById('btnConfirmarCliente').addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') {
-            e.preventDefault();
-            confirmarCliente();
         }
     });
 
