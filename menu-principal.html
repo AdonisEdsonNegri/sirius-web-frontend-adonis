@@ -328,6 +328,11 @@
             background: radial-gradient(ellipse at 60% 50%, #0d1f3c 0%, #050e22 70%);
         }
 
+        /* Área clicável */
+        .main-area {
+            cursor: pointer;
+        }
+
         /* Grid de fundo sutil */
         .main-area::before {
             content: '';
@@ -678,20 +683,21 @@
                 </a>
             </div>
 
-            <!-- PDV -->
+            <!-- Vendas (submenu) -->
             <div class="nav-item">
-                <a href="pdv.html" class="nav-link">
-                    <span class="nav-icone">🛒</span>
-                    <span class="nav-texto">PDV</span>
-                </a>
-            </div>
-
-            <!-- Pedidos -->
-            <div class="nav-item">
-                <a href="pedidos.html" class="nav-link">
-                    <span class="nav-icone">📋</span>
-                    <span class="nav-texto">Pedidos</span>
-                </a>
+                <div class="nav-link" id="btnVendas" onclick="toggleSubmenuVendas()">
+                    <span class="nav-icone">💼</span>
+                    <span class="nav-texto">Vendas</span>
+                    <span class="nav-seta">›</span>
+                </div>
+                <div class="submenu" id="submenuVendas">
+                    <a href="pdv.html" class="submenu-link">
+                        <span class="sub-icone">🛒</span> PDV
+                    </a>
+                    <a href="pedidos.html" class="submenu-link">
+                        <span class="sub-icone">📋</span> Pedidos Realizados
+                    </a>
+                </div>
             </div>
 
             <div class="nav-separador"></div>
@@ -756,9 +762,9 @@
     </aside>
 
     <!-- ============================================================
-         ÁREA PRINCIPAL - ILUSTRAÇÃO ERP
+         ÁREA PRINCIPAL - ILUSTRAÇÃO ERP (clicável → Outros Módulos)
          ============================================================ -->
-    <main class="main-area">
+    <main class="main-area" onclick="window.location.href='outros-modulos.html'">
         <div class="main-content">
 
             <!-- Tagline -->
@@ -922,6 +928,17 @@
         } catch (e) {
             console.error('Erro ao carregar usuário:', e);
         }
+    }
+
+    /* ============================================================
+       SUBMENU VENDAS
+       ============================================================ */
+    function toggleSubmenuVendas() {
+        const btn     = document.getElementById('btnVendas');
+        const submenu = document.getElementById('submenuVendas');
+        const aberto  = submenu.classList.contains('aberto');
+        submenu.classList.toggle('aberto', !aberto);
+        btn.classList.toggle('aberto', !aberto);
     }
 
     /* ============================================================
