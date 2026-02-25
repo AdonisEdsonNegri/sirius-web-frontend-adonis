@@ -163,7 +163,7 @@ async function login(email, senha) {
             
             // Redirecionar após 1 segundo
             setTimeout(() => {
-                window.location.href = 'dashboard.html';
+                window.location.href = 'menu-principal.html';
             }, 1000);
             
         } else {

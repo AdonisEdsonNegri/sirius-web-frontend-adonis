@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIRIUS WEB – Módulo Delivery</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:ital,wght@0,300;0,400;0,600;1,300&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --acento:  #06b6d4;
+            --acento2: #22d3ee;
+            --acento3: #0891b2;
+            --glow:    rgba(6,182,212,0.5);
+            --cinza:   #cffafe;
+        }
+
+        html, body { width:100%; height:100%; overflow:hidden; font-family:'Barlow',sans-serif; cursor:pointer; user-select:none; }
+
+        .fundo {
+            width:100vw; height:100vh;
+            background:
+                radial-gradient(ellipse 80% 55% at 68% 28%, rgba(6,182,212,0.22) 0%, transparent 65%),
+                radial-gradient(ellipse 55% 65% at 15% 80%, rgba(8,145,178,0.12) 0%, transparent 60%),
+                linear-gradient(155deg, #00080c 0%, #001418 50%, #000b10 100%);
+            position:relative; display:flex; flex-direction:column;
+            align-items:center; justify-content:center; overflow:hidden;
+        }
+
+        .fundo::before {
+            content:''; position:absolute; inset:-10%;
+            background-image:radial-gradient(circle, rgba(6,182,212,0.30) 1px, transparent 1px);
+            background-size:40px 40px;
+            animation:moverGrade 22s linear infinite; opacity:0.42;
+        }
+        @keyframes moverGrade { 0%{transform:translate(0,0);} 100%{transform:translate(40px,40px);} }
+
+        .fundo::after {
+            content:''; position:absolute; left:0; top:42%; width:100%; height:1px;
+            background:linear-gradient(90deg, transparent 0%, var(--acento3) 30%, var(--acento2) 58%, transparent 100%);
+            opacity:0.20; filter:blur(2px);
+        }
+
+        /* Decorativo: mapa/rota com pins */
+        .deco-mapa {
+            position:absolute; right:8vw; top:50%;
+            transform:translateY(-50%) rotate(5deg);
+            width:200px; height:200px;
+            border:1px solid rgba(6,182,212,0.25);
+            border-radius:16px;
+            background:linear-gradient(145deg, rgba(6,182,212,0.08), rgba(8,145,178,0.04));
+            opacity:0;
+            animation:entrarDoc 0.9s ease 0.5s forwards;
+            overflow:hidden;
+        }
+        /* Grade de ruas */
+        .deco-mapa::before {
+            content:''; position:absolute; inset:0;
+            background:
+                linear-gradient(0deg, transparent 49%, rgba(6,182,212,0.18) 49%, rgba(6,182,212,0.18) 51%, transparent 51%),
+                linear-gradient(90deg, transparent 32%, rgba(6,182,212,0.18) 32%, rgba(6,182,212,0.18) 34%, transparent 34%),
+                linear-gradient(90deg, transparent 68%, rgba(6,182,212,0.12) 68%, rgba(6,182,212,0.12) 70%, transparent 70%);
+        }
+        /* Pin de destino */
+        .deco-mapa::after {
+            content:'📍'; position:absolute; top:28%; right:28%;
+            font-size:28px; animation:pulsar 1.5s ease-in-out infinite;
+        }
+        @keyframes pulsar { 0%,100%{transform:scale(1);} 50%{transform:scale(1.18);} }
+        @keyframes entrarDoc { from{opacity:0;transform:translateY(-44%) rotate(5deg);} to{opacity:0.9;transform:translateY(-50%) rotate(5deg);} }
+
+        /* Segundo elemento: caixa de entrega */
+        .deco-caixa {
+            position:absolute; right:16vw; top:62%;
+            transform:translateY(-50%) rotate(-4deg);
+            width:80px; height:70px;
+            border:1px solid rgba(6,182,212,0.20);
+            border-radius:8px;
+            background:linear-gradient(145deg, rgba(0,20,28,0.7), rgba(6,182,212,0.06));
+            opacity:0;
+            animation:entrarDoc2 0.9s ease 0.8s forwards;
+        }
+        .deco-caixa::after { content:'📦'; position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:30px; }
+        @keyframes entrarDoc2 { from{opacity:0;transform:translateY(-44%) rotate(-4deg);} to{opacity:0.7;transform:translateY(-50%) rotate(-4deg);} }
+
+        .badge {
+            position:absolute; top:28px; right:10vw;
+            background:rgba(6,182,212,0.12); border:1px solid rgba(6,182,212,0.32);
+            color:rgba(34,211,238,0.9); border-radius:20px; padding:5px 14px;
+            font-family:'Barlow',sans-serif; font-size:12px; font-weight:600;
+            letter-spacing:2px; text-transform:uppercase;
+            opacity:0; animation:subir 0.5s ease 0.3s forwards; z-index:20;
+        }
+
+        .conteudo { position:relative; z-index:10; display:flex; flex-direction:column; align-items:flex-start; padding:0 0 0 10vw; width:100%; }
+
+        .marca { font-family:'Barlow',sans-serif; font-weight:300; font-size:clamp(13px,1.5vw,18px); letter-spacing:8px; text-transform:uppercase; color:rgba(255,255,255,0.3); opacity:0; animation:subir 0.6s ease 0.05s forwards; margin-bottom:2px; }
+        .pre-titulo { font-family:'Barlow',sans-serif; font-weight:600; font-size:clamp(11px,1.2vw,14px); letter-spacing:6px; text-transform:uppercase; color:var(--acento); opacity:0; transform:translateY(16px); animation:subir 0.6s ease 0.2s forwards; margin-bottom:8px; }
+
+        .titulo {
+            font-family:'Bebas Neue', sans-serif;
+            font-size:clamp(80px,14vw,200px);
+            line-height:0.88; letter-spacing:-3px;
+            color:transparent;
+            background:linear-gradient(130deg, #ffffff 0%, #a5f3fc 42%, var(--acento) 72%, #0e7490 100%);
+            -webkit-background-clip:text; background-clip:text;
+            opacity:0; transform:translateX(-40px);
+            animation:entrarEsquerda 0.8s cubic-bezier(0.16,1,0.3,1) 0.35s forwards;
+            filter:drop-shadow(0 0 38px rgba(6,182,212,0.5));
+            margin-bottom:22px;
+        }
+
+        .separador { width:0; height:2px; background:linear-gradient(90deg,var(--acento),var(--acento2)); border-radius:2px; opacity:0; animation:expandir 0.7s ease 0.8s forwards; margin-bottom:24px; }
+
+        .linha-texto { display:flex; align-items:center; gap:14px; opacity:0; transform:translateY(12px); }
+        .linha-texto:nth-child(6) { animation:subir 0.5s ease 1.0s forwards; }
+        .linha-texto:nth-child(7) { animation:subir 0.5s ease 1.15s forwards; }
+        .linha-icone { font-size:16px; }
+        .linha-texto span:last-child { font-family:'Barlow',sans-serif; font-weight:300; font-size:clamp(14px,1.6vw,20px); color:rgba(255,255,255,0.75); }
+        .linha-texto em { color:var(--acento2); font-style:normal; font-weight:600; }
+
+        .rodape {
+            position:absolute; bottom:0; left:0; right:0;
+            display:flex; align-items:center; justify-content:space-between;
+            padding:20px 10vw;
+            background:linear-gradient(0deg, rgba(0,8,12,0.96) 0%, transparent 100%);
+            opacity:0; animation:subir 0.6s ease 1.4s forwards;
+        }
+        .rodape-marca { font-family:'Barlow',sans-serif; font-weight:600; font-size:13px; letter-spacing:3px; text-transform:uppercase; color:rgba(255,255,255,0.2); }
+
+        .btn-fale { display:inline-flex; align-items:center; gap:10px; padding:12px 30px; background:transparent; border:1px solid rgba(6,182,212,0.6); border-radius:40px; color:var(--cinza); font-family:'Barlow',sans-serif; font-weight:600; font-size:14px; letter-spacing:3px; text-transform:uppercase; text-decoration:none; cursor:pointer; transition:all 0.3s ease; position:relative; overflow:hidden; }
+        .btn-fale::before { content:''; position:absolute; inset:0; background:linear-gradient(135deg,var(--acento3),var(--acento2)); opacity:0; transition:opacity 0.3s ease; border-radius:40px; }
+        .btn-fale:hover::before { opacity:1; }
+        .btn-fale span { position:relative; z-index:1; }
+        .btn-fale:hover { color:white; border-color:transparent; box-shadow:0 0 20px rgba(6,182,212,0.5),0 0 60px rgba(8,145,178,0.15); }
+        .btn-seta { position:relative; z-index:1; font-size:16px; transition:transform 0.3s ease; }
+        .btn-fale:hover .btn-seta { transform:translateX(4px); }
+
+        @keyframes subir { from{opacity:0;transform:translateY(16px);} to{opacity:1;transform:translateY(0);} }
+        @keyframes entrarEsquerda { from{opacity:0;transform:translateX(-40px);} to{opacity:1;transform:translateX(0);} }
+        @keyframes expandir { from{width:0;opacity:0;} to{width:180px;opacity:1;} }
+    </style>
+</head>
+<body>
+
+<div class="fundo" onclick="window.location.href='https://www.softclever.com.br'">
+
+    <div class="deco-mapa"></div>
+    <div class="deco-caixa"></div>
+    <div class="badge">🛵 Rastreio em Tempo Real</div>
+
+    <div class="conteudo">
+        <div class="marca">SIRIUS WEB</div>
+        <div class="pre-titulo">Módulo</div>
+        <h1 class="titulo">DELIVERY</h1>
+        <div class="separador"></div>
+        <div class="linha-texto">
+            <span class="linha-icone">🗺️</span>
+            <span>Gestão de rotas e <em>entregadores</em></span>
+        </div>
+        <div class="linha-texto">
+            <span class="linha-icone">⚡</span>
+            <span>Do pedido à porta do cliente</span>
+        </div>
+    </div>
+
+    <div class="rodape">
+        <div class="rodape-marca">Soft Clever Informática</div>
+        <a class="btn-fale" href="https://www.softclever.com.br" target="_blank" onclick="event.stopPropagation()">
+            <span>Fale Conosco</span>
+            <span class="btn-seta">→</span>
+        </a>
+    </div>
+
+    <canvas id="particulas" style="position:absolute;inset:0;pointer-events:none;z-index:5;"></canvas>
+</div>
+
+<script>
+    const canvas = document.getElementById('particulas');
+    const ctx = canvas.getContext('2d');
+    function redimensionar() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+    redimensionar(); window.addEventListener('resize', redimensionar);
+    const particulas = Array.from({ length: 26 }, () => ({
+        x: Math.random() * window.innerWidth, y: Math.random() * window.innerHeight,
+        r: Math.random() * 1.8 + 0.4, vx: (Math.random() - 0.5) * 0.4,
+        vy: -(Math.random() * 0.6 + 0.2), alpha: Math.random() * 0.5 + 0.1,
+        cor: Math.random() > 0.5 ? '6,182,212' : '34,211,238'
+    }));
+    function animar() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        particulas.forEach(p => {
+            p.x += p.vx; p.y += p.vy;
+            if (p.y < -10) { p.y = canvas.height + 10; p.x = Math.random() * canvas.width; }
+            ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(${p.cor},${p.alpha})`; ctx.fill();
+        });
+        requestAnimationFrame(animar);
+    }
+    animar();
+</script>
+</body>
+</html>

@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIRIUS WEB – Módulo Comissões</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:ital,wght@0,300;0,400;0,600;1,300&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        :root { --acento:#ec4899; --acento2:#f472b6; --acento3:#be185d; --verde:#00e5a0; --cinza:#fce7f3; }
+        html, body { width:100%; height:100%; overflow:hidden; font-family:'Barlow',sans-serif; cursor:pointer; user-select:none; }
+
+        .fundo {
+            width:100vw; height:100vh;
+            background:
+                radial-gradient(ellipse 78% 55% at 65% 28%, rgba(236,72,153,0.20) 0%, transparent 62%),
+                radial-gradient(ellipse 55% 65% at 18% 78%, rgba(190,24,93,0.12) 0%, transparent 60%),
+                linear-gradient(155deg, #0e0008 0%, #180010 50%, #0c0008 100%);
+            position:relative; display:flex; flex-direction:column; align-items:center; justify-content:center; overflow:hidden;
+        }
+        .fundo::before { content:''; position:absolute; inset:-10%; background-image:radial-gradient(circle,rgba(236,72,153,0.28) 1px,transparent 1px); background-size:38px 38px; animation:moverGrade 20s linear infinite; opacity:0.40; }
+        @keyframes moverGrade { 0%{transform:translate(0,0);} 100%{transform:translate(38px,38px);} }
+        .fundo::after { content:''; position:absolute; left:0; top:42%; width:100%; height:1px; background:linear-gradient(90deg,transparent 0%,var(--acento3) 28%,var(--acento2) 58%,transparent 100%); opacity:0.20; filter:blur(2px); }
+
+        /* Decorativo: gráfico de linha ascendente */
+        .deco-grafico { position:absolute; right:7vw; bottom:20%; width:200px; height:130px; opacity:0; animation:entrarDeco 0.8s ease 0.5s forwards; }
+        /* Linha do gráfico via SVG inline */
+        .deco-grafico svg { width:100%; height:100%; }
+        @keyframes entrarDeco { from{opacity:0;transform:translateY(16px);} to{opacity:0.80;transform:translateY(0);} }
+
+        /* Troféu decorativo */
+        .deco-trofeu { position:absolute; right:12vw; top:18%; font-size:64px; opacity:0; animation:entrarTrofeu 0.8s ease 0.7s forwards; }
+        @keyframes entrarTrofeu { from{opacity:0;transform:scale(0.7) rotate(-12deg);} to{opacity:0.75;transform:scale(1) rotate(-8deg);} }
+
+        .badge { position:absolute; top:28px; right:10vw; background:rgba(236,72,153,0.12); border:1px solid rgba(236,72,153,0.32); color:rgba(244,114,182,0.95); border-radius:20px; padding:5px 14px; font-family:'Barlow',sans-serif; font-size:12px; font-weight:600; letter-spacing:2px; text-transform:uppercase; opacity:0; animation:subir 0.5s ease 0.3s forwards; z-index:20; }
+
+        .conteudo { position:relative; z-index:10; display:flex; flex-direction:column; align-items:flex-start; padding:0 0 0 10vw; width:100%; }
+        .marca { font-family:'Barlow',sans-serif; font-weight:300; font-size:clamp(13px,1.5vw,18px); letter-spacing:8px; text-transform:uppercase; color:rgba(255,255,255,0.3); opacity:0; animation:subir 0.6s ease 0.05s forwards; margin-bottom:2px; }
+        .pre-titulo { font-family:'Barlow',sans-serif; font-weight:600; font-size:clamp(11px,1.2vw,14px); letter-spacing:6px; text-transform:uppercase; color:var(--acento2); opacity:0; transform:translateY(16px); animation:subir 0.6s ease 0.2s forwards; margin-bottom:8px; }
+        .titulo { font-family:'Bebas Neue',sans-serif; font-size:clamp(72px,12vw,170px); line-height:0.88; letter-spacing:-3px; color:transparent; background:linear-gradient(130deg,#ffffff 0%,#fce7f3 38%,var(--acento) 65%,var(--verde) 100%); -webkit-background-clip:text; background-clip:text; opacity:0; transform:translateX(-40px); animation:entrarEsquerda 0.8s cubic-bezier(0.16,1,0.3,1) 0.35s forwards; filter:drop-shadow(0 0 38px rgba(236,72,153,0.50)); margin-bottom:22px; }
+        .separador { width:0; height:2px; background:linear-gradient(90deg,var(--acento3),var(--acento2)); border-radius:2px; opacity:0; animation:expandir 0.7s ease 0.8s forwards; margin-bottom:24px; }
+        .linha-texto { display:flex; align-items:center; gap:14px; opacity:0; transform:translateY(12px); }
+        .linha-texto:nth-child(6) { animation:subir 0.5s ease 1.0s forwards; }
+        .linha-texto:nth-child(7) { animation:subir 0.5s ease 1.15s forwards; }
+        .linha-icone { font-size:16px; }
+        .linha-texto span:last-child { font-family:'Barlow',sans-serif; font-weight:300; font-size:clamp(14px,1.6vw,20px); color:rgba(255,255,255,0.75); }
+        .linha-texto em { color:var(--acento2); font-style:normal; font-weight:600; }
+
+        .rodape { position:absolute; bottom:0; left:0; right:0; display:flex; align-items:center; justify-content:space-between; padding:20px 10vw; background:linear-gradient(0deg,rgba(14,0,8,0.96) 0%,transparent 100%); opacity:0; animation:subir 0.6s ease 1.4s forwards; }
+        .rodape-marca { font-family:'Barlow',sans-serif; font-weight:600; font-size:13px; letter-spacing:3px; text-transform:uppercase; color:rgba(255,255,255,0.2); }
+        .btn-fale { display:inline-flex; align-items:center; gap:10px; padding:12px 30px; background:transparent; border:1px solid rgba(236,72,153,0.6); border-radius:40px; color:var(--cinza); font-family:'Barlow',sans-serif; font-weight:600; font-size:14px; letter-spacing:3px; text-transform:uppercase; text-decoration:none; cursor:pointer; transition:all 0.3s ease; position:relative; overflow:hidden; }
+        .btn-fale::before { content:''; position:absolute; inset:0; background:linear-gradient(135deg,var(--acento3),var(--acento2)); opacity:0; transition:opacity 0.3s ease; border-radius:40px; }
+        .btn-fale:hover::before { opacity:1; }
+        .btn-fale span { position:relative; z-index:1; }
+        .btn-fale:hover { color:#fff; border-color:transparent; box-shadow:0 0 20px rgba(236,72,153,0.5); }
+        .btn-seta { position:relative; z-index:1; font-size:16px; transition:transform 0.3s ease; }
+        .btn-fale:hover .btn-seta { transform:translateX(4px); }
+
+        @keyframes subir { from{opacity:0;transform:translateY(16px);} to{opacity:1;transform:translateY(0);} }
+        @keyframes entrarEsquerda { from{opacity:0;transform:translateX(-40px);} to{opacity:1;transform:translateX(0);} }
+        @keyframes expandir { from{width:0;opacity:0;} to{width:180px;opacity:1;} }
+    </style>
+</head>
+<body>
+<div class="fundo" onclick="window.location.href='https://www.softclever.com.br'">
+
+    <!-- Gráfico de linha ascendente SVG -->
+    <div class="deco-grafico">
+        <svg viewBox="0 0 200 130" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <!-- Área preenchida -->
+            <path d="M0,110 L40,85 L80,90 L120,50 L160,35 L200,10 L200,130 L0,130 Z" fill="rgba(236,72,153,0.08)"/>
+            <!-- Linha -->
+            <polyline points="0,110 40,85 80,90 120,50 160,35 200,10"
+                stroke="rgba(244,114,182,0.55)" stroke-width="2" stroke-linejoin="round" fill="none"/>
+            <!-- Pontos -->
+            <circle cx="0"   cy="110" r="4" fill="rgba(236,72,153,0.6)"/>
+            <circle cx="40"  cy="85"  r="4" fill="rgba(236,72,153,0.6)"/>
+            <circle cx="80"  cy="90"  r="4" fill="rgba(236,72,153,0.6)"/>
+            <circle cx="120" cy="50"  r="4" fill="rgba(236,72,153,0.6)"/>
+            <circle cx="160" cy="35"  r="5" fill="rgba(244,114,182,0.8)"/>
+            <circle cx="200" cy="10"  r="5" fill="rgba(0,229,160,0.8)"/>
+        </svg>
+    </div>
+
+    <div class="deco-trofeu">🏆</div>
+    <div class="badge">🎯 Por Vendedor · Produto · Período</div>
+
+    <div class="conteudo">
+        <div class="marca">SIRIUS WEB</div>
+        <div class="pre-titulo">Módulo</div>
+        <h1 class="titulo">COMISSÕES</h1>
+        <div class="separador"></div>
+        <div class="linha-texto"><span class="linha-icone">📈</span><span>Cálculo <em>automático</em> por vendedor</span></div>
+        <div class="linha-texto"><span class="linha-icone">🎯</span><span>Metas, faixas e regras personalizadas</span></div>
+    </div>
+    <div class="rodape">
+        <div class="rodape-marca">Soft Clever Informática</div>
+        <a class="btn-fale" href="https://www.softclever.com.br" target="_blank" onclick="event.stopPropagation()">
+            <span>Fale Conosco</span><span class="btn-seta">→</span>
+        </a>
+    </div>
+    <canvas id="particulas" style="position:absolute;inset:0;pointer-events:none;z-index:5;"></canvas>
+</div>
+<script>
+    const canvas=document.getElementById('particulas'),ctx=canvas.getContext('2d');
+    function r(){canvas.width=innerWidth;canvas.height=innerHeight;}r();window.addEventListener('resize',r);
+    const pts=Array.from({length:26},()=>({x:Math.random()*innerWidth,y:Math.random()*innerHeight,rx:Math.random()*1.8+0.4,vx:(Math.random()-0.5)*0.4,vy:-(Math.random()*0.6+0.2),a:Math.random()*0.5+0.1,c:Math.random()>0.5?'236,72,153':'0,229,160'}));
+    function an(){ctx.clearRect(0,0,canvas.width,canvas.height);pts.forEach(p=>{p.x+=p.vx;p.y+=p.vy;if(p.y<-10){p.y=canvas.height+10;p.x=Math.random()*canvas.width;}ctx.beginPath();ctx.arc(p.x,p.y,p.rx,0,Math.PI*2);ctx.fillStyle=`rgba(${p.c},${p.a})`;ctx.fill();});requestAnimationFrame(an);}an();
+</script>
+</body>
+</html>

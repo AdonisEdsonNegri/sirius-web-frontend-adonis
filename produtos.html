@@ -14,248 +14,262 @@
             box-sizing: border-box;
         }
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            /* Fundo escuro navy — mesmo tom do menu-principal.html */
-            background: linear-gradient(180deg, #050e22 0%, #0a1628 60%, #050e22 100%);
-            min-height: 100vh;
-            padding: 0;
+        html, body {
+            height: 100%;
+            font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+            background: #050e22;
+            overflow: hidden;
         }
 
         /* ============================================================
-           BARRA DE TOPO (identidade visual do menu-principal)
+           LAYOUT: SIDEBAR ÍCONES + ÁREA PRINCIPAL
            ============================================================ */
-        .topbar {
-            background: linear-gradient(90deg, #0a1628 0%, #0d1f3c 100%);
-            border-bottom: 1px solid rgba(37, 99, 235, 0.3);
-            padding: 0 24px;
-            height: 56px;
+        .app-layout {
             display: flex;
-            align-items: center;
-            justify-content: space-between;
-            box-shadow: 0 2px 16px rgba(0, 0, 0, 0.5);
-            position: sticky;
-            top: 0;
-            z-index: 100;
+            height: 100vh;
+            width: 100vw;
         }
 
-        /* Linha decorativa inferior da topbar */
-        .topbar::after {
+        /* ============================================================
+           SIDEBAR DE ÍCONES — estreita, compacta, fundo navy escuro
+           ============================================================ */
+        .sidebar-icones {
+            width: 80px;
+            min-width: 80px;
+            background: linear-gradient(180deg, #0a1628 0%, #0d1f3c 60%, #0a1628 100%);
+            border-right: 1px solid rgba(37, 99, 235, 0.25);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 16px 0 12px;
+            position: relative;
+            z-index: 10;
+            box-shadow: 4px 0 20px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Linha decorativa lateral */
+        .sidebar-icones::after {
             content: '';
             position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 2px;
-            background: linear-gradient(90deg,
+            top: 0; right: 0;
+            width: 2px;
+            height: 100%;
+            background: linear-gradient(180deg,
                 transparent 0%,
-                #2563eb 20%,
-                #60a5fa 50%,
-                #2563eb 80%,
+                #2563eb 25%,
+                #00e5a0 50%,
+                #2563eb 75%,
                 transparent 100%
             );
-            opacity: 0.6;
+            opacity: 0.5;
         }
 
-        .topbar-brand {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .topbar-icone {
-            width: 32px;
-            height: 32px;
+        /* Logo do módulo no topo */
+        .sidebar-modulo-logo {
+            width: 44px;
+            height: 44px;
             background: linear-gradient(135deg, #2563eb, #1e40af);
-            border-radius: 8px;
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 15px;
-            box-shadow: 0 0 10px rgba(37, 99, 235, 0.45);
+            font-size: 20px;
+            box-shadow: 0 0 16px rgba(37, 99, 235, 0.5);
+            margin-bottom: 10px;
+            flex-shrink: 0;
         }
 
-        .topbar-nome {
-            color: #e2e8f0;
-            font-size: 16px;
-            font-weight: 700;
-            letter-spacing: 1.5px;
+        /* Divisor horizontal */
+        .sidebar-divisor {
+            width: 40px;
+            height: 1px;
+            background: rgba(255, 255, 255, 0.07);
+            margin: 6px 0;
+            flex-shrink: 0;
         }
 
-        .topbar-nome span {
-            color: #60a5fa;
-        }
+        /* Empurra o botão Voltar para o rodapé */
+        .sidebar-spacer { flex: 1; }
 
-        .topbar-modulo {
+        /* ---- Botão de ação da sidebar ---- */
+        .sidebar-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            width: 64px;
+            padding: 10px 4px;
+            border-radius: 12px;
+            border: 1px solid transparent;
+            background: transparent;
             color: #64748b;
-            font-size: 11px;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            margin-top: 1px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            position: relative;
+            flex-shrink: 0;
+            margin-bottom: 2px;
         }
 
-        /* Botão Voltar na topbar */
-        .btn-voltar {
-            background: rgba(37, 99, 235, 0.15);
+        .sidebar-btn:hover {
+            background: rgba(37, 99, 235, 0.14);
             color: #93c5fd;
-            border: 1px solid rgba(37, 99, 235, 0.35);
-            padding: 8px 18px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 14px;
+            border-color: rgba(37, 99, 235, 0.25);
+        }
+
+        .sidebar-btn.ativo {
+            background: rgba(37, 99, 235, 0.20);
+            color: #60a5fa;
+            border-color: rgba(37, 99, 235, 0.35);
+        }
+
+        /* Ícone */
+        .btn-icone {
+            font-size: 20px;
+            line-height: 1;
+        }
+
+        /* Rótulo */
+        .btn-label {
+            font-size: 9px;
             font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            text-align: center;
+            line-height: 1.2;
+            white-space: nowrap;
+        }
+
+        /* Botão Voltar — visual diferenciado */
+        .sidebar-btn.btn-voltar {
+            color: #475569;
+            margin-top: 4px;
+        }
+        .sidebar-btn.btn-voltar:hover {
+            background: rgba(148, 163, 184, 0.10);
+            color: #94a3b8;
+            border-color: rgba(148, 163, 184, 0.18);
+        }
+
+        /* ---- Tooltip ao hover ---- */
+        .sidebar-btn::before {
+            content: attr(data-tooltip);
+            position: absolute;
+            left: calc(100% + 14px);
+            top: 50%;
+            transform: translateY(-50%);
+            background: #0d1f3c;
+            color: #e2e8f0;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 6px 12px;
+            border-radius: 8px;
+            border: 1px solid rgba(37, 99, 235, 0.3);
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.15s ease;
+            z-index: 300;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45);
+        }
+
+        /* Seta do tooltip */
+        .sidebar-btn::after {
+            content: '';
+            position: absolute;
+            left: calc(100% + 7px);
+            top: 50%;
+            transform: translateY(-50%);
+            border: 5px solid transparent;
+            border-right-color: rgba(37, 99, 235, 0.3);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.15s ease;
+            z-index: 300;
+        }
+
+        .sidebar-btn:hover::before,
+        .sidebar-btn:hover::after {
+            opacity: 1;
+        }
+
+        /* ============================================================
+           ÁREA PRINCIPAL
+           ============================================================ */
+        .main-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            background: linear-gradient(160deg, #071122 0%, #0a1628 100%);
+        }
+
+        /* Barra de título */
+        .page-topbar {
+            padding: 15px 22px 13px;
+            border-bottom: 1px solid rgba(37, 99, 235, 0.12);
             display: flex;
             align-items: center;
-            gap: 7px;
-            transition: all 0.2s ease;
-            letter-spacing: 0.3px;
-        }
-
-        .btn-voltar:hover {
-            background: rgba(37, 99, 235, 0.28);
-            color: #ffffff;
-            border-color: rgba(37, 99, 235, 0.6);
-            transform: translateX(-2px);
-        }
-
-        /* ============================================================
-           CONTAINER PRINCIPAL (card sobre fundo escuro)
-           ============================================================ */
-        .page-wrapper {
-            padding: 28px 24px 40px;
-        }
-
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            background: #ffffff;
-            border-radius: 16px;
-            padding: 30px;
-            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.55),
-                        0 0 0 1px rgba(37, 99, 235, 0.12);
-            position: relative;
-        }
-
-        /* ============================================================
-           CABEÇALHO DO MÓDULO
-           ============================================================ */
-        h1 {
-            color: #1e40af;
-            text-align: center;
-            margin-bottom: 6px;
-            font-size: 2.2em;
-        }
-
-        .subtitle {
-            text-align: center;
-            color: #64748b;
-            margin-bottom: 28px;
-            font-size: 1.1em;
-        }
-
-        /* ============================================================
-           TOOLBAR — BOTÕES EM DEGRADÊ AZUL (#2563eb base)
-           ============================================================ */
-        .btn-toolbar {
-            display: flex;
             gap: 10px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
+            flex-shrink: 0;
+            background: rgba(10, 22, 40, 0.55);
         }
 
-        /* Remover spinner dos inputs numéricos */
-        input[type="number"]::-webkit-inner-spin-button,
-        input[type="number"]::-webkit-outer-spin-button {
-            -webkit-appearance: none;
-            margin: 0;
-        }
-        input[type="number"] { -moz-appearance: textfield; }
-
-        /* Novo Produto — Azul mais forte */
-        .btn {
-            background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%);
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 15px;
+        .page-titulo {
+            color: #e2e8f0;
+            font-size: 17px;
             font-weight: 700;
-            transition: all 0.25s;
-        }
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 18px rgba(37, 99, 235, 0.4);
+            letter-spacing: 0.4px;
         }
 
-        /* Ordenação — Azul médio/forte */
-        .btn-ordenacao {
-            background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
+        .page-subtitulo {
+            color: #475569;
+            font-size: 12px;
+            letter-spacing: 0.6px;
         }
 
-        /* Filtros — Azul médio */
-        .btn-filtros {
-            background: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%);
+        /* Área de scroll */
+        .content-scroll {
+            flex: 1;
+            overflow-y: auto;
+            padding: 18px 22px 30px;
         }
 
-        /* Relatórios — Azul mais suave */
-        .btn-relatorio {
-            background: linear-gradient(135deg, #60a5fa 0%, #93c5fd 100%);
-            color: #1e3a8a;
-        }
+        .content-scroll::-webkit-scrollbar { width: 5px; }
+        .content-scroll::-webkit-scrollbar-track { background: transparent; }
+        .content-scroll::-webkit-scrollbar-thumb { background: rgba(37,99,235,0.3); border-radius: 4px; }
 
-        /* ============================================================
-           DROPDOWN
-           ============================================================ */
-        .dropdown { position: relative; display: inline-block; }
-        .dropdown-content {
-            display: none;
-            position: absolute;
-            background-color: #ffffff;
-            min-width: 220px;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
-            z-index: 100;
-            border-radius: 10px;
-            overflow: hidden;
-            border: 1px solid rgba(37, 99, 235, 0.15);
+        /* Card branco */
+        .card {
+            background: #ffffff;
+            border-radius: 14px;
+            padding: 22px;
+            box-shadow:
+                0 8px 32px rgba(0, 0, 0, 0.5),
+                0 0 0 1px rgba(37, 99, 235, 0.08);
         }
-        .dropdown-content a {
-            color: #1e293b;
-            padding: 12px 16px;
-            text-decoration: none;
-            display: block;
-            font-size: 14px;
-            transition: background 0.2s;
-        }
-        .dropdown-content a:hover {
-            background-color: #eff6ff;
-            color: #1d4ed8;
-        }
-        .dropdown:hover .dropdown-content { display: block; }
 
         /* ============================================================
            FILTRO ATIVO
            ============================================================ */
         .filtro-ativo {
-            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+            background: linear-gradient(135deg, #eff6ff, #dbeafe);
             border: 1px solid #bfdbfe;
             color: #1e40af;
-            padding: 12px 20px;
+            padding: 10px 16px;
             border-radius: 8px;
-            margin-bottom: 20px;
+            margin-bottom: 16px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-        }
-        .btn-limpar-filtro {
-            background: #2563eb;
-            color: white;
-            border: none;
-            padding: 6px 14px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 600;
             font-size: 13px;
+        }
+
+        .btn-limpar-filtro {
+            background: #2563eb; color: white; border: none;
+            padding: 5px 12px; border-radius: 6px; cursor: pointer;
+            font-weight: 600; font-size: 12px; transition: background 0.2s;
         }
         .btn-limpar-filtro:hover { background: #1d4ed8; }
 
@@ -263,547 +277,632 @@
            TABELA
            ============================================================ */
         table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
-            background: white;
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
+            width: 100%; border-collapse: collapse; margin-bottom: 16px;
+            border-radius: 10px; overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.07);
         }
-        thead {
-            background: linear-gradient(135deg, #1e40af 0%, #2563eb 100%);
-            color: white;
-        }
-        th, td {
-            padding: 14px 10px;
-            text-align: left;
-            font-size: 14px;
-        }
-        tbody tr { border-bottom: 1px solid #f1f5f9; transition: background 0.2s; }
-        tbody tr:hover { background-color: #f8faff; }
-        tbody tr.estoque-baixo  { background-color: #fff7ed !important; }
-        tbody tr.estoque-baixo:hover { background-color: #fed7aa !important; }
 
-        /* Botões de ação na tabela */
+        thead { background: linear-gradient(135deg, #1e40af 0%, #2563eb 100%); color: white; }
+        th, td { padding: 12px 10px; text-align: left; font-size: 13px; }
+        tbody tr { border-bottom: 1px solid #f1f5f9; transition: background 0.18s; }
+        tbody tr:hover { background: #f8faff; }
+        tbody tr.estoque-baixo       { background: #fff7ed !important; }
+        tbody tr.estoque-baixo:hover { background: #fed7aa !important; }
+
         .btn-small {
-            padding: 6px 12px;
-            font-size: 12px;
-            margin: 2px;
-            border-radius: 6px;
-            border: none;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.2s;
-            white-space: nowrap;
+            padding: 5px 10px; font-size: 11px; margin: 2px; border-radius: 6px;
+            border: none; cursor: pointer; font-weight: 600;
+            transition: all 0.18s; white-space: nowrap;
         }
-        .btn-edit        { background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%); color: white; }
-        .btn-delete      { background: linear-gradient(135deg, #ef4444 0%, #f87171 100%); color: white; }
-        .btn-ficha       { background: linear-gradient(135deg, #0ea5e9 0%, #38bdf8 100%); color: white; }
-        .btn-movimentacoes { background: linear-gradient(135deg, #059669 0%, #10b981 100%); color: white; }
-        .btn-small:hover { transform: translateY(-1px); box-shadow: 0 3px 8px rgba(0,0,0,0.18); }
-
-        /* ============================================================
-           MODAL
-           ============================================================ */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0; top: 0;
-            width: 100%; height: 100%;
-            overflow: auto;
-            background-color: rgba(5, 14, 34, 0.75);
-            backdrop-filter: blur(2px);
-        }
-        .modal-content {
-            background-color: white;
-            margin: 2% auto;
-            padding: 0;
-            border-radius: 16px;
-            width: 90%;
-            max-width: 900px;
-            box-shadow: 0 16px 60px rgba(0, 0, 0, 0.45);
-            max-height: 90vh;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-        }
-        .modal-header {
-            padding: 20px 30px;
-            border-bottom: 2px solid #e2e8f0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: linear-gradient(135deg, #f8faff 0%, #eff6ff 100%);
-        }
-        .form-title { color: #1e40af; font-size: 1.6em; margin: 0; }
-        .close {
-            color: #94a3b8;
-            font-size: 28px;
-            font-weight: bold;
-            cursor: pointer;
-            line-height: 1;
-            transition: color 0.2s;
-        }
-        .close:hover { color: #1e293b; }
-
-        /* Abas do modal */
-        .tabs {
-            display: flex;
-            border-bottom: 2px solid #e2e8f0;
-            background: #f8faff;
-        }
-        .tab-button {
-            flex: 1;
-            padding: 14px 18px;
-            border: none;
-            background: transparent;
-            cursor: pointer;
-            font-size: 15px;
-            font-weight: 600;
-            color: #64748b;
-            transition: all 0.25s;
-        }
-        .tab-button.active {
-            background: white;
-            color: #2563eb;
-            border-bottom: 3px solid #2563eb;
-        }
-        .tab-button:hover:not(.active) { background: #eff6ff; color: #1d4ed8; }
-
-        .modal-body {
-            padding: 30px;
-            overflow-y: auto;
-            max-height: calc(90vh - 200px);
-        }
-        .tab-content         { display: none; }
-        .tab-content.active  { display: block; }
-
-        /* Formulário */
-        .form-row {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin-bottom: 15px;
-        }
-        .form-group { display: flex; flex-direction: column; }
-        .form-group label {
-            margin-bottom: 5px;
-            font-weight: 600;
-            color: #334155;
-            font-size: 13px;
-        }
-        .form-group input,
-        .form-group select {
-            padding: 10px 12px;
-            border: 2px solid #e2e8f0;
-            border-radius: 7px;
-            font-size: 14px;
-            transition: border-color 0.2s;
-        }
-        .form-group input:focus,
-        .form-group select:focus {
-            outline: none;
-            border-color: #2563eb;
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-        }
-
-        /* Checkbox */
-        .checkbox-group { display: flex; align-items: center; gap: 10px; }
-        .checkbox-group input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; accent-color: #2563eb; }
-
-        /* Subtítulos de seção dentro do modal */
-        .section-title {
-            color: #1e40af;
-            margin-top: 20px;
-            margin-bottom: 15px;
-            font-size: 1rem;
-            font-weight: 700;
-            padding-bottom: 6px;
-            border-bottom: 1px solid #dbeafe;
-        }
-
-        /* Botões do formulário */
-        .form-buttons {
-            display: flex;
-            gap: 10px;
-            justify-content: flex-end;
-            margin-top: 20px;
-            padding-top: 20px;
-            border-top: 2px solid #e2e8f0;
-        }
-        .btn-submit {
-            background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%);
-            color: white;
-            border: none;
-            padding: 12px 28px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 15px;
-            font-weight: 700;
-        }
-        .btn-cancel {
-            background: #64748b;
-            color: white;
-            border: none;
-            padding: 12px 28px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 15px;
-            font-weight: 600;
-        }
-        .btn-submit:hover { background: linear-gradient(135deg, #1e40af 0%, #1d4ed8 100%); }
-        .btn-cancel:hover { background: #475569; }
+        .btn-edit         { background: linear-gradient(135deg, #2563eb, #3b82f6); color: white; }
+        .btn-delete       { background: linear-gradient(135deg, #ef4444, #f87171); color: white; }
+        .btn-ficha        { background: linear-gradient(135deg, #0ea5e9, #38bdf8); color: white; }
+        .btn-movimentacoes{ background: linear-gradient(135deg, #059669, #10b981); color: white; }
+        .btn-small:hover  { transform: translateY(-1px); box-shadow: 0 3px 8px rgba(0,0,0,0.18); }
 
         /* ============================================================
            PAGINAÇÃO
            ============================================================ */
         .pagination {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 20px;
-            margin-top: 20px;
+            display: flex; justify-content: center; align-items: center;
+            gap: 18px; margin-top: 16px;
         }
+
         .pagination button {
-            background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%);
-            color: white;
-            border: none;
-            padding: 10px 22px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 700;
-            transition: all 0.2s;
+            background: linear-gradient(135deg, #1d4ed8, #2563eb); color: white;
+            border: none; padding: 8px 18px; border-radius: 8px;
+            cursor: pointer; font-size: 13px; font-weight: 700; transition: all 0.2s;
         }
-        .pagination button:hover:not(:disabled) {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35);
-        }
-        .pagination button:disabled { opacity: 0.45; cursor: not-allowed; }
-        .pagination span { font-size: 15px; font-weight: 600; color: #334155; }
+        .pagination button:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(37,99,235,0.35); }
+        .pagination button:disabled { opacity: 0.4; cursor: not-allowed; }
+        .pagination span { font-size: 13px; font-weight: 600; color: #334155; }
 
         /* ============================================================
            LOADING E MENSAGENS
            ============================================================ */
         .loading, .mensagem {
-            padding: 14px;
-            margin-bottom: 18px;
-            border-radius: 8px;
-            text-align: center;
-            font-weight: 600;
+            padding: 12px; margin-bottom: 14px; border-radius: 8px;
+            text-align: center; font-weight: 600; font-size: 13px;
         }
-        .loading              { background: #eff6ff; color: #1d4ed8; }
-        .mensagem.success     { background: #d1fae5; color: #065f46; }
-        .mensagem.error       { background: #fee2e2; color: #991b1b; }
+        .loading           { background: #eff6ff; color: #1d4ed8; }
+        .mensagem.success  { background: #d1fae5; color: #065f46; }
+        .mensagem.error    { background: #fee2e2; color: #991b1b; }
+
+        /* ============================================================
+           DROPDOWNS FLUTUANTES
+           (surgem à direita da sidebar ao clicar nos ícones)
+           ============================================================ */
+        .dropdown-flutuante {
+            display: none;
+            position: fixed;
+            left: 92px;
+            background: #0d1f3c;
+            border: 1px solid rgba(37, 99, 235, 0.3);
+            border-radius: 12px;
+            min-width: 220px;
+            box-shadow: 0 8px 28px rgba(0, 0, 0, 0.55);
+            z-index: 500;
+            overflow: hidden;
+            animation: fadeSlide 0.15s ease;
+        }
+
+        @keyframes fadeSlide {
+            from { opacity: 0; transform: translateX(-8px); }
+            to   { opacity: 1; transform: translateX(0); }
+        }
+
+        .dropdown-flutuante.visivel { display: block; }
+
+        .dropdown-flutuante-titulo {
+            padding: 11px 16px 8px;
+            color: #60a5fa;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            border-bottom: 1px solid rgba(37,99,235,0.15);
+        }
+
+        .dropdown-flutuante a {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 16px;
+            color: #94a3b8;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .dropdown-flutuante a:hover {
+            background: rgba(37, 99, 235, 0.14);
+            color: #e2e8f0;
+        }
+
+        /* ============================================================
+           MODAL DE CADASTRO / EDIÇÃO
+           ============================================================ */
+        .modal {
+            display: none; position: fixed; z-index: 1000;
+            left: 0; top: 0; width: 100%; height: 100%;
+            overflow: auto; background: rgba(5,14,34,0.82);
+            backdrop-filter: blur(3px);
+        }
+
+        .modal-content {
+            background: white; margin: 2% auto; padding: 0;
+            border-radius: 16px; width: 90%; max-width: 900px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            max-height: 90vh; overflow: hidden; display: flex; flex-direction: column;
+        }
+
+        .modal-header {
+            padding: 20px 28px; border-bottom: 2px solid #e2e8f0;
+            display: flex; justify-content: space-between; align-items: center;
+            background: linear-gradient(135deg, #f8faff, #eff6ff);
+        }
+
+        .form-title { color: #1e40af; font-size: 1.5em; margin: 0; font-weight: 700; }
+
+        .close { color: #94a3b8; font-size: 28px; font-weight: bold; cursor: pointer; line-height: 1; transition: color 0.2s; }
+        .close:hover { color: #1e293b; }
+
+        .tabs { display: flex; border-bottom: 2px solid #e2e8f0; background: #f8faff; }
+
+        .tab-button {
+            flex: 1; padding: 12px 12px; border: none; background: transparent;
+            cursor: pointer; font-size: 13px; font-weight: 600; color: #64748b; transition: all 0.25s;
+        }
+        .tab-button.active { background: white; color: #2563eb; border-bottom: 3px solid #2563eb; }
+        .tab-button:hover:not(.active) { background: #eff6ff; color: #1d4ed8; }
+
+        .modal-body { padding: 24px; overflow-y: auto; max-height: calc(90vh - 180px); }
+        .tab-content        { display: none; }
+        .tab-content.active { display: block; }
+
+        .form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin-bottom: 14px; }
+        .form-group { display: flex; flex-direction: column; }
+        .form-group label { margin-bottom: 5px; font-weight: 600; color: #334155; font-size: 13px; }
+
+        .form-group input,
+        .form-group select {
+            padding: 9px 12px; border: 2px solid #e2e8f0; border-radius: 7px;
+            font-size: 14px; transition: border-color 0.2s; font-family: inherit;
+        }
+        .form-group input:focus,
+        .form-group select:focus { outline: none; border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
+
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+        input[type="number"] { -moz-appearance: textfield; }
+
+        .checkbox-group { display: flex; align-items: center; gap: 10px; }
+        .checkbox-group input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; accent-color: #2563eb; }
+
+        .section-title {
+            color: #1e40af; font-size: 14px; font-weight: 700;
+            margin-top: 20px; margin-bottom: 14px;
+            padding-bottom: 6px; border-bottom: 1px solid #dbeafe;
+        }
+
+        .form-buttons {
+            display: flex; gap: 10px; justify-content: flex-end;
+            margin-top: 18px; padding-top: 18px; border-top: 2px solid #e2e8f0;
+        }
+
+        .btn-submit {
+            background: linear-gradient(135deg, #1d4ed8, #2563eb); color: white;
+            border: none; padding: 11px 26px; border-radius: 8px;
+            cursor: pointer; font-size: 14px; font-weight: 700; transition: all 0.2s;
+        }
+        .btn-submit:hover { background: linear-gradient(135deg, #1e40af, #1d4ed8); }
+
+        .btn-cancel {
+            background: #64748b; color: white; border: none;
+            padding: 11px 26px; border-radius: 8px;
+            cursor: pointer; font-size: 14px; font-weight: 600; transition: background 0.2s;
+        }
+        .btn-cancel:hover { background: #475569; }
+
+        /* ============================================================
+           MODAL DE AVISO
+           ============================================================ */
+        #modalAviso {
+            display: none; position: fixed; inset: 0;
+            background: rgba(0,0,0,0.7); z-index: 9999;
+            align-items: center; justify-content: center;
+        }
+        #modalAviso.visivel { display: flex; }
+
+        .modal-box {
+            background: #0d1f3c; border: 1px solid rgba(37,99,235,0.3);
+            border-radius: 14px; padding: 28px; max-width: 380px; width: 90%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+        }
+
+        .modal-box-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+        .modal-box-titulo { color: #60a5fa; font-size: 16px; font-weight: 600; }
+        .modal-box-fechar { color: #64748b; font-size: 22px; cursor: pointer; line-height: 1; transition: color 0.15s; }
+        .modal-box-fechar:hover { color: #e2e8f0; }
+        .modal-box-mensagem { color: #94a3b8; font-size: 14px; line-height: 1.6; margin-bottom: 20px; }
+
+        .modal-box-ok {
+            width: 100%; padding: 11px; background: #2563eb; color: white;
+            border: none; border-radius: 8px; font-size: 14px;
+            font-weight: 600; cursor: pointer; transition: background 0.2s;
+        }
+        .modal-box-ok:hover { background: #1e40af; }
     </style>
 </head>
 <body>
 
-    <!-- ============================================================
-         BARRA DE TOPO — identidade visual do menu-principal
-         ============================================================ -->
-    <div class="topbar">
-        <div class="topbar-brand">
-            <div class="topbar-icone">📦</div>
-            <div>
-                <div class="topbar-nome">SIRIUS <span>WEB</span></div>
-                <div class="topbar-modulo">Gestão de Produtos</div>
-            </div>
-        </div>
+<div class="app-layout">
 
-        <!-- Botão Voltar — agora aponta para menu-principal.html -->
-        <button class="btn-voltar" onclick="voltarPagina()">
-            ← Voltar ao Menu
+    <!-- ============================================================
+         SIDEBAR DE ÍCONES — compacta, exclusiva do módulo Produtos
+         ============================================================ -->
+    <aside class="sidebar-icones">
+
+        <!-- Ícone/logo do módulo -->
+        <div class="sidebar-modulo-logo" title="Gestão de Produtos">📦</div>
+
+        <div class="sidebar-divisor"></div>
+
+        <!-- Novo Produto -->
+        <button class="sidebar-btn"
+                data-tooltip="Novo Produto"
+                onclick="abrirModal()">
+            <span class="btn-icone">➕</span>
+            <span class="btn-label">Novo</span>
         </button>
+
+        <!-- Ordenação -->
+        <button class="sidebar-btn"
+                id="btnOrdenacao"
+                data-tooltip="Ordenação"
+                onclick="toggleDrop('dropOrdenacao', this)">
+            <span class="btn-icone">📊</span>
+            <span class="btn-label">Ordenar</span>
+        </button>
+
+        <!-- Filtros -->
+        <button class="sidebar-btn"
+                id="btnFiltros"
+                data-tooltip="Filtros"
+                onclick="toggleDrop('dropFiltros', this)">
+            <span class="btn-icone">🔍</span>
+            <span class="btn-label">Filtros</span>
+        </button>
+
+        <!-- Relatórios -->
+        <button class="sidebar-btn"
+                id="btnRelatorios"
+                data-tooltip="Relatórios"
+                onclick="toggleDrop('dropRelatorios', this)">
+            <span class="btn-icone">📄</span>
+            <span class="btn-label">Relat.</span>
+        </button>
+
+        <!-- Espaçador empurra Voltar para o rodapé -->
+        <div class="sidebar-spacer"></div>
+
+        <div class="sidebar-divisor"></div>
+
+        <!-- Voltar -->
+        <button class="sidebar-btn btn-voltar"
+                data-tooltip="Voltar ao Menu"
+                onclick="window.location.href='menu-principal.html'">
+            <span class="btn-icone">↩</span>
+            <span class="btn-label">Voltar</span>
+        </button>
+
+    </aside>
+
+    <!-- ============================================================
+         DROPDOWNS FLUTUANTES (surgem à direita da sidebar)
+         ============================================================ -->
+
+    <div id="dropOrdenacao" class="dropdown-flutuante">
+        <div class="dropdown-flutuante-titulo">📊 Ordenação</div>
+        <a href="#" onclick="aplicarOrdenacao('codigo');       fecharDropdowns(); return false;">🔢 Por Código</a>
+        <a href="#" onclick="aplicarOrdenacao('descricao');    fecharDropdowns(); return false;">📝 Por Descrição</a>
+        <a href="#" onclick="aplicarOrdenacao('data_criacao'); fecharDropdowns(); return false;">📅 Ordem de Inserção</a>
+        <a href="#" onclick="aplicarOrdenacao('ultimos');      fecharDropdowns(); return false;">⏱️ Últimos Lançamentos</a>
+    </div>
+
+    <div id="dropFiltros" class="dropdown-flutuante">
+        <div class="dropdown-flutuante-titulo">🔍 Filtros</div>
+        <a href="#" onclick="aplicarFiltro('codigo');         fecharDropdowns(); return false;">🔢 Por Código</a>
+        <a href="#" onclick="aplicarFiltro('descricao');      fecharDropdowns(); return false;">📝 Por Descrição</a>
+        <a href="#" onclick="aplicarFiltro('ean');            fecharDropdowns(); return false;">📊 Por EAN/Barras</a>
+        <a href="#" onclick="aplicarFiltro('estoque_zero');   fecharDropdowns(); return false;">⚠️ Estoque Zero</a>
+        <a href="#" onclick="aplicarFiltro('estoque_baixo'); fecharDropdowns(); return false;">📉 Abaixo do Mínimo</a>
+    </div>
+
+    <div id="dropRelatorios" class="dropdown-flutuante">
+        <div class="dropdown-flutuante-titulo">📄 Relatórios</div>
+        <a href="#" onclick="gerarRelatorio(); fecharDropdowns(); return false;">📊 Produtos sob Filtro</a>
     </div>
 
     <!-- ============================================================
-         CONTEÚDO PRINCIPAL
+         ÁREA PRINCIPAL
          ============================================================ -->
-    <div class="page-wrapper">
-        <div class="container">
+    <div class="main-area">
 
-            <h1>📦 Gestão de Produtos</h1>
-            <p class="subtitle">Cadastro e controle de estoque</p>
+        <!-- Barra de título -->
+        <div class="page-topbar">
+            <span class="page-titulo">📦 Gestão de Produtos</span>
+            <span class="page-subtitulo">/ Cadastro e controle de estoque</span>
+        </div>
 
-            <div class="btn-toolbar">
-                <button class="btn" onclick="abrirModal()">➕ Novo Produto</button>
+        <!-- Conteúdo -->
+        <div class="content-scroll">
+            <div class="card">
 
-                <div class="dropdown" onclick="toggleDropdown(event, this)">
-                    <button class="btn btn-ordenacao">📊 Ordenação</button>
-                    <div class="dropdown-content">
-                        <a href="#" onclick="aplicarOrdenacao('codigo')">🔢 Por Código</a>
-                        <a href="#" onclick="aplicarOrdenacao('descricao')">📝 Por Descrição</a>
-                        <a href="#" onclick="aplicarOrdenacao('data_criacao')">📅 Ordem de Inserção</a>
-                        <a href="#" onclick="aplicarOrdenacao('ultimos')">⏱️ Últimos Lançamentos</a>
-                    </div>
+                <div id="filtroAtivo" class="filtro-ativo" style="display:none;">
+                    <div><strong>Filtro ativo:</strong> <span id="textoFiltro"></span></div>
+                    <button class="btn-limpar-filtro" onclick="limparFiltro()">✖ Limpar</button>
                 </div>
 
-                <div class="dropdown" onclick="toggleDropdown(event, this)">
-                    <button class="btn btn-filtros">🔍 Filtros</button>
-                    <div class="dropdown-content">
-                        <a href="#" onclick="aplicarFiltro('codigo')">🔢 Por Código</a>
-                        <a href="#" onclick="aplicarFiltro('descricao')">📝 Por Descrição</a>
-                        <a href="#" onclick="aplicarFiltro('ean')">📊 Por EAN/Barras</a>
-                        <a href="#" onclick="aplicarFiltro('estoque_zero')">⚠️ Estoque Zero</a>
-                        <a href="#" onclick="aplicarFiltro('estoque_baixo')">📉 Estoque Abaixo do Mínimo</a>
-                    </div>
+                <div id="mensagem" class="mensagem"></div>
+                <div id="loading" class="loading" style="display:none;">Carregando produtos...</div>
+
+                <div id="tabelaContainer">
+                    <table id="tabelaProdutos">
+                        <thead>
+                            <tr>
+                                <th>Código</th>
+                                <th>Descrição</th>
+                                <th>Unidade</th>
+                                <th>Estoque</th>
+                                <th>Preço Custo</th>
+                                <th>Preço Venda</th>
+                                <th>Status</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbody"></tbody>
+                    </table>
                 </div>
 
-                <div class="dropdown" onclick="toggleDropdown(event, this)">
-                    <button class="btn btn-relatorio">📄 Relatórios</button>
-                    <div class="dropdown-content">
-                        <a href="#" onclick="gerarRelatorio()">📊 Produtos sob Filtro</a>
-                    </div>
+                <div class="pagination">
+                    <button id="btnPrev" onclick="mudarPagina(-1)">◀ Anterior</button>
+                    <span id="paginaInfo">Página 1 de 1</span>
+                    <button id="btnNext" onclick="mudarPagina(1)">Próximo ▶</button>
                 </div>
-            </div>
 
-            <div id="filtroAtivo" class="filtro-ativo" style="display:none;">
-                <div><strong>Filtro ativo:</strong> <span id="textoFiltro"></span></div>
-                <button class="btn-limpar-filtro" onclick="limparFiltro()">✖ Limpar</button>
-            </div>
-
-            <div id="mensagem" class="mensagem"></div>
-            <div id="loading" class="loading" style="display:none;">Carregando produtos...</div>
-
-            <div id="tabelaContainer">
-                <table id="tabelaProdutos">
-                    <thead>
-                        <tr>
-                            <th>Código</th>
-                            <th>Descrição</th>
-                            <th>Unidade</th>
-                            <th>Estoque</th>
-                            <th>Preço Custo</th>
-                            <th>Preço Venda</th>
-                            <th>Status</th>
-                            <th>Ações</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tbody"></tbody>
-                </table>
-            </div>
-
-            <div class="pagination">
-                <button id="btnPrev" onclick="mudarPagina(-1)">◀ Anterior</button>
-                <span id="paginaInfo">Página 1 de 1</span>
-                <button id="btnNext" onclick="mudarPagina(1)">Próximo ▶</button>
-            </div>
-
-        </div><!-- /.container -->
-    </div><!-- /.page-wrapper -->
-
-    <!-- ============================================================
-         MODAL DE CADASTRO / EDIÇÃO
-         ============================================================ -->
-    <div id="modal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 id="modalTitle" class="form-title">Novo Produto</h2>
-                <span class="close" onclick="fecharModal()">&times;</span>
-            </div>
-
-            <!-- Abas -->
-            <div class="tabs">
-                <button class="tab-button active" data-tab="basico"  onclick="mudarAba('basico')">📋 Dados Básicos</button>
-                <button class="tab-button"         data-tab="estoque" onclick="mudarAba('estoque')">📦 Estoque</button>
-                <button class="tab-button"         data-tab="fiscais" onclick="mudarAba('fiscais')">🧾 Dados Fiscais</button>
-                <button class="tab-button"         data-tab="config"  onclick="mudarAba('config')">⚙️ Configurações</button>
-            </div>
-
-            <div class="modal-body">
-                <form id="produtoForm" onsubmit="salvarProduto(event)">
-
-                    <!-- Aba: Dados Básicos -->
-                    <div id="tab-basico" class="tab-content active">
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label>Código *</label>
-                                <input type="text" id="codigo" required>
-                            </div>
-                            <div class="form-group">
-                                <label>Código de Barras (EAN-13)</label>
-                                <input type="text" id="ean" maxlength="13">
-                            </div>
-                        </div>
-
-                        <div class="form-row">
-                            <div class="form-group" style="grid-column: 1 / -1;">
-                                <label>Descrição *</label>
-                                <input type="text" id="descricao" required>
-                            </div>
-                        </div>
-
-                        <div class="form-row">
-                            <div class="form-group" style="grid-column: 1 / -1;">
-                                <label>Descrição Complementar</label>
-                                <input type="text" id="descricao_complemento">
-                            </div>
-                        </div>
-
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label>Unidade de Medida *</label>
-                                <select id="unidade_comercial" required>
-                                    <option value="">Selecione...</option>
-                                    <option value="UN">UN - Unidade</option>
-                                    <option value="CX">CX - Caixa</option>
-                                    <option value="KG">KG - Quilograma</option>
-                                    <option value="MT">MT - Metro</option>
-                                    <option value="LT">LT - Litro</option>
-                                    <option value="PC">PC - Peça</option>
-                                    <option value="PR">PR - Par</option>
-                                    <option value="PT">PT - Pacote</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label>Preço de Custo</label>
-                                <input type="number" id="custo" step="0.01" min="0">
-                            </div>
-                            <div class="form-group">
-                                <label>Preço de Venda *</label>
-                                <input type="number" id="valor_venda" step="0.01" min="0.01" required>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Aba: Estoque -->
-                    <div id="tab-estoque" class="tab-content">
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label>Estoque Atual (Somente Leitura)</label>
-                                <input type="number" id="saldo" step="0.001" min="0" placeholder="0,000"
-                                       readonly
-                                       style="background-color: #f1f5f9; cursor: not-allowed; color: #64748b;">
-                                <small style="color: #ef4444; font-size: 12px; display: block; margin-top: 4px;">
-                                    ⚠️ O saldo só pode ser alterado através de movimentações de estoque
-                                </small>
-                            </div>
-                        </div>
-
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label>Estoque Mínimo</label>
-                                <input type="number" id="estoque_minimo" step="0.01" min="0" value="0">
-                            </div>
-                            <div class="form-group">
-                                <label>Estoque Máximo</label>
-                                <input type="number" id="estoque_maximo" step="0.01" min="0" value="0">
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Aba: Dados Fiscais -->
-                    <div id="tab-fiscais" class="tab-content">
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label>NCM</label>
-                                <input type="text" id="ncm" maxlength="8">
-                            </div>
-                            <div class="form-group">
-                                <label>CEST</label>
-                                <input type="text" id="cest" maxlength="7">
-                            </div>
-                        </div>
-
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label>CFOP</label>
-                                <input type="text" id="cfop" maxlength="4">
-                            </div>
-                            <div class="form-group">
-                                <label>Origem da Mercadoria</label>
-                                <select id="origem">
-                                    <option value="">Selecione...</option>
-                                    <option value="0">0 - Nacional</option>
-                                    <option value="1">1 - Estrangeira (Importação Direta)</option>
-                                    <option value="2">2 - Estrangeira (Adquirida no Mercado Interno)</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <h3 class="section-title">ICMS</h3>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label>CST ICMS</label>
-                                <input type="text" id="cst_icms" maxlength="3">
-                            </div>
-                            <div class="form-group">
-                                <label>Alíquota ICMS (%)</label>
-                                <input type="number" id="aliq_icms" step="0.01" min="0" max="100">
-                            </div>
-                        </div>
-
-                        <h3 class="section-title">PIS</h3>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label>CST PIS</label>
-                                <input type="text" id="cst_pis" maxlength="2">
-                            </div>
-                            <div class="form-group">
-                                <label>Alíquota PIS (%)</label>
-                                <input type="number" id="aliq_pis" step="0.01" min="0" max="100">
-                            </div>
-                        </div>
-
-                        <h3 class="section-title">COFINS</h3>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label>CST COFINS</label>
-                                <input type="text" id="cst_cofins" maxlength="2">
-                            </div>
-                            <div class="form-group">
-                                <label>Alíquota COFINS (%)</label>
-                                <input type="number" id="aliq_cofins" step="0.01" min="0" max="100">
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Aba: Configurações -->
-                    <div id="tab-config" class="tab-content">
-                        <div class="form-row">
-                            <div class="form-group">
-                                <div class="checkbox-group">
-                                    <input type="checkbox" id="ativo" checked>
-                                    <label for="ativo">Produto Ativo</label>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="form-row">
-                            <div class="form-group">
-                                <div class="checkbox-group">
-                                    <input type="checkbox" id="ativo_pdv" checked>
-                                    <label for="ativo_pdv">Disponível no PDV</label>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Botões do Formulário -->
-                    <div class="form-buttons">
-                        <button type="button" class="btn-cancel" onclick="fecharModal()">Cancelar</button>
-                        <button type="submit" class="btn-submit">💾 Salvar Produto</button>
-                    </div>
-
-                </form>
             </div>
         </div>
     </div>
 
-    <script src="js/produtos.js"></script>
-    <script>
-        /**
-         * ✅ Botão Voltar — retorna para menu-principal.html
-         */
-        function voltarPagina() {
-            window.location.href = 'menu-principal.html';
+</div><!-- /.app-layout -->
+
+<!-- ============================================================
+     MODAL DE CADASTRO / EDIÇÃO
+     ============================================================ -->
+<div id="modal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 id="modalTitle" class="form-title">Novo Produto</h2>
+            <span class="close" onclick="fecharModal()">&times;</span>
+        </div>
+
+        <div class="tabs">
+            <button class="tab-button active" data-tab="basico"  onclick="mudarAba('basico')">📋 Dados Básicos</button>
+            <button class="tab-button"         data-tab="estoque" onclick="mudarAba('estoque')">📦 Estoque</button>
+            <button class="tab-button"         data-tab="fiscais" onclick="mudarAba('fiscais')">🧾 Dados Fiscais</button>
+            <button class="tab-button"         data-tab="config"  onclick="mudarAba('config')">⚙️ Configurações</button>
+        </div>
+
+        <div class="modal-body">
+            <form id="produtoForm" onsubmit="salvarProduto(event)">
+
+                <!-- Dados Básicos -->
+                <div id="tab-basico" class="tab-content active">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Código *</label>
+                            <input type="text" id="codigo" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Código de Barras (EAN-13)</label>
+                            <input type="text" id="ean" maxlength="13">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group" style="grid-column:1/-1;">
+                            <label>Descrição *</label>
+                            <input type="text" id="descricao" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group" style="grid-column:1/-1;">
+                            <label>Descrição Complementar</label>
+                            <input type="text" id="descricao_complemento">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Unidade de Medida *</label>
+                            <select id="unidade_comercial" required>
+                                <option value="">Selecione...</option>
+                                <option value="UN">UN - Unidade</option>
+                                <option value="CX">CX - Caixa</option>
+                                <option value="KG">KG - Quilograma</option>
+                                <option value="MT">MT - Metro</option>
+                                <option value="LT">LT - Litro</option>
+                                <option value="PC">PC - Peça</option>
+                                <option value="PR">PR - Par</option>
+                                <option value="PT">PT - Pacote</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Preço de Custo</label>
+                            <input type="number" id="custo" step="0.01" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label>Preço de Venda *</label>
+                            <input type="number" id="valor_venda" step="0.01" min="0.01" required>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Estoque -->
+                <div id="tab-estoque" class="tab-content">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Estoque Atual (Somente Leitura)</label>
+                            <input type="number" id="saldo" step="0.001" min="0" placeholder="0,000"
+                                   readonly style="background:#f1f5f9;cursor:not-allowed;color:#64748b;">
+                            <small style="color:#ef4444;font-size:12px;display:block;margin-top:4px;">
+                                ⚠️ O saldo só pode ser alterado através de movimentações de estoque
+                            </small>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Estoque Mínimo</label>
+                            <input type="number" id="estoque_minimo" step="0.01" min="0" value="0">
+                        </div>
+                        <div class="form-group">
+                            <label>Estoque Máximo</label>
+                            <input type="number" id="estoque_maximo" step="0.01" min="0" value="0">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dados Fiscais -->
+                <div id="tab-fiscais" class="tab-content">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>NCM</label>
+                            <input type="text" id="ncm" maxlength="8">
+                        </div>
+                        <div class="form-group">
+                            <label>CEST</label>
+                            <input type="text" id="cest" maxlength="7">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>CFOP</label>
+                            <input type="text" id="cfop" maxlength="4">
+                        </div>
+                        <div class="form-group">
+                            <label>Origem da Mercadoria</label>
+                            <select id="origem">
+                                <option value="">Selecione...</option>
+                                <option value="0">0 - Nacional</option>
+                                <option value="1">1 - Estrangeira (Importação Direta)</option>
+                                <option value="2">2 - Estrangeira (Adquirida no Mercado Interno)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <h3 class="section-title">ICMS</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>CST ICMS</label>
+                            <input type="text" id="cst_icms" maxlength="3">
+                        </div>
+                        <div class="form-group">
+                            <label>Alíquota ICMS (%)</label>
+                            <input type="number" id="aliq_icms" step="0.01" min="0" max="100">
+                        </div>
+                    </div>
+
+                    <h3 class="section-title">PIS</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>CST PIS</label>
+                            <input type="text" id="cst_pis" maxlength="2">
+                        </div>
+                        <div class="form-group">
+                            <label>Alíquota PIS (%)</label>
+                            <input type="number" id="aliq_pis" step="0.01" min="0" max="100">
+                        </div>
+                    </div>
+
+                    <h3 class="section-title">COFINS</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>CST COFINS</label>
+                            <input type="text" id="cst_cofins" maxlength="2">
+                        </div>
+                        <div class="form-group">
+                            <label>Alíquota COFINS (%)</label>
+                            <input type="number" id="aliq_cofins" step="0.01" min="0" max="100">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Configurações -->
+                <div id="tab-config" class="tab-content">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="ativo" checked>
+                                <label for="ativo">Produto Ativo</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="ativo_pdv" checked>
+                                <label for="ativo_pdv">Disponível no PDV</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-buttons">
+                    <button type="button" class="btn-cancel" onclick="fecharModal()">Cancelar</button>
+                    <button type="submit" class="btn-submit">💾 Salvar Produto</button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Aviso -->
+<div id="modalAviso">
+    <div class="modal-box">
+        <div class="modal-box-header">
+            <span class="modal-box-titulo">ℹ️ Informação</span>
+            <span class="modal-box-fechar" onclick="closeMessage()">&times;</span>
+        </div>
+        <p class="modal-box-mensagem" id="mensagemAviso"></p>
+        <button class="modal-box-ok" onclick="closeMessage()">OK</button>
+    </div>
+</div>
+
+<script src="js/produtos.js"></script>
+
+<script>
+    /* ============================================================
+       DROPDOWNS FLUTUANTES
+       ============================================================ */
+    const IDS_DROPS = ['dropOrdenacao', 'dropFiltros', 'dropRelatorios'];
+
+    /**
+     * Fecha todos os dropdowns flutuantes.
+     */
+    function fecharDropdowns() {
+        IDS_DROPS.forEach(id => {
+            document.getElementById(id).classList.remove('visivel');
+        });
+    }
+
+    /**
+     * Abre/fecha o dropdown especificado, posicionando-o
+     * na mesma altura do botão que o acionou.
+     */
+    function toggleDrop(idDrop, btnEl) {
+        const drop   = document.getElementById(idDrop);
+        const aberto = drop.classList.contains('visivel');
+
+        fecharDropdowns(); // fecha qualquer outro aberto
+
+        if (aberto) return; // clique duplo = fecha
+
+        // Posiciona verticalmente alinhado ao botão
+        const rect   = btnEl.getBoundingClientRect();
+        const maxTop = window.innerHeight - 220; // garante que caiba na tela
+        drop.style.top = Math.min(rect.top, maxTop) + 'px';
+        drop.classList.add('visivel');
+    }
+
+    // Fecha ao clicar fora da sidebar ou do dropdown
+    document.addEventListener('click', function (e) {
+        if (!e.target.closest('.sidebar-icones') &&
+            !e.target.closest('.dropdown-flutuante')) {
+            fecharDropdowns();
         }
-    </script>
+    });
+
+    /* ============================================================
+       MODAL DE AVISO
+       ============================================================ */
+    function showMessage(msg) {
+        document.getElementById('mensagemAviso').textContent = msg;
+        document.getElementById('modalAviso').classList.add('visivel');
+    }
+
+    function closeMessage() {
+        document.getElementById('modalAviso').classList.remove('visivel');
+    }
+
+    document.getElementById('modalAviso').addEventListener('click', function (e) {
+        if (e.target === this) closeMessage();
+    });
+
+    console.log('✅ Produtos | Sidebar ícones compacta | SIRIUS WEB');
+</script>
 </body>
 </html>

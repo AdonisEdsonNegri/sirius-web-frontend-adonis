@@ -96,12 +96,77 @@
         #overlay-final.ativo {
             opacity: 1;
         }
+
+        /* =============================================
+           BOTÃO FALE CONOSCO (documento pai)
+           Fica por cima do iframe — clicável sempre
+           ============================================= */
+        #btn-fale-conosco {
+            position: fixed;
+            bottom: 32px;
+            right: 10vw;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 30px;
+            background: transparent;
+            border: 1px solid rgba(37, 99, 235, 0.6);
+            border-radius: 40px;
+            color: #c8d6e8;
+            font-family: 'Segoe UI', sans-serif;
+            font-weight: 700;
+            font-size: 13px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            text-decoration: none;
+            cursor: pointer;
+            z-index: 9998;
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+
+        #btn-fale-conosco::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, #2563eb, #00e5a0);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            border-radius: 40px;
+        }
+
+        #btn-fale-conosco:hover::before { opacity: 1; }
+
+        #btn-fale-conosco span { position: relative; z-index: 1; }
+
+        #btn-fale-conosco:hover {
+            color: white;
+            border-color: transparent;
+            box-shadow: 0 0 20px rgba(37,99,235,0.5), 0 0 60px rgba(0,229,160,0.15);
+        }
+
+        .seta-btn {
+            position: relative;
+            z-index: 1;
+            transition: transform 0.3s ease;
+        }
+
+        #btn-fale-conosco:hover .seta-btn { transform: translateX(4px); }
     </style>
 </head>
 <body>
 
     <!-- Barra de progresso global -->
     <div id="barra-progresso"></div>
+
+    <!-- Botão Fale Conosco — no documento pai, sempre clicável -->
+    <a id="btn-fale-conosco"
+       href="https://www.softclever.com.br"
+       target="_blank"
+       onclick="event.stopPropagation()">
+        <span>Fale Conosco</span>
+        <span class="seta-btn">→</span>
+    </a>
 
     <!-- Iframe onde cada tela é exibida -->
     <iframe id="frame-promo" src="" title="Apresentação SIRIUS WEB"></iframe>
@@ -119,16 +184,16 @@
 
     // Pool completo de telas disponíveis
     const TODAS_AS_TELAS = [
-        'promo-nfe.html',
-        'promo-nfce.html',
-        'promo-sped.html',
-        'promo-mdfe.html',
-        'promo-cte.html',
+        'promo-comandas.html',
+        'promo-delivery.html',
+        'promo-NFCe.html',
+        'promo-NFe.html',
+        'promo-compras.html',
         'promo-financeiro.html',
         'promo-xml.html',
-        'promo-producao.html',
-        'promo-forca-vendas.html',
-        'promo-erp.html'
+        'promo-estoque.html',
+        'promo-controle-de-caixa.html',
+        'promo-comissoes.html'
     ];
 
     const QTDE_TELAS      = 4;       // quantas telas exibir por sessão
