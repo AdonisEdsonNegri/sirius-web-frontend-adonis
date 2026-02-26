@@ -26,8 +26,7 @@
             border: none;
             opacity: 0;
             transition: opacity 0.35s ease;
-            /* Impedir que o iframe capture cliques e
-               redirecione para o site antes da hora */
+            /* Impedir que o iframe capture cliques */
             pointer-events: none;
         }
 
@@ -98,60 +97,20 @@
         }
 
         /* =============================================
-           BOTÃO FALE CONOSCO (documento pai)
-           Fica por cima do iframe — clicável sempre
+           ZONA CLICÁVEL "FALE CONOSCO"
+           Área transparente sobre o botão do iframe.
+           Fica z-index alto para capturar o clique
+           sem mostrar nada visualmente.
            ============================================= */
-        #btn-fale-conosco {
+        #zona-fale {
             position: fixed;
-            bottom: 32px;
-            right: 10vw;
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            padding: 12px 30px;
-            background: transparent;
-            border: 1px solid rgba(37, 99, 235, 0.6);
-            border-radius: 40px;
-            color: #c8d6e8;
-            font-family: 'Segoe UI', sans-serif;
-            font-weight: 700;
-            font-size: 13px;
-            letter-spacing: 3px;
-            text-transform: uppercase;
-            text-decoration: none;
-            cursor: pointer;
+            bottom: 0;
+            right: 0;
+            width: 280px;   /* cobre a largura do btn-fale nas telas promo */
+            height: 80px;   /* cobre a altura do rodapé */
             z-index: 9998;
-            transition: all 0.3s ease;
-            overflow: hidden;
+            cursor: pointer;
         }
-
-        #btn-fale-conosco::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(135deg, #2563eb, #00e5a0);
-            opacity: 0;
-            transition: opacity 0.3s ease;
-            border-radius: 40px;
-        }
-
-        #btn-fale-conosco:hover::before { opacity: 1; }
-
-        #btn-fale-conosco span { position: relative; z-index: 1; }
-
-        #btn-fale-conosco:hover {
-            color: white;
-            border-color: transparent;
-            box-shadow: 0 0 20px rgba(37,99,235,0.5), 0 0 60px rgba(0,229,160,0.15);
-        }
-
-        .seta-btn {
-            position: relative;
-            z-index: 1;
-            transition: transform 0.3s ease;
-        }
-
-        #btn-fale-conosco:hover .seta-btn { transform: translateX(4px); }
     </style>
 </head>
 <body>
@@ -159,17 +118,11 @@
     <!-- Barra de progresso global -->
     <div id="barra-progresso"></div>
 
-    <!-- Botão Fale Conosco — no documento pai, sempre clicável -->
-    <a id="btn-fale-conosco"
-       href="https://www.softclever.com.br"
-       target="_blank"
-       onclick="event.stopPropagation()">
-        <span>Fale Conosco</span>
-        <span class="seta-btn">→</span>
-    </a>
-
     <!-- Iframe onde cada tela é exibida -->
     <iframe id="frame-promo" src="" title="Apresentação SIRIUS WEB"></iframe>
+
+    <!-- Zona transparente clicável sobre o botão "Fale Conosco" das telas promo -->
+    <div id="zona-fale" title="Fale Conosco - Soft Clever Informática"></div>
 
     <!-- Bolinhas indicadoras de passo -->
     <div id="indicadores"></div>
@@ -196,16 +149,17 @@
         'promo-comissoes.html'
     ];
 
-    const QTDE_TELAS      = 4;       // quantas telas exibir por sessão
-    const DURACAO_MS      = 3000;    // duração de cada tela em milissegundos
-    const FADE_MS         = 350;     // duração do fade entre telas (ms)
-    const DESTINO_FINAL   = 'login.html';  // para onde redirecionar ao final
+    const QTDE_TELAS    = 4;              // quantas telas exibir por sessão
+    const DURACAO_MS    = 3000;           // duração de cada tela em ms
+    const FADE_MS       = 350;            // duração do fade entre telas (ms)
+    const DESTINO_FINAL = 'login.html';   // para onde redirecionar ao final
+    const SITE_URL      = 'https://www.softclever.com.br';
 
     /* ============================================================
-       SORTEAR 4 TELAS SEM REPETIÇÃO
+       SORTEAR TELAS SEM REPETIÇÃO
        ============================================================ */
     function sortearTelas(pool, qtde) {
-        const copia = [...pool];
+        const copia    = [...pool];
         const sorteadas = [];
         for (let i = 0; i < qtde && copia.length > 0; i++) {
             const idx = Math.floor(Math.random() * copia.length);
@@ -223,7 +177,7 @@
         for (let i = 0; i < qtde; i++) {
             const dot = document.createElement('div');
             dot.className = 'dot';
-            dot.id = `dot-${i}`;
+            dot.id        = `dot-${i}`;
             container.appendChild(dot);
         }
     }
@@ -232,7 +186,7 @@
         for (let i = 0; i < QTDE_TELAS; i++) {
             const dot = document.getElementById(`dot-${i}`);
             dot.className = 'dot';
-            if (i < passo)  dot.classList.add('concluido');
+            if (i < passo)   dot.classList.add('concluido');
             if (i === passo) dot.classList.add('ativo');
         }
     }
@@ -242,19 +196,14 @@
        ============================================================ */
     function animarBarra(passoAtual, totalPassos, duracaoMs) {
         const barra = document.getElementById('barra-progresso');
-        const porcentagemInicio = (passoAtual / totalPassos) * 100;
-        const porcentagemFim    = ((passoAtual + 1) / totalPassos) * 100;
+        const ini   = (passoAtual / totalPassos) * 100;
+        const fim   = ((passoAtual + 1) / totalPassos) * 100;
 
-        // Começar no ponto atual
         barra.style.transition = 'none';
-        barra.style.width      = porcentagemInicio + '%';
-
-        // Forçar reflow para a transição funcionar
-        barra.getBoundingClientRect();
-
-        // Animar até o próximo ponto na duração da tela
+        barra.style.width      = ini + '%';
+        barra.getBoundingClientRect(); // forçar reflow
         barra.style.transition = `width ${duracaoMs}ms linear`;
-        barra.style.width      = porcentagemFim + '%';
+        barra.style.width      = fim + '%';
     }
 
     /* ============================================================
@@ -270,36 +219,30 @@
 
     function exibirTela(indice) {
         if (indice >= telasSorteadas.length) {
-            // ✅ Todas as telas exibidas → redirecionar para o login
             encerrar();
             return;
         }
 
         const arquivo = telasSorteadas[indice];
 
-        // Fade OUT do iframe atual
+        // Fade OUT
         frame.classList.remove('visivel');
 
         setTimeout(() => {
-            // Trocar o src enquanto está invisível
             frame.src = arquivo;
 
-            // Atualizar indicadores e barra
             atualizarIndicadores(indice);
             animarBarra(indice, QTDE_TELAS, DURACAO_MS);
 
-            // Aguardar o carregamento do iframe e então fazer fade IN
             frame.onload = () => {
                 frame.classList.add('visivel');
-
-                // Aguardar a duração da tela e avançar
                 setTimeout(() => {
                     passoAtual++;
                     exibirTela(passoAtual);
                 }, DURACAO_MS);
             };
 
-            // Fallback: se o onload demorar mais de 500ms, avançar mesmo assim
+            // Fallback: se onload demorar mais de 500ms
             setTimeout(() => {
                 if (!frame.classList.contains('visivel')) {
                     frame.classList.add('visivel');
@@ -314,32 +257,33 @@
     }
 
     function encerrar() {
-        // Fade para escuro antes de ir ao login
         frame.classList.remove('visivel');
         overlayFinal.classList.add('ativo');
-
-        setTimeout(() => {
-            window.location.href = DESTINO_FINAL;
-        }, 550);
+        setTimeout(() => { window.location.href = DESTINO_FINAL; }, 550);
     }
 
-    // ✅ Iniciar após um breve delay para a página terminar de carregar
-    setTimeout(() => {
-        exibirTela(0);
-    }, 100);
+    // Iniciar
+    setTimeout(() => { exibirTela(0); }, 100);
 
     /* ============================================================
-       ATALHO: qualquer clique avança para o próximo
-       (mantém a consistência com o comportamento das telas promo)
+       ZONA "FALE CONOSCO" — abre o site sem avançar o slide
+       ============================================================ */
+    document.getElementById('zona-fale').addEventListener('click', function(e) {
+        e.stopPropagation(); // não avança o slide
+        window.open(SITE_URL, '_blank');
+    });
+
+    /* ============================================================
+       CLIQUE GERAL — avança para o próximo slide
+       (o stopPropagation da zona-fale garante que ela não chegue aqui)
        ============================================================ */
     document.addEventListener('click', () => {
-        // Cancelar o temporizador atual e avançar imediatamente
         passoAtual++;
         exibirTela(passoAtual);
     });
 
     /* ============================================================
-       ATALHO: tecla ESC ou Enter pula direto para o login
+       ATALHOS DE TECLADO
        ============================================================ */
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape' || e.key === 'Enter') {
@@ -350,3 +294,4 @@
 
 </body>
 </html>
+

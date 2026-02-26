@@ -5,548 +5,519 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SIRIUS WEB - Movimentações de Estoque</title>
     <style>
-        * {
+        /* ============================================================
+           RESET E BASE
+           ============================================================ */
+        *, *::before, *::after {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
-            background: #f9fafb;
-        }
-
-        /* Header */
-        .header {
-            background: #2563eb;
-            color: white;
-            padding: 16px 24px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-
-        .header-content {
-            max-width: 1400px;
-            margin: 0 auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .header h1 {
-            font-size: 24px;
-        }
-
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
-
-        .btn-logout {
-            padding: 8px 16px;
-            background: rgba(255,255,255,0.2);
-            border: 1px solid rgba(255,255,255,0.3);
-            color: white;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 14px;
-            transition: all 0.2s;
-        }
-
-        .btn-logout:hover {
-            background: rgba(255,255,255,0.3);
-        }
-
-        /* Navigation */
-        .nav {
-            background: white;
-            border-bottom: 1px solid #e5e7eb;
-        }
-
-        .nav-content {
-            max-width: 1400px;
-            margin: 0 auto;
-            display: flex;
-            gap: 8px;
-            padding: 0 24px;
-        }
-
-        .nav a {
-            padding: 16px 20px;
-            color: #6b7280;
-            text-decoration: none;
-            font-weight: 500;
-            border-bottom: 3px solid transparent;
-            transition: all 0.2s;
-        }
-
-        .nav a:hover {
-            color: #2563eb;
-            background: #f9fafb;
-        }
-
-        .nav a.active {
-            color: #2563eb;
-            border-bottom-color: #2563eb;
-        }
-
-        /* Container */
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 24px;
-        }
-
-        /* Breadcrumb */
-        .breadcrumb {
-            padding: 16px 0;
-            color: #6b7280;
-            font-size: 14px;
-        }
-
-        .breadcrumb a {
-            color: #2563eb;
-            text-decoration: none;
-        }
-
-        .breadcrumb a:hover {
-            text-decoration: underline;
-        }
-
-        /* Produto Info Box */
-        .produto-info-box {
-            background: white;
-            border-radius: 12px;
-            padding: 20px 24px;
-            margin-bottom: 24px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .produto-info h2 {
-            font-size: 20px;
-            color: #1f2937;
-            margin-bottom: 4px;
-        }
-
-        .produto-info .saldo {
-            font-size: 14px;
-            color: #6b7280;
-        }
-
-        .produto-info .saldo-valor {
-            font-weight: 700;
-            color: #059669;
-            font-size: 16px;
-        }
-
-        /* Toolbar */
-        .toolbar {
-            background: white;
-            border-radius: 12px;
-            padding: 16px 24px;
-            margin-bottom: 24px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-            display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
-            align-items: center;
-        }
-
-        .btn {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .btn-primary {
-            background: #2563eb;
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background: #1e40af;
-        }
-
-        .btn-success {
-            background: #059669;
-            color: white;
-        }
-
-        .btn-success:hover {
-            background: #047857;
-        }
-
-        .btn-danger {
-            background: #dc2626;
-            color: white;
-        }
-
-        .btn-danger:hover {
-            background: #b91c1c;
-        }
-
-        .btn-secondary {
-            background: #6b7280;
-            color: white;
-        }
-
-        .btn-secondary:hover {
-            background: #4b5563;
-        }
-
-        .dropdown {
-            position: relative;
-            display: inline-block;
-        }
-
-        .dropdown-toggle {
-            padding: 10px 20px;
-            background: #2563eb;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .dropdown-menu {
-            display: none;
-            position: absolute;
-            top: 100%;
-            left: 0;
-            margin-top: 4px;
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            z-index: 100;
-            min-width: 180px;
-        }
-
-        .dropdown-menu.show {
-            display: block;
-        }
-
-        .dropdown-menu button {
-            display: block;
-            width: 100%;
-            padding: 12px 16px;
-            border: none;
-            background: none;
-            text-align: left;
-            cursor: pointer;
-            font-size: 14px;
-            color: #1f2937;
-            transition: background 0.2s;
-        }
-
-        .dropdown-menu button:first-child {
-            border-radius: 8px 8px 0 0;
-        }
-
-        .dropdown-menu button:last-child {
-            border-radius: 0 0 8px 8px;
-        }
-
-        .dropdown-menu button:hover {
-            background: #f3f4f6;
-        }
-
-        /* View Toggle */
-        .view-toggle {
-            display: flex;
-            gap: 4px;
-            background: #f3f4f6;
-            padding: 4px;
-            border-radius: 8px;
-        }
-
-        .view-btn {
-            padding: 8px 16px;
-            border: none;
-            background: transparent;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 14px;
-            color: #6b7280;
-            transition: all 0.2s;
-        }
-
-        .view-btn.active {
-            background: white;
-            color: #2563eb;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        }
-
-        /* Table */
-        .table-container {
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        html, body {
+            height: 100%;
+            font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+            background: #050e22;
             overflow: hidden;
         }
 
+        /* ============================================================
+           LAYOUT: SIDEBAR ÍCONES + ÁREA PRINCIPAL
+           ============================================================ */
+        .app-layout {
+            display: flex;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        /* ============================================================
+           SIDEBAR DE ÍCONES — padrão idêntico ao produtos.html
+           ============================================================ */
+        .sidebar-icones {
+            width: 80px;
+            min-width: 80px;
+            background: linear-gradient(180deg, #0a1628 0%, #0d1f3c 60%, #0a1628 100%);
+            border-right: 1px solid rgba(37, 99, 235, 0.25);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 16px 0 12px;
+            position: relative;
+            z-index: 10;
+            box-shadow: 4px 0 20px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Linha decorativa lateral */
+        .sidebar-icones::after {
+            content: '';
+            position: absolute;
+            top: 0; right: 0;
+            width: 2px;
+            height: 100%;
+            background: linear-gradient(180deg,
+                transparent 0%,
+                #2563eb 25%,
+                #00e5a0 50%,
+                #2563eb 75%,
+                transparent 100%
+            );
+            opacity: 0.5;
+        }
+
+        /* Logo do módulo no topo */
+        .sidebar-modulo-logo {
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, #2563eb, #1e40af);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            box-shadow: 0 0 16px rgba(37, 99, 235, 0.5);
+            margin-bottom: 10px;
+            flex-shrink: 0;
+        }
+
+        /* Divisor horizontal */
+        .sidebar-divisor {
+            width: 40px;
+            height: 1px;
+            background: rgba(255, 255, 255, 0.07);
+            margin: 6px 0;
+            flex-shrink: 0;
+        }
+
+        /* Empurra o botão Voltar para o rodapé */
+        .sidebar-spacer { flex: 1; }
+
+        /* ---- Botão de ação da sidebar ---- */
+        .sidebar-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            width: 64px;
+            padding: 10px 4px;
+            border-radius: 12px;
+            border: 1px solid transparent;
+            background: transparent;
+            color: #64748b;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            position: relative;
+            flex-shrink: 0;
+            margin-bottom: 2px;
+        }
+
+        .sidebar-btn:hover {
+            background: rgba(37, 99, 235, 0.14);
+            color: #93c5fd;
+            border-color: rgba(37, 99, 235, 0.25);
+        }
+
+        .sidebar-btn.ativo {
+            background: rgba(37, 99, 235, 0.20);
+            color: #60a5fa;
+            border-color: rgba(37, 99, 235, 0.35);
+        }
+
+        /* Ícone */
+        .btn-icone { font-size: 20px; line-height: 1; }
+
+        /* Rótulo */
+        .btn-label {
+            font-size: 9px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            text-align: center;
+            line-height: 1.2;
+            white-space: nowrap;
+        }
+
+        /* Botão Voltar */
+        .sidebar-btn.btn-voltar {
+            color: #475569;
+            margin-top: 4px;
+        }
+        .sidebar-btn.btn-voltar:hover {
+            background: rgba(148, 163, 184, 0.10);
+            color: #94a3b8;
+            border-color: rgba(148, 163, 184, 0.18);
+        }
+
+        /* ---- Tooltip ao hover ---- */
+        .sidebar-btn::before {
+            content: attr(data-tooltip);
+            position: absolute;
+            left: calc(100% + 14px);
+            top: 50%;
+            transform: translateY(-50%);
+            background: #0d1f3c;
+            color: #e2e8f0;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 6px 12px;
+            border-radius: 8px;
+            border: 1px solid rgba(37, 99, 235, 0.3);
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.15s ease;
+            z-index: 300;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45);
+        }
+
+        /* Seta do tooltip */
+        .sidebar-btn::after {
+            content: '';
+            position: absolute;
+            left: calc(100% + 7px);
+            top: 50%;
+            transform: translateY(-50%);
+            border: 5px solid transparent;
+            border-right-color: rgba(37, 99, 235, 0.3);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.15s ease;
+            z-index: 300;
+        }
+
+        .sidebar-btn:hover::before,
+        .sidebar-btn:hover::after { opacity: 1; }
+
+        /* ============================================================
+           ÁREA PRINCIPAL
+           ============================================================ */
+        .main-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            background: linear-gradient(160deg, #071122 0%, #0a1628 100%);
+        }
+
+        /* Barra de título */
+        .page-topbar {
+            padding: 15px 22px 13px;
+            border-bottom: 1px solid rgba(37, 99, 235, 0.12);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-shrink: 0;
+            background: rgba(10, 22, 40, 0.55);
+            flex-wrap: wrap;
+        }
+
+        .page-titulo {
+            color: #e2e8f0;
+            font-size: 17px;
+            font-weight: 700;
+            letter-spacing: 0.4px;
+        }
+
+        .page-subtitulo {
+            color: #475569;
+            font-size: 12px;
+            letter-spacing: 0.6px;
+        }
+
+        /* Badge do produto atual (saldo) */
+        .badge-saldo {
+            margin-left: auto;
+            background: rgba(5, 150, 105, 0.15);
+            border: 1px solid rgba(5, 150, 105, 0.3);
+            color: #34d399;
+            border-radius: 20px;
+            padding: 4px 14px;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+        }
+
+        /* Área de scroll */
+        .content-scroll {
+            flex: 1;
+            overflow-y: auto;
+            padding: 18px 22px 30px;
+        }
+
+        .content-scroll::-webkit-scrollbar { width: 5px; }
+        .content-scroll::-webkit-scrollbar-track { background: transparent; }
+        .content-scroll::-webkit-scrollbar-thumb { background: rgba(37,99,235,0.3); border-radius: 4px; }
+
+        /* Card branco */
+        .card {
+            background: #ffffff;
+            border-radius: 14px;
+            padding: 0;
+            box-shadow:
+                0 8px 32px rgba(0, 0, 0, 0.5),
+                0 0 0 1px rgba(37, 99, 235, 0.08);
+            overflow: hidden;
+        }
+
+        /* ============================================================
+           TABELA
+           ============================================================ */
         table {
             width: 100%;
             border-collapse: collapse;
         }
 
         thead {
-            background: #f9fafb;
-            border-bottom: 2px solid #e5e7eb;
+            background: linear-gradient(135deg, #1e40af 0%, #2563eb 100%);
+            color: white;
         }
 
         th {
-            padding: 16px;
+            padding: 13px 12px;
             text-align: left;
-            font-size: 12px;
-            font-weight: 600;
-            color: #6b7280;
+            font-size: 11px;
+            font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.8px;
         }
+
+        th.right { text-align: right; }
 
         td {
-            padding: 16px;
-            border-bottom: 1px solid #e5e7eb;
+            padding: 13px 12px;
+            border-bottom: 1px solid #f1f5f9;
             color: #1f2937;
-            font-size: 14px;
+            font-size: 13px;
         }
 
-        tbody tr:hover {
-            background: #f9fafb;
-            cursor: pointer;
-        }
+        td.right { text-align: right; }
 
-        tbody tr:last-child td {
-            border-bottom: none;
-        }
+        tbody tr { transition: background 0.18s; }
+        tbody tr:hover { background: #f8faff; cursor: pointer; }
+        tbody tr:last-child td { border-bottom: none; }
 
-        /* Badge */
-        .badge {
+        /* Badges de tipo */
+        .badge-tipo {
             display: inline-block;
             padding: 4px 12px;
             border-radius: 12px;
-            font-size: 12px;
-            font-weight: 600;
+            font-size: 11px;
+            font-weight: 700;
         }
 
-        .badge-entrada {
-            background: #d1fae5;
-            color: #065f46;
-        }
+        .badge-entrada { background: #d1fae5; color: #065f46; }
+        .badge-saida   { background: #fee2e2; color: #991b1b; }
 
-        .badge-saida {
-            background: #fee2e2;
-            color: #991b1b;
-        }
+        /* ============================================================
+           DETAIL VIEW (cartões)
+           ============================================================ */
+        .detail-view { display: none; padding: 20px; }
+        .detail-view.active { display: block; }
 
-        /* Detail View */
-        .detail-view {
-            display: none;
-        }
-
-        .detail-view.active {
-            display: block;
-        }
-
-        .detail-cards {
-            display: grid;
-            gap: 16px;
-        }
+        .detail-cards { display: grid; gap: 14px; }
 
         .detail-card {
             background: white;
-            border-radius: 12px;
-            padding: 20px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            border-radius: 10px;
+            padding: 18px 20px;
             border-left: 4px solid #2563eb;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.06);
         }
-
-        .detail-card.entrada {
-            border-left-color: #059669;
-        }
-
-        .detail-card.saida {
-            border-left-color: #dc2626;
-        }
+        .detail-card.entrada { border-left-color: #059669; }
+        .detail-card.saida   { border-left-color: #dc2626; }
 
         .detail-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 16px;
+            margin-bottom: 14px;
         }
 
-        .detail-title {
-            font-size: 16px;
-            font-weight: 600;
-            color: #1f2937;
-        }
+        .detail-title { font-size: 15px; font-weight: 600; color: #1f2937; }
 
         .detail-info {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 12px;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 10px;
         }
 
-        .detail-field {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
+        .detail-field { display: flex; flex-direction: column; gap: 3px; }
+        .detail-label { font-size: 11px; color: #6b7280; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+        .detail-value { font-size: 13px; color: #1f2937; }
 
-        .detail-label {
-            font-size: 12px;
-            color: #6b7280;
-            font-weight: 500;
-        }
-
-        .detail-value {
-            font-size: 14px;
-            color: #1f2937;
-        }
-
-        /* Pagination */
+        /* ============================================================
+           PAGINAÇÃO
+           ============================================================ */
         .pagination {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 20px 24px;
+            padding: 16px 20px;
             background: white;
-            border-top: 1px solid #e5e7eb;
+            border-top: 1px solid #f1f5f9;
         }
 
-        .pagination-info {
-            font-size: 14px;
-            color: #6b7280;
-        }
+        .pagination-info { font-size: 13px; color: #6b7280; }
 
-        .pagination-buttons {
-            display: flex;
-            gap: 8px;
-        }
+        .pagination-buttons { display: flex; gap: 8px; }
 
         .pagination-buttons button {
-            padding: 8px 16px;
+            padding: 7px 14px;
             border: 1px solid #d1d5db;
             background: white;
             border-radius: 6px;
             cursor: pointer;
-            font-size: 14px;
+            font-size: 13px;
             color: #374151;
             transition: all 0.2s;
         }
+        .pagination-buttons button:hover:not(:disabled) { background: #f0f4ff; border-color: #2563eb; color: #2563eb; }
+        .pagination-buttons button:disabled { opacity: 0.4; cursor: not-allowed; }
+        .pagination-buttons button.active { background: #2563eb; color: white; border-color: #2563eb; }
 
-        .pagination-buttons button:hover:not(:disabled) {
-            background: #f9fafb;
-            border-color: #9ca3af;
+        /* ============================================================
+           LOADING / EMPTY STATE
+           ============================================================ */
+        .loading, .empty-state {
+            text-align: center;
+            padding: 48px;
+            color: #6b7280;
+            font-size: 14px;
         }
 
-        .pagination-buttons button:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
+        .empty-state-icon { font-size: 48px; margin-bottom: 14px; }
+
+        /* ============================================================
+           DROPDOWNS FLUTUANTES (mesmo padrão do produtos.html)
+           ============================================================ */
+        .dropdown-flutuante {
+            display: none;
+            position: fixed;
+            left: 92px;
+            background: #0d1f3c;
+            border: 1px solid rgba(37, 99, 235, 0.3);
+            border-radius: 12px;
+            min-width: 210px;
+            box-shadow: 0 8px 28px rgba(0, 0, 0, 0.55);
+            z-index: 500;
+            overflow: hidden;
+            animation: fadeSlide 0.15s ease;
         }
 
-        .pagination-buttons button.active {
-            background: #2563eb;
-            color: white;
-            border-color: #2563eb;
+        @keyframes fadeSlide {
+            from { opacity: 0; transform: translateX(-8px); }
+            to   { opacity: 1; transform: translateX(0); }
         }
 
-        /* Modal */
+        .dropdown-flutuante.visivel { display: block; }
+
+        .dropdown-flutuante-titulo {
+            padding: 11px 16px 8px;
+            color: #60a5fa;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            border-bottom: 1px solid rgba(37,99,235,0.15);
+        }
+
+        .dropdown-flutuante a {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 16px;
+            color: #94a3b8;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .dropdown-flutuante a:hover {
+            background: rgba(37, 99, 235, 0.14);
+            color: #e2e8f0;
+        }
+
+        /* ============================================================
+           MODAL DE MOVIMENTAÇÃO
+           ============================================================ */
         .modal {
             display: none;
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
+            inset: 0;
+            background: rgba(5, 14, 34, 0.82);
+            backdrop-filter: blur(3px);
             z-index: 1000;
             align-items: center;
             justify-content: center;
         }
 
-        .modal.show {
-            display: flex;
-        }
+        .modal.show { display: flex; }
 
         .modal-content {
             background: white;
-            border-radius: 12px;
+            border-radius: 16px;
             width: 90%;
-            max-width: 500px;
-            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.3);
+            max-width: 480px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
         }
 
         .modal-header {
-            padding: 24px 24px 16px 24px;
-            border-bottom: 1px solid #e5e7eb;
+            padding: 22px 24px 16px;
+            border-bottom: 2px solid #e2e8f0;
+            background: linear-gradient(135deg, #f8faff, #eff6ff);
         }
 
         .modal-title {
-            font-size: 20px;
-            font-weight: 600;
-            color: #1f2937;
+            font-size: 18px;
+            font-weight: 700;
+            color: #1e40af;
         }
 
-        .modal-body {
-            padding: 24px;
-        }
+        .modal-body { padding: 22px 24px; }
 
         .modal-produto-info {
-            background: #f9fafb;
-            padding: 16px;
+            background: #f0f4ff;
+            border: 1px solid #dbeafe;
+            padding: 14px 16px;
             border-radius: 8px;
-            margin-bottom: 20px;
+            margin-bottom: 18px;
         }
 
         .modal-produto-info h4 {
-            font-size: 14px;
+            font-size: 11px;
+            font-weight: 700;
             color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
             margin-bottom: 4px;
         }
 
-        .modal-produto-info p {
-            font-size: 16px;
-            color: #1f2937;
-            font-weight: 500;
-        }
+        .modal-produto-info p { font-size: 15px; color: #1f2937; font-weight: 500; }
 
-        .form-group {
-            margin-bottom: 20px;
-        }
+        .form-group { margin-bottom: 18px; }
 
         .form-group label {
             display: block;
-            font-size: 14px;
-            font-weight: 500;
-            color: #374151;
-            margin-bottom: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #334155;
+            margin-bottom: 7px;
         }
 
         .form-group input,
         .form-group textarea {
             width: 100%;
-            padding: 12px;
-            border: 1px solid #d1d5db;
+            padding: 10px 12px;
+            border: 2px solid #e2e8f0;
             border-radius: 8px;
             font-size: 14px;
             font-family: inherit;
+            transition: border-color 0.2s;
         }
 
         .form-group input:focus,
@@ -556,210 +527,357 @@
             box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
         }
 
-        .form-group textarea {
-            resize: vertical;
-            min-height: 80px;
-        }
+        .form-group textarea { resize: vertical; min-height: 76px; }
 
         .modal-footer {
             padding: 16px 24px;
-            border-top: 1px solid #e5e7eb;
+            border-top: 2px solid #e2e8f0;
             display: flex;
             justify-content: flex-end;
-            gap: 12px;
+            gap: 10px;
         }
 
-        /* Loading */
-        .loading {
-            text-align: center;
-            padding: 48px;
-            color: #6b7280;
+        .btn-modal {
+            padding: 10px 22px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
         }
 
-        .empty-state {
-            text-align: center;
-            padding: 48px;
-            color: #6b7280;
+        .btn-modal-cancelar { background: #64748b; color: white; }
+        .btn-modal-cancelar:hover { background: #475569; }
+
+        .btn-modal-confirmar { background: linear-gradient(135deg, #1d4ed8, #2563eb); color: white; }
+        .btn-modal-confirmar:hover { background: linear-gradient(135deg, #1e40af, #1d4ed8); }
+
+        .btn-modal-confirmar.entrada { background: linear-gradient(135deg, #047857, #059669); }
+        .btn-modal-confirmar.saida   { background: linear-gradient(135deg, #b91c1c, #dc2626); }
+
+        /* ============================================================
+           MODAL DE AVISO (siriusAlert)
+           ============================================================ */
+        #modalAviso {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.7);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
         }
 
-        .empty-state-icon {
-            font-size: 48px;
-            margin-bottom: 16px;
+        #modalAviso.visivel { display: flex; }
+
+        .modal-box {
+            background: #0d1f3c;
+            border: 1px solid rgba(37,99,235,0.3);
+            border-radius: 14px;
+            padding: 28px;
+            max-width: 380px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
         }
+
+        .modal-box-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+        .modal-box-titulo { color: #60a5fa; font-size: 16px; font-weight: 600; }
+        .modal-box-fechar { color: #64748b; font-size: 22px; cursor: pointer; line-height: 1; transition: color 0.15s; }
+        .modal-box-fechar:hover { color: #e2e8f0; }
+        .modal-box-mensagem { color: #94a3b8; font-size: 14px; line-height: 1.6; margin-bottom: 20px; }
+
+        .modal-box-ok {
+            width: 100%; padding: 11px; background: #2563eb; color: white;
+            border: none; border-radius: 8px; font-size: 14px; font-weight: 600;
+            cursor: pointer; transition: background 0.2s;
+        }
+        .modal-box-ok:hover { background: #1e40af; }
     </style>
 </head>
 <body>
-    <!-- Header -->
-    <div class="header">
-        <div class="header-content">
-            <h1>SIRIUS WEB</h1>
-            <div class="user-info">
-                <span id="userName">Carregando...</span>
-                <button class="btn-logout" onclick="logout()">Sair</button>
-            </div>
-        </div>
+
+<div class="app-layout">
+
+    <!-- ============================================================
+         SIDEBAR DE ÍCONES — padrão do módulo Movimentações
+         ============================================================ -->
+    <aside class="sidebar-icones">
+
+        <!-- Ícone/logo do módulo -->
+        <div class="sidebar-modulo-logo" title="Movimentações de Estoque">📊</div>
+
+        <div class="sidebar-divisor"></div>
+
+        <!-- Entrada de Estoque -->
+        <button class="sidebar-btn"
+                data-tooltip="Entrada de Estoque"
+                onclick="abrirModalMovimentacao('ENTRADA')">
+            <span class="btn-icone">📥</span>
+            <span class="btn-label">Entrada</span>
+        </button>
+
+        <!-- Saída de Estoque -->
+        <button class="sidebar-btn"
+                data-tooltip="Saída de Estoque"
+                onclick="abrirModalMovimentacao('SAIDA')">
+            <span class="btn-icone">📤</span>
+            <span class="btn-label">Saída</span>
+        </button>
+
+        <!-- Ordenação -->
+        <button class="sidebar-btn"
+                id="btnOrdenacao"
+                data-tooltip="Ordenação crescente / decrescente"
+                onclick="toggleOrdenacaoUI()">
+            <span class="btn-icone" id="ordenacaoIconSidebar">⬆️</span>
+            <span class="btn-label">Ordem</span>
+        </button>
+
+        <!-- Visualização (Grid / Detalhe) -->
+        <button class="sidebar-btn"
+                id="btnVisualizacao"
+                data-tooltip="Alternar Visualização"
+                onclick="toggleDrop('dropVisualizacao', this)">
+            <span class="btn-icone">👁️</span>
+            <span class="btn-label">Visão</span>
+        </button>
+
+        <!-- Espaçador empurra Voltar para o rodapé -->
+        <div class="sidebar-spacer"></div>
+
+        <div class="sidebar-divisor"></div>
+
+        <!-- Voltar para Produtos -->
+        <button class="sidebar-btn btn-voltar"
+                data-tooltip="Voltar para Produtos"
+                onclick="voltarProdutos()">
+            <span class="btn-icone">↩</span>
+            <span class="btn-label">Voltar</span>
+        </button>
+
+    </aside>
+
+    <!-- ============================================================
+         DROPDOWN FLUTUANTE — Visualização
+         ============================================================ -->
+    <div id="dropVisualizacao" class="dropdown-flutuante">
+        <div class="dropdown-flutuante-titulo">👁️ Visualização</div>
+        <a href="#" onclick="setView('grid');   fecharDropdowns(); return false;">📊 Grid (tabela)</a>
+        <a href="#" onclick="setView('detail'); fecharDropdowns(); return false;">📋 Detalhe (cartões)</a>
     </div>
 
-    <!-- Navigation -->
-    <div class="nav">
-        <div class="nav-content">
-            <a href="dashboard.html">Dashboard</a>
-            <a href="produtos.html" class="active">Produtos</a>
-            <a href="clientes.html">Clientes</a>
-            <a href="#" onclick="alert('Em desenvolvimento!')">Fornecedores</a>
-            <a href="#" onclick="alert('Em desenvolvimento!')">PDV</a>
-        </div>
-    </div>
+    <!-- ============================================================
+         ÁREA PRINCIPAL
+         ============================================================ -->
+    <div class="main-area">
 
-    <!-- Container -->
-    <div class="container">
-        <!-- Breadcrumb -->
-        <div class="breadcrumb">
-            <a href="dashboard.html">Dashboard</a> / 
-            <a href="produtos.html">Produtos</a> / 
-            <span>Movimentações</span>
+        <!-- Barra de título -->
+        <div class="page-topbar">
+            <span class="page-titulo">📊 Movimentações de Estoque</span>
+            <span class="page-subtitulo" id="produtoSubtitulo">/ Carregando...</span>
+            <span class="badge-saldo" id="badgeSaldo" style="display:none;">
+                Saldo: <span id="produtoSaldo">-</span>
+            </span>
         </div>
 
-        <!-- Produto Info -->
-        <div class="produto-info-box">
-            <div class="produto-info">
-                <h2 id="produtoDescricao">Carregando...</h2>
-                <div class="saldo">
-                    Saldo atual: <span class="saldo-valor" id="produtoSaldo">-</span>
-                </div>
-            </div>
-            <button class="btn btn-primary" onclick="voltarProdutos()">
-                ← Voltar
-            </button>
-        </div>
+        <!-- Conteúdo -->
+        <div class="content-scroll">
 
-        <!-- Toolbar -->
-        <div class="toolbar">
-            <!-- Dropdown Rotinas -->
-            <div class="dropdown" id="dropdownRotinas">
-                <button class="dropdown-toggle" onclick="toggleDropdown('dropdownRotinas')">
-                    ⚙️ Rotinas ▼
-                </button>
-                <div class="dropdown-menu">
-                    <button onclick="abrirModalMovimentacao('ENTRADA')">📥 Entrada de Estoque</button>
-                    <button onclick="abrirModalMovimentacao('SAIDA')">📤 Saída de Estoque</button>
-                </div>
-            </div>
+            <!-- VIEW: GRID (tabela) -->
+            <div id="gridView" class="card" style="margin-bottom:18px;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Data / Hora</th>
+                            <th>Tipo</th>
+                            <th class="right">Quantidade</th>
+                            <th class="right">Saldo Anterior</th>
+                            <th class="right">Saldo Atual</th>
+                            <th>Usuário</th>
+                            <th>Observação</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                        <tr>
+                            <td colspan="7" class="loading">⏳ Carregando movimentações...</td>
+                        </tr>
+                    </tbody>
+                </table>
 
-            <!-- Botão Ordenação -->
-            <button class="btn btn-secondary" onclick="toggleOrdenacao()">
-                <span id="ordenacaoIcon">⬆️</span>
-                <span id="ordenacaoText">Crescente</span>
-            </button>
-
-            <div style="flex: 1"></div>
-
-            <!-- View Toggle -->
-            <div class="view-toggle">
-                <button class="view-btn active" data-view="grid" onclick="setView('grid')">
-                    📊 Grid
-                </button>
-                <button class="view-btn" data-view="detail" onclick="setView('detail')">
-                    📋 Detalhe
-                </button>
-            </div>
-        </div>
-
-        <!-- Grid View -->
-        <div id="gridView" class="table-container">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Data/Hora</th>
-                        <th>Tipo</th>
-                        <th style="text-align: right;">Quantidade</th>
-                        <th style="text-align: right;">Saldo Anterior</th>
-                        <th style="text-align: right;">Saldo Atual</th>
-                        <th>Usuário</th>
-                        <th>Observação</th>
-                    </tr>
-                </thead>
-                <tbody id="tableBody">
-                    <tr>
-                        <td colspan="7" class="loading">Carregando movimentações...</td>
-                    </tr>
-                </tbody>
-            </table>
-            
-            <!-- Pagination -->
-            <div class="pagination">
-                <div class="pagination-info" id="paginationInfo">-</div>
-                <div class="pagination-buttons">
-                    <button onclick="previousPage()" id="btnPrevious">Anterior</button>
-                    <button class="active" id="currentPageBtn">1</button>
-                    <button onclick="nextPage()" id="btnNext">Próxima</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Detail View -->
-        <div id="detailView" class="detail-view">
-            <div class="detail-cards" id="detailCards">
-                <div class="loading">Carregando movimentações...</div>
-            </div>
-
-            <!-- Pagination -->
-            <div class="table-container" style="margin-top: 24px;">
                 <div class="pagination">
-                    <div class="pagination-info" id="paginationInfoDetail">-</div>
+                    <div class="pagination-info" id="paginationInfo">-</div>
                     <div class="pagination-buttons">
-                        <button onclick="previousPage()" id="btnPreviousDetail">Anterior</button>
-                        <button class="active" id="currentPageBtnDetail">1</button>
-                        <button onclick="nextPage()" id="btnNextDetail">Próxima</button>
+                        <button onclick="previousPage()" id="btnPrevious">◀ Anterior</button>
+                        <button class="active" id="currentPageBtn">1</button>
+                        <button onclick="nextPage()" id="btnNext">Próxima ▶</button>
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
 
-    <!-- Modal Movimentação -->
-    <div id="modalMovimentacao" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 class="modal-title" id="modalTitle">Movimentação</h3>
-            </div>
-            <div class="modal-body">
-                <div class="modal-produto-info">
-                    <h4>Produto:</h4>
-                    <p id="modalProdutoDescricao">-</p>
+            <!-- VIEW: DETALHE (cartões) -->
+            <div id="detailView" class="detail-view">
+                <div class="detail-cards" id="detailCards">
+                    <div class="loading">⏳ Carregando movimentações...</div>
                 </div>
 
-                <form id="formMovimentacao">
-                    <div class="form-group">
-                        <label for="quantidade">Quantidade: *</label>
-                        <input 
-                            type="number" 
-                            id="quantidade" 
-                            name="quantidade" 
-                            step="0.001"
-                            min="0.001"
-                            required
-                            placeholder="Digite a quantidade"
-                        >
+                <div class="card" style="margin-top:16px;">
+                    <div class="pagination">
+                        <div class="pagination-info" id="paginationInfoDetail">-</div>
+                        <div class="pagination-buttons">
+                            <button onclick="previousPage()" id="btnPreviousDetail">◀ Anterior</button>
+                            <button class="active" id="currentPageBtnDetail">1</button>
+                            <button onclick="nextPage()" id="btnNextDetail">Próxima ▶</button>
+                        </div>
                     </div>
+                </div>
+            </div>
 
-                    <div class="form-group">
-                        <label for="observacao">Observação:</label>
-                        <textarea 
-                            id="observacao" 
-                            name="observacao" 
-                            placeholder="Informações adicionais (opcional)"
-                        ></textarea>
-                    </div>
-                </form>
+        </div><!-- /.content-scroll -->
+    </div><!-- /.main-area -->
+
+</div><!-- /.app-layout -->
+
+<!-- ============================================================
+     MODAL DE MOVIMENTAÇÃO (Entrada / Saída)
+     ============================================================ -->
+<div id="modalMovimentacao" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 class="modal-title" id="modalTitle">Movimentação</h3>
+        </div>
+        <div class="modal-body">
+            <div class="modal-produto-info">
+                <h4>Produto:</h4>
+                <p id="modalProdutoDescricao">-</p>
             </div>
-            <div class="modal-footer">
-                <button class="btn btn-secondary" onclick="fecharModal()">Cancelar</button>
-                <button class="btn btn-primary" id="btnConfirmarModal" onclick="confirmarMovimentacao()">Confirmar</button>
-            </div>
+            <form id="formMovimentacao">
+                <div class="form-group">
+                    <label for="quantidade">Quantidade *</label>
+                    <input type="number" id="quantidade" name="quantidade"
+                           step="0.001" min="0.001" required
+                           placeholder="Digite a quantidade">
+                </div>
+                <div class="form-group">
+                    <label for="observacao">Observação</label>
+                    <textarea id="observacao" name="observacao"
+                              placeholder="Informações adicionais (opcional)"></textarea>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-modal btn-modal-cancelar" onclick="fecharModal()">Cancelar</button>
+            <button class="btn-modal btn-modal-confirmar" id="btnConfirmarModal"
+                    onclick="confirmarMovimentacao()">Confirmar</button>
         </div>
     </div>
+</div>
 
-    <script src="js/produtos-movimentacoes.js"></script>
+<!-- ============================================================
+     MODAL DE AVISO — usado pelo siriusAlert() do JS
+     ============================================================ -->
+<div id="modalAviso">
+    <div class="modal-box">
+        <div class="modal-box-header">
+            <span class="modal-box-titulo" id="avisoTitulo">ℹ️ Informação</span>
+            <span class="modal-box-fechar" id="avisoFechar">&times;</span>
+        </div>
+        <p class="modal-box-mensagem" id="mensagemAviso"></p>
+        <button class="modal-box-ok" id="avisoOk">OK</button>
+    </div>
+</div>
+
+<!-- ============================================================
+     ELEMENTOS OCULTOS — compatibilidade com produtos-movimentacoes.js
+     O JS procura esses IDs/classes via getElementById / querySelector.
+     Ficam invisíveis; a UI real é controlada pelos botões da sidebar.
+     ============================================================ -->
+<div style="display:none;" aria-hidden="true">
+    <span id="userName"></span>
+    <span id="produtoDescricao"></span>
+    <span id="ordenacaoIcon">⬆️</span>
+    <span id="ordenacaoText">Crescente</span>
+    <button class="view-btn active" data-view="grid"></button>
+    <button class="view-btn"        data-view="detail"></button>
+</div>
+
+<!-- JS do módulo -->
+<script src="js/produtos-movimentacoes.js"></script>
+
+<script>
+    /* ============================================================
+       DROPDOWNS FLUTUANTES
+       ============================================================ */
+    const IDS_DROPS = ['dropVisualizacao'];
+
+    function fecharDropdowns() {
+        IDS_DROPS.forEach(id => {
+            document.getElementById(id).classList.remove('visivel');
+        });
+    }
+
+    function toggleDrop(idDrop, btnEl) {
+        const drop   = document.getElementById(idDrop);
+        const aberto = drop.classList.contains('visivel');
+        fecharDropdowns();
+        if (aberto) return;
+        const rect   = btnEl.getBoundingClientRect();
+        const maxTop = window.innerHeight - 160;
+        drop.style.top = Math.min(rect.top, maxTop) + 'px';
+        drop.classList.add('visivel');
+    }
+
+    // Fechar ao clicar fora
+    document.addEventListener('click', function (e) {
+        if (!e.target.closest('.sidebar-icones') &&
+            !e.target.closest('.dropdown-flutuante')) {
+            fecharDropdowns();
+        }
+    });
+
+    /* ============================================================
+       ORDENAÇÃO — wrapper que chama o JS do módulo e sincroniza
+       o ícone da sidebar após a atualização.
+       toggleOrdenacao() está definida em produtos-movimentacoes.js
+       ============================================================ */
+    async function toggleOrdenacaoUI() {
+        await toggleOrdenacao();   // altera state.orderDir, atualiza #ordenacaoIcon e recarrega dados
+        // Sincroniza o ícone visível da sidebar com o que o JS atualizou no span oculto
+        const iconeAtualizado = document.getElementById('ordenacaoIcon').textContent;
+        const iconeSidebar    = document.getElementById('ordenacaoIconSidebar');
+        if (iconeSidebar) iconeSidebar.textContent = iconeAtualizado;
+    }
+
+    /* ============================================================
+       SINCRONIZA TOPBAR automaticamente quando o JS atualizar
+       #produtoDescricao e #produtoSaldo (feito via loadMovimentacoes)
+       ============================================================ */
+    function iniciarSincronizacaoTopbar() {
+        // Observa #produtoDescricao (oculto) → atualiza subtítulo visível
+        const elDesc = document.getElementById('produtoDescricao');
+        if (elDesc) {
+            new MutationObserver(() => {
+                const sub = document.getElementById('produtoSubtitulo');
+                if (sub) sub.textContent = '/ ' + elDesc.textContent;
+            }).observe(elDesc, { childList: true, characterData: true, subtree: true });
+        }
+
+        // Observa #produtoSaldo (já visível na topbar) → exibe o badge quando preenchido
+        const elSaldo = document.getElementById('produtoSaldo');
+        if (elSaldo) {
+            new MutationObserver(() => {
+                const badge = document.getElementById('badgeSaldo');
+                if (badge && elSaldo.textContent.trim() !== '-') {
+                    badge.style.display = 'inline-flex';
+                }
+            }).observe(elSaldo, { childList: true, characterData: true, subtree: true });
+        }
+    }
+
+    // Aguarda o carregamento do módulo JS e inicia os observers
+    document.addEventListener('DOMContentLoaded', iniciarSincronizacaoTopbar);
+
+    console.log('✅ Movimentações | Sidebar ícones compacta | SIRIUS WEB');
+</script>
 </body>
 </html>

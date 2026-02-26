@@ -3,960 +3,402 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SIRIUS WEB - Outros Módulos</title>
+    <title>SIRIUS WEB – Introdução</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
-        /* ============================================================
-           RESET E BASE
-           ============================================================ */
-        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --azul:    #2563eb;
+            --azul2:   #60a5fa;
+            --verde:   #10b981;
+            --ouro:    #f59e0b;
+            --branco:  #ffffff;
+            --cinza:   #94a3b8;
+        }
 
         html, body {
-            height: 100%;
-            overflow: hidden;
-            font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+            width: 100%; height: 100%; overflow: hidden;
+            font-family: 'Barlow', sans-serif;
             background: #040c1e;
-            color: #e2e8f0;
         }
 
         /* ============================================================
-           LAYOUT PRINCIPAL
+           FUNDO
            ============================================================ */
-        .app {
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-        }
-
-        /* --- Topo --- */
-        .topo {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 14px 28px;
-            background: rgba(10, 22, 40, 0.95);
-            border-bottom: 1px solid rgba(37,99,235,0.2);
-            flex-shrink: 0;
-            backdrop-filter: blur(8px);
-        }
-
-        .topo-esquerda {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-        }
-
-        .btn-voltar {
-            display: flex;
-            align-items: center;
-            gap: 7px;
-            padding: 8px 14px;
-            background: rgba(37,99,235,0.12);
-            border: 1px solid rgba(37,99,235,0.25);
-            color: #60a5fa;
-            border-radius: 8px;
-            font-size: 13px;
-            font-weight: 500;
-            cursor: pointer;
-            text-decoration: none;
-            transition: all 0.2s;
-        }
-
-        .btn-voltar:hover {
-            background: rgba(37,99,235,0.22);
-            border-color: rgba(37,99,235,0.45);
-        }
-
-        .topo-titulo {
-            color: rgba(255,255,255,0.7);
-            font-size: 13px;
-            letter-spacing: 1px;
-        }
-
-        .topo-titulo strong {
-            color: #60a5fa;
-        }
-
-        /* Indicadores de slide */
-        .slide-indicadores {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .indicador {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: rgba(255,255,255,0.15);
-            cursor: pointer;
-            transition: all 0.25s;
-        }
-
-        .indicador.ativo {
-            background: #2563eb;
-            width: 24px;
-            border-radius: 4px;
-            box-shadow: 0 0 8px rgba(37,99,235,0.6);
-        }
-
-        /* ============================================================
-           ÁREA DE SLIDES
-           ============================================================ */
-        .slides-wrapper {
-            flex: 1;
-            position: relative;
+        .fundo {
+            width: 100vw; height: 100vh; position: relative;
+            background:
+                radial-gradient(ellipse 70% 55% at 50% 10%, rgba(37,99,235,0.18) 0%, transparent 65%),
+                radial-gradient(ellipse 40% 50% at 85% 80%, rgba(16,185,129,0.08) 0%, transparent 60%),
+                linear-gradient(160deg, #040c1e 0%, #071530 55%, #040c1e 100%);
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
             overflow: hidden;
         }
 
-        .slide {
-            position: absolute;
-            inset: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: flex-start;
-            padding: 36px 48px 20px;
-            opacity: 0;
-            transform: translateX(60px);
-            transition: all 0.45s cubic-bezier(0.4, 0, 0.2, 1);
-            pointer-events: none;
-            overflow-y: auto;
+        /* Grade de pontos */
+        .fundo::before {
+            content: ''; position: absolute; inset: -5%;
+            background-image: radial-gradient(circle, rgba(37,99,235,0.25) 1px, transparent 1px);
+            background-size: 38px 38px;
+            animation: moverGrade 22s linear infinite;
+            opacity: 0.35;
         }
+        @keyframes moverGrade { 0% { transform: translate(0,0); } 100% { transform: translate(38px,38px); } }
 
-        .slide.ativo {
-            opacity: 1;
-            transform: translateX(0);
-            pointer-events: all;
-        }
-
-        .slide.saindo-esq {
-            opacity: 0;
-            transform: translateX(-60px);
-        }
-
-        /* Scrollbar estilizada */
-        .slide::-webkit-scrollbar { width: 4px; }
-        .slide::-webkit-scrollbar-track { background: transparent; }
-        .slide::-webkit-scrollbar-thumb { background: rgba(37,99,235,0.3); border-radius: 4px; }
-
-        /* ============================================================
-           SLIDE 0 — INTRODUÇÃO
-           ============================================================ */
-        .slide-intro {
-            background: radial-gradient(ellipse at 50% 0%, #0d1f3c 0%, #040c1e 65%);
-        }
-
-        .intro-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 6px 16px;
-            background: rgba(37,99,235,0.15);
-            border: 1px solid rgba(37,99,235,0.3);
-            border-radius: 20px;
-            color: #60a5fa;
-            font-size: 12px;
-            font-weight: 600;
-            letter-spacing: 1.5px;
-            text-transform: uppercase;
-            margin-bottom: 20px;
-        }
-
-        .intro-titulo {
-            font-size: 36px;
-            font-weight: 800;
-            text-align: center;
-            line-height: 1.15;
-            margin-bottom: 10px;
-            background: linear-gradient(135deg, #fff 40%, #60a5fa);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .intro-subtitulo {
-            color: #64748b;
-            font-size: 15px;
-            text-align: center;
-            margin-bottom: 36px;
-            max-width: 550px;
-        }
-
-        /* Grid dos 4 diferenciais */
-        .diferenciais-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 16px;
-            width: 100%;
-            max-width: 820px;
-            margin-bottom: 32px;
-        }
-
-        .diferencial-card {
-            background: rgba(255,255,255,0.03);
-            border: 1px solid rgba(255,255,255,0.07);
-            border-radius: 14px;
-            padding: 22px 24px;
-            display: flex;
-            gap: 16px;
-            align-items: flex-start;
-            transition: all 0.25s;
-        }
-
-        .diferencial-card:hover {
-            background: rgba(37,99,235,0.08);
-            border-color: rgba(37,99,235,0.2);
-            transform: translateY(-2px);
-        }
-
-        .diferencial-numero {
-            width: 40px;
-            height: 40px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-            font-weight: 900;
-            flex-shrink: 0;
-        }
-
-        .dif-1 .diferencial-numero { background: rgba(16,185,129,0.15); color: #10b981; }
-        .dif-2 .diferencial-numero { background: rgba(245,158,11,0.15); color: #f59e0b; }
-        .dif-3 .diferencial-numero { background: rgba(239,68,68,0.15); color: #ef4444; }
-        .dif-4 .diferencial-numero { background: rgba(139,92,246,0.15); color: #8b5cf6; }
-
-        .diferencial-conteudo h4 {
-            font-size: 15px;
-            font-weight: 700;
-            margin-bottom: 5px;
-            color: #e2e8f0;
-        }
-
-        .diferencial-conteudo p {
-            font-size: 13px;
-            color: #64748b;
-            line-height: 1.5;
-        }
-
-        /* Nota sobre versão gratuita */
-        .nota-versao {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 12px 20px;
-            background: rgba(245,158,11,0.08);
-            border: 1px solid rgba(245,158,11,0.2);
-            border-radius: 10px;
-            color: #fbbf24;
-            font-size: 13px;
-            max-width: 820px;
-            width: 100%;
+        /* Linha horizontal decorativa */
+        .fundo::after {
+            content: ''; position: absolute; left: 0; top: 38%;
+            width: 100%; height: 1px;
+            background: linear-gradient(90deg, transparent 0%, var(--azul) 30%, var(--verde) 60%, var(--azul) 85%, transparent 100%);
+            opacity: 0.15; filter: blur(1px);
         }
 
         /* ============================================================
-           SLIDES DE MÓDULO (Varejo, Atacado, etc.)
+           CONTEÚDO PRINCIPAL
            ============================================================ */
-        .modulo-titulo-area {
-            text-align: center;
-            margin-bottom: 28px;
-        }
-
-        .modulo-badge {
-            display: inline-flex;
+        .conteudo {
+            position: relative; z-index: 10;
+            display: flex; flex-direction: column;
             align-items: center;
-            gap: 7px;
-            padding: 5px 14px;
-            border-radius: 16px;
-            font-size: 11px;
-            font-weight: 700;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            margin-bottom: 14px;
+            width: 100%; padding: 0 5vw;
+            max-width: 1100px;
         }
 
-        .modulo-titulo {
-            font-size: 30px;
-            font-weight: 800;
-            margin-bottom: 6px;
-        }
-
-        .modulo-descricao {
-            color: #64748b;
-            font-size: 14px;
-            max-width: 600px;
-            margin: 0 auto;
-            line-height: 1.6;
-        }
-
-        /* Grid dos recursos */
-        .recursos-grid {
-            display: grid;
-            gap: 12px;
-            width: 100%;
-            max-width: 900px;
-        }
-
-        .recursos-grid.col-3 { grid-template-columns: repeat(3, 1fr); }
-        .recursos-grid.col-4 { grid-template-columns: repeat(4, 1fr); }
-        .recursos-grid.col-2 { grid-template-columns: repeat(2, 1fr); }
-
-        .recurso-card {
-            background: rgba(255,255,255,0.03);
-            border: 1px solid rgba(255,255,255,0.07);
-            border-radius: 12px;
-            padding: 16px 18px;
-            transition: all 0.2s;
-        }
-
-        .recurso-card:hover {
-            transform: translateY(-2px);
-            border-color: rgba(255,255,255,0.14);
-        }
-
-        .recurso-icone {
-            font-size: 22px;
-            margin-bottom: 7px;
-            display: block;
-        }
-
-        .recurso-nome {
-            font-size: 13px;
-            font-weight: 700;
-            color: #e2e8f0;
+        /* Marca */
+        .marca {
+            font-weight: 300; font-size: clamp(11px, 1.2vw, 15px);
+            letter-spacing: 8px; text-transform: uppercase;
+            color: rgba(255,255,255,0.25);
+            opacity: 0; animation: subir 0.6s ease 0.05s forwards;
             margin-bottom: 4px;
         }
 
-        .recurso-desc {
-            font-size: 11px;
-            color: #64748b;
-            line-height: 1.4;
-        }
-
-        /* Cores por segmento */
-        .slide-varejo      { background: radial-gradient(ellipse at 50% 0%, #0d2410 0%, #040c1e 65%); }
-        .slide-atacado     { background: radial-gradient(ellipse at 50% 0%, #1a1500 0%, #040c1e 65%); }
-        .slide-distribuicao{ background: radial-gradient(ellipse at 50% 0%, #0f1526 0%, #040c1e 65%); }
-        .slide-industria   { background: radial-gradient(ellipse at 50% 0%, #1a0a00 0%, #040c1e 65%); }
-        .slide-fiscal      { background: radial-gradient(ellipse at 50% 0%, #160a26 0%, #040c1e 65%); }
-
-        .badge-varejo      { background: rgba(16,185,129,0.12); border: 1px solid rgba(16,185,129,0.25); color: #10b981; }
-        .badge-atacado     { background: rgba(245,158,11,0.12); border: 1px solid rgba(245,158,11,0.25); color: #f59e0b; }
-        .badge-distribuicao{ background: rgba(59,130,246,0.12); border: 1px solid rgba(59,130,246,0.25); color: #3b82f6; }
-        .badge-industria   { background: rgba(249,115,22,0.12); border: 1px solid rgba(249,115,22,0.25); color: #f97316; }
-        .badge-fiscal      { background: rgba(139,92,246,0.12); border: 1px solid rgba(139,92,246,0.25); color: #8b5cf6; }
-
-        .titulo-varejo      { color: #10b981; }
-        .titulo-atacado     { color: #f59e0b; }
-        .titulo-distribuicao{ color: #3b82f6; }
-        .titulo-industria   { color: #f97316; }
-        .titulo-fiscal      { color: #8b5cf6; }
-
-        .recurso-varejo      .recurso-card:hover { background: rgba(16,185,129,0.06); border-color: rgba(16,185,129,0.2); }
-        .recurso-atacado     .recurso-card:hover { background: rgba(245,158,11,0.06); border-color: rgba(245,158,11,0.2); }
-        .recurso-distribuicao .recurso-card:hover { background: rgba(59,130,246,0.06); border-color: rgba(59,130,246,0.2); }
-        .recurso-industria   .recurso-card:hover { background: rgba(249,115,22,0.06); border-color: rgba(249,115,22,0.2); }
-        .recurso-fiscal      .recurso-card:hover { background: rgba(139,92,246,0.06); border-color: rgba(139,92,246,0.2); }
-
-        /* ============================================================
-           BARRA DE NAVEGAÇÃO INFERIOR
-           ============================================================ */
-        .nav-bar {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 14px 28px;
-            background: rgba(10,22,40,0.95);
-            border-top: 1px solid rgba(37,99,235,0.15);
-            flex-shrink: 0;
-            backdrop-filter: blur(8px);
-        }
-
-        .nav-btn {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 10px 20px;
-            border: 1px solid rgba(37,99,235,0.25);
+        /* Badge */
+        .badge-intro {
+            display: inline-flex; align-items: center; gap: 6px;
             background: rgba(37,99,235,0.1);
-            color: #60a5fa;
-            border-radius: 9px;
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s;
+            border: 1px solid rgba(37,99,235,0.3);
+            border-radius: 20px; padding: 5px 16px;
+            color: var(--azul2); font-size: 12px;
+            font-weight: 600; letter-spacing: 2px; text-transform: uppercase;
+            opacity: 0; animation: subir 0.6s ease 0.15s forwards;
+            margin-bottom: 14px;
+        }
+        .badge-ponto { width: 6px; height: 6px; border-radius: 50%; background: var(--verde); animation: piscar 1.5s ease infinite; }
+        @keyframes piscar { 0%,100% { opacity: 1; } 50% { opacity: 0.2; } }
+
+        /* Título principal */
+        .titulo-principal {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: clamp(58px, 9vw, 110px);
+            line-height: 0.9; letter-spacing: -2px;
+            color: transparent;
+            background: linear-gradient(130deg, #ffffff 0%, #bfdbfe 30%, var(--azul2) 55%, var(--verde) 85%);
+            -webkit-background-clip: text; background-clip: text;
+            opacity: 0; transform: translateY(20px);
+            animation: subir 0.8s cubic-bezier(0.16,1,0.3,1) 0.3s forwards;
+            filter: drop-shadow(0 0 40px rgba(37,99,235,0.4));
+            text-align: center; margin-bottom: 8px;
         }
 
-        .nav-btn:hover:not(:disabled) {
-            background: rgba(37,99,235,0.2);
-            border-color: rgba(37,99,235,0.45);
-        }
-
-        .nav-btn:disabled {
-            opacity: 0.3;
-            cursor: default;
-        }
-
-        /* Botões de slide no centro */
-        .nav-slides {
-            display: flex;
-            gap: 8px;
-        }
-
-        .nav-slide-btn {
-            padding: 7px 16px;
-            background: rgba(255,255,255,0.04);
-            border: 1px solid rgba(255,255,255,0.08);
-            color: #64748b;
-            border-radius: 8px;
-            font-size: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-            white-space: nowrap;
-        }
-
-        .nav-slide-btn:hover {
-            background: rgba(37,99,235,0.12);
-            color: #93c5fd;
-            border-color: rgba(37,99,235,0.25);
-        }
-
-        .nav-slide-btn.ativo {
-            background: rgba(37,99,235,0.2);
-            color: #60a5fa;
-            border-color: rgba(37,99,235,0.4);
+        /* Subtítulo */
+        .subtitulo {
+            font-size: clamp(13px, 1.8vw, 20px); font-weight: 600;
+            letter-spacing: 4px; text-transform: uppercase;
+            color: transparent;
+            background: linear-gradient(90deg, var(--azul2), var(--verde));
+            -webkit-background-clip: text; background-clip: text;
+            opacity: 0; transform: translateY(16px);
+            animation: subir 0.7s ease 0.5s forwards;
+            text-align: center; margin-bottom: 36px;
         }
 
         /* ============================================================
-           RESPONSIVO
+           CARDS DE TÓPICOS
            ============================================================ */
-        @media (max-width: 768px) {
-            .slide { padding: 24px 20px 16px; }
-            .diferenciais-grid { grid-template-columns: 1fr; }
-            .recursos-grid.col-3,
-            .recursos-grid.col-4 { grid-template-columns: repeat(2, 1fr); }
-            .intro-titulo { font-size: 26px; }
-            .modulo-titulo { font-size: 22px; }
-            .nav-slides { display: none; }
+        .topicos-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 14px;
+            width: 100%;
+            opacity: 0; transform: translateY(20px);
+            animation: subir 0.7s ease 0.75s forwards;
         }
+
+        .topico-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 16px;
+            padding: 20px 16px;
+            display: flex; flex-direction: column;
+            align-items: center; text-align: center;
+            transition: all 0.3s ease;
+            cursor: default;
+            position: relative; overflow: hidden;
+        }
+        .topico-card::before {
+            content: ''; position: absolute; inset: 0;
+            background: var(--cor-card, rgba(37,99,235,0.06));
+            opacity: 0; transition: opacity 0.3s;
+            border-radius: 16px;
+        }
+        .topico-card:hover::before { opacity: 1; }
+        .topico-card:hover {
+            border-color: var(--borda-card, rgba(37,99,235,0.4));
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.35);
+        }
+
+        .topico-icone-wrap {
+            width: 52px; height: 52px; border-radius: 16px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 24px; margin-bottom: 14px;
+            background: var(--bg-icone, rgba(37,99,235,0.15));
+            border: 1px solid var(--borda-icone, rgba(37,99,235,0.3));
+            box-shadow: 0 0 18px var(--sombra-icone, rgba(37,99,235,0.2));
+            position: relative; z-index: 1;
+        }
+
+        .topico-titulo {
+            color: #e2e8f0; font-size: 13px; font-weight: 700;
+            letter-spacing: 1px; text-transform: uppercase;
+            margin-bottom: 8px; position: relative; z-index: 1;
+        }
+
+        .topico-desc {
+            color: #64748b; font-size: 12px; line-height: 1.5;
+            position: relative; z-index: 1;
+        }
+
+        .topico-divisor {
+            width: 30px; height: 2px; border-radius: 2px;
+            background: var(--linha-card, rgba(37,99,235,0.5));
+            margin: 8px auto;
+        }
+
+        /* Variações de cores por card */
+        .card-internet {
+            --cor-card: rgba(37,99,235,0.06);
+            --borda-card: rgba(37,99,235,0.4);
+            --bg-icone: rgba(37,99,235,0.15);
+            --borda-icone: rgba(37,99,235,0.3);
+            --sombra-icone: rgba(37,99,235,0.25);
+            --linha-card: #2563eb;
+        }
+        .card-mouse {
+            --cor-card: rgba(16,185,129,0.06);
+            --borda-card: rgba(16,185,129,0.4);
+            --bg-icone: rgba(16,185,129,0.12);
+            --borda-icone: rgba(16,185,129,0.3);
+            --sombra-icone: rgba(16,185,129,0.2);
+            --linha-card: #10b981;
+        }
+        .card-seguranca {
+            --cor-card: rgba(139,92,246,0.06);
+            --borda-card: rgba(139,92,246,0.4);
+            --bg-icone: rgba(139,92,246,0.12);
+            --borda-icone: rgba(139,92,246,0.3);
+            --sombra-icone: rgba(139,92,246,0.2);
+            --linha-card: #8b5cf6;
+        }
+        .card-velocidade {
+            --cor-card: rgba(245,158,11,0.06);
+            --borda-card: rgba(245,158,11,0.4);
+            --bg-icone: rgba(245,158,11,0.12);
+            --borda-icone: rgba(245,158,11,0.3);
+            --sombra-icone: rgba(245,158,11,0.2);
+            --linha-card: #f59e0b;
+        }
+        .card-modos {
+            --cor-card: rgba(14,165,233,0.06);
+            --borda-card: rgba(14,165,233,0.4);
+            --bg-icone: rgba(14,165,233,0.12);
+            --borda-icone: rgba(14,165,233,0.3);
+            --sombra-icone: rgba(14,165,233,0.2);
+            --linha-card: #0ea5e9;
+        }
+
+        /* ============================================================
+           RODAPÉ
+           ============================================================ */
+        .rodape {
+            position: absolute; bottom: 0; left: 0; right: 0;
+            z-index: 20; display: flex;
+            align-items: center; justify-content: space-between;
+            padding: 18px 5vw;
+            background: linear-gradient(0deg, rgba(4,12,30,0.95) 0%, transparent 100%);
+            opacity: 0; animation: subir 0.6s ease 1.1s forwards;
+        }
+        .rodape-marca {
+            font-weight: 600; font-size: 12px; letter-spacing: 3px;
+            text-transform: uppercase; color: rgba(255,255,255,0.15);
+        }
+        .rodape-acoes { display: flex; align-items: center; gap: 16px; }
+
+        .btn-voltar {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 10px 24px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 40px; color: var(--cinza);
+            font-family: 'Barlow', sans-serif; font-weight: 600;
+            font-size: 13px; letter-spacing: 2px; text-transform: uppercase;
+            text-decoration: none; cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .btn-voltar:hover { background: rgba(37,99,235,0.12); color: #e2e8f0; border-color: rgba(37,99,235,0.3); }
+
+        .btn-site {
+            display: inline-flex; align-items: center; gap: 10px;
+            padding: 10px 28px;
+            background: transparent;
+            border: 1px solid rgba(37,99,235,0.4);
+            border-radius: 40px; color: var(--cinza);
+            font-family: 'Barlow', sans-serif; font-weight: 600;
+            font-size: 13px; letter-spacing: 2px; text-transform: uppercase;
+            text-decoration: none; cursor: pointer;
+            transition: all 0.3s ease; position: relative; overflow: hidden;
+        }
+        .btn-site::before {
+            content: ''; position: absolute; inset: 0;
+            background: linear-gradient(135deg, var(--azul), var(--verde));
+            opacity: 0; transition: opacity 0.3s; border-radius: 40px;
+        }
+        .btn-site:hover::before { opacity: 1; }
+        .btn-site span, .btn-seta { position: relative; z-index: 1; }
+        .btn-site:hover { color: white; border-color: transparent; box-shadow: 0 0 24px rgba(37,99,235,0.4); }
+        .btn-seta { transition: transform 0.3s; }
+        .btn-site:hover .btn-seta { transform: translateX(4px); }
+
+        /* Animações */
+        @keyframes subir { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
 
-<div class="app">
+<div class="fundo">
 
-    <!-- =====================================================
-         TOPO
-         ===================================================== -->
-    <header class="topo">
-        <div class="topo-esquerda">
-            <a href="menu-principal.html" class="btn-voltar">← Voltar</a>
-            <span class="topo-titulo">SIRIUS WEB &nbsp;·&nbsp; <strong>Módulos Disponíveis</strong></span>
-        </div>
-        <div class="slide-indicadores" id="indicadores"></div>
-    </header>
+    <!-- Partículas -->
+    <canvas id="particulas" style="position:absolute;inset:0;pointer-events:none;z-index:5;"></canvas>
 
-    <!-- =====================================================
-         SLIDES
-         ===================================================== -->
-    <div class="slides-wrapper">
+    <!-- Conteúdo central -->
+    <div class="conteudo">
 
-        <!-- ── SLIDE 0: INTRODUÇÃO ──────────────────────── -->
-        <div class="slide slide-intro ativo" data-slide="0">
-            <div class="intro-badge">⭐ Sirius ERP — Módulos Premium</div>
-            <h1 class="intro-titulo">Gestão Empresarial<br>Completa e Poderosa</h1>
-            <p class="intro-subtitulo">
-                Exceto nesta versão gratuita, nossos módulos avançados contam com diferenciais exclusivos
-                que elevam a sua operação a um novo nível.
-            </p>
+        <div class="marca">SIRIUS WEB</div>
 
-            <!-- 4 Diferenciais -->
-            <div class="diferenciais-grid">
-                <div class="diferencial-card dif-1">
-                    <div class="diferencial-numero">1</div>
-                    <div class="diferencial-conteudo">
-                        <h4>🌐 Livre da Internet</h4>
-                        <p>Tudo continua funcionando mesmo sem conexão com a internet. Sua operação nunca para.</p>
-                    </div>
-                </div>
-                <div class="diferencial-card dif-2">
-                    <div class="diferencial-numero">2</div>
-                    <div class="diferencial-conteudo">
-                        <h4>⌨️ Livre do Mouse</h4>
-                        <p>Para maior agilidade, as rotinas de vendas podem ser operadas exclusivamente pelo teclado.</p>
-                    </div>
-                </div>
-                <div class="diferencial-card dif-3">
-                    <div class="diferencial-numero">3</div>
-                    <div class="diferencial-conteudo">
-                        <h4>🔒 Segurança Total</h4>
-                        <p>Robusto plano de senhas e permissões por usuário, protegendo os dados da sua empresa.</p>
-                    </div>
-                </div>
-                <div class="diferencial-card dif-4">
-                    <div class="diferencial-numero">4</div>
-                    <div class="diferencial-conteudo">
-                        <h4>⚡ Máxima Velocidade</h4>
-                        <p>Maior velocidade em todas as telas e rotinas, garantindo produtividade no dia a dia.</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="nota-versao">
-                ⚠️ <strong>Nota:</strong>&nbsp; Os módulos apresentados nas próximas telas estão disponíveis
-                nas versões pagas do Sirius ERP. Entre em contato para saber mais.
-            </div>
+        <div class="badge-intro">
+            <div class="badge-ponto"></div>
+            Sistema integrado de gestão empresarial
         </div>
 
-        <!-- ── SLIDE 1: VAREJO ──────────────────────────── -->
-        <div class="slide slide-varejo" data-slide="1">
-            <div class="modulo-titulo-area">
-                <div class="modulo-badge badge-varejo">🛍️ Segmento</div>
-                <h2 class="modulo-titulo titulo-varejo">Sírius S@T & NFC-e — Varejo</h2>
-                <p class="modulo-descricao">
-                    Sistema de gestão completo para comércios de varejo com emissão de cupom fiscal,
-                    controle de caixa e muito mais. Homologado na SEFAZ.
-                </p>
+        <h1 class="titulo-principal">SIRIUS ERP</h1>
+
+        <p class="subtitulo">Completa e Robusta</p>
+
+        <!-- 5 Cards de tópicos -->
+        <div class="topicos-grid">
+
+            <!-- 1. Livre da Internet -->
+            <div class="topico-card card-internet">
+                <div class="topico-icone-wrap">📡</div>
+                <div class="topico-titulo">Livre da Internet</div>
+                <div class="topico-divisor"></div>
+                <div class="topico-desc">Tudo continua funcionando mesmo sem conexão. Sua operação nunca para.</div>
             </div>
-            <div class="recursos-grid col-4 recurso-varejo">
-                <div class="recurso-card">
-                    <span class="recurso-icone">🛒</span>
-                    <div class="recurso-nome">PDV / Caixa</div>
-                    <div class="recurso-desc">Pré-vendas, abertura e fechamento, reforços e sangrias.</div>
-                </div>
-                <div class="recurso-card">
-                    <span class="recurso-icone">📦</span>
-                    <div class="recurso-nome">Controle de Estoque</div>
-                    <div class="recurso-desc">Entradas e saídas integradas com compras e cupom fiscal.</div>
-                </div>
-                <div class="recurso-card">
-                    <span class="recurso-icone">🚴</span>
-                    <div class="recurso-nome">Delivery</div>
-                    <div class="recurso-desc">Localização rápida do cliente, comandas e controle de entregas.</div>
-                </div>
-                <div class="recurso-card">
-                    <span class="recurso-icone">🍽️</span>
-                    <div class="recurso-nome">Comandas e Mesas</div>
-                    <div class="recurso-desc">Controle completo de mesas e comandas com emissão de cupom.</div>
-                </div>
-                <div class="recurso-card">
-                    <span class="recurso-icone">💳</span>
-                    <div class="recurso-nome">Formas de Pagamento</div>
-                    <div class="recurso-desc">Integração com maquininhas de crédito e débito.</div>
-                </div>
-                <div class="recurso-card">
-                    <span class="recurso-icone">💰</span>
-                    <div class="recurso-nome">Financeiro</div>
-                    <div class="recurso-desc">Contas a pagar e receber, filtros e relatórios gerenciais.</div>
-                </div>
-                <div class="recurso-card">
-                    <span class="recurso-icone">🛍️</span>
-                    <div class="recurso-nome">iFood</div>
-                    <div class="recurso-desc">Captura pedidos do iFood e monta o cupom automaticamente.</div>
-                </div>
-                <div class="recurso-card">
-                    <span class="recurso-icone">🌐</span>
-                    <div class="recurso-nome">WEB Lojas</div>
-                    <div class="recurso-desc">Gerenciamento online de uma ou mais lojas à distância.</div>
-                </div>
-                <div class="recurso-card">
-                    <span class="recurso-icone">📱</span>
-                    <div class="recurso-nome">APP Pré-Vendas</div>
-                    <div class="recurso-desc">Aplicativo Android para geração de pré-vendas e comandas.</div>
-                </div>
-                <div class="recurso-card">
-                    <span class="recurso-icone">🛒</span>
-                    <div class="recurso-nome">Pedidos de Compras</div>
-                    <div class="recurso-desc">Integrado com estoque e financeiro a pagar.</div>
-                </div>
-                <div class="recurso-card">
-                    <span class="recurso-icone">📊</span>
-                    <div class="recurso-nome">Relatórios</div>
-                    <div class="recurso-desc">Totais de vendas e comissões por vendedor.</div>
-                </div>
-                <div class="recurso-card">
-                    <span class="recurso-icone">📋</span>
-                    <div class="recurso-nome">Módulos Especiais</div>
-                    <div class="recurso-desc">Óticas, Pet Shop, MarketPlace, Cardápio Digital e mais.</div>
-                </div>
+
+            <!-- 2. Livre do Mouse -->
+            <div class="topico-card card-mouse">
+                <div class="topico-icone-wrap">⌨️</div>
+                <div class="topico-titulo">Livre do Mouse</div>
+                <div class="topico-divisor"></div>
+                <div class="topico-desc">As rotinas de vendas podem ser operadas exclusivamente pelo teclado para máxima agilidade.</div>
             </div>
+
+            <!-- 3. Segurança Total -->
+            <div class="topico-card card-seguranca">
+                <div class="topico-icone-wrap">🔐</div>
+                <div class="topico-titulo">Segurança Total</div>
+                <div class="topico-divisor"></div>
+                <div class="topico-desc">Controle de acesso por perfil, criptografia de dados e auditoria completa das operações.</div>
+            </div>
+
+            <!-- 4. Máxima Velocidade -->
+            <div class="topico-card card-velocidade">
+                <div class="topico-icone-wrap">⚡</div>
+                <div class="topico-titulo">Máxima Velocidade</div>
+                <div class="topico-divisor"></div>
+                <div class="topico-desc">Maior velocidade em todas as telas e rotinas, garantindo produtividade no dia a dia.</div>
+            </div>
+
+            <!-- 5. Modos de Uso -->
+            <div class="topico-card card-modos">
+                <div class="topico-icone-wrap">☁️</div>
+                <div class="topico-titulo">Modos de Uso</div>
+                <div class="topico-divisor"></div>
+                <div class="topico-desc">Local, Híbrido e Nuvem. Escolha o modelo que melhor atende à sua operação.</div>
+            </div>
+
         </div>
 
-        <!-- ── SLIDE 2: ATACADO ──────────────────────────── -->
-        <div class="slide slide-atacado" data-slide="2">
-            <div class="modulo-titulo-area">
-                <div class="modulo-badge badge-atacado">🏭 Segmento</div>
-                <h2 class="modulo-titulo titulo-atacado">Sírius ERP — Atacado</h2>
-                <p class="modulo-descricao">
-                    Sistema de gestão empresarial completo para atacadistas, integrando vendas,
-                    compras, estoque, financeiro, fiscal e muito mais.
-                </p>
-            </div>
-            <div class="recursos-grid col-3 recurso-atacado">
-                <div class="recurso-card">
-                    <span class="recurso-icone">📋</span>
-                    <div class="recurso-nome">Pedidos de Vendas</div>
-                    <div class="recurso-desc">Emissão rápida ou detalhada, orçamentos e controle de entregas parciais.</div>
-                </div>
-                <div class="recurso-card">
-                    <span class="recurso-icone">💰</span>
-                    <div class="recurso-nome">Financeiro Completo</div>
-                    <div class="recurso-desc">Contas a pagar/receber, conciliação bancária, boletos e SISPAG.</div>
-                </div>
-                <div class="recurso-card">
-                    <span class="recurso-icone">📄</span>
-                    <div class="recurso-nome">Nota Fiscal (NF-e)</div>
-                    <div class="recurso-desc">Emissão, cancelamento, carta de correção e envio automático por e-mail.</div>
-                </div>
-                <div class="recurso-card">
-                    <span class="recurso-icone">🛒</span>
-                    <div class="recurso-nome">Compras</div>
-                    <div class="recurso-desc">Pedidos de compra com importação de XML dos fornecedores.</div>
-                </div>
-                <div class="recurso-card">
-                    <span class="recurso-icone">📊</span>
-                    <div class="recurso-nome">Relatórios e DRE</div>
-                    <div class="recurso-desc">Curva ABC, mapas de vendas e Demonstrativo de Resultado.</div>
-                </div>
-                <div class="recurso-card">
-                    <span class="recurso-icone">🔧</span>
-                    <div class="recurso-nome">Ordens de Serviço</div>
-                    <div class="recurso-desc">Assistência técnica com orçamentos, status e geração de NF-e.</div>
-                </div>
-                <div class="recurso-card">
-                    <span class="recurso-icone">📑</span>
-                    <div class="recurso-nome">Orçamentos</div>
-                    <div class="recurso-desc">Controle completo com Orçado x Faturado x Saldo e Follow-Up.</div>
-                </div>
-                <div class="recurso-card">
-                    <span class="recurso-icone">🌐</span>
-                    <div class="recurso-nome">Força de Vendas WEB</div>
-                    <div class="recurso-desc">Plataforma para vendedores externos com NF-e em tempo real.</div>
-                </div>
-                <div class="recurso-card">
-                    <span class="recurso-icone">📝</span>
-                    <div class="recurso-nome">NFS-e</div>
-                    <div class="recurso-desc">Nota Fiscal de Serviços Eletrônica com envio em lote à prefeitura.</div>
-                </div>
-            </div>
+    </div>
+
+    <!-- Rodapé -->
+    <div class="rodape">
+        <div class="rodape-marca">Soft Clever Informática</div>
+        <div class="rodape-acoes">
+            <a class="btn-voltar" href="menu-principal.html">← Voltar ao Menu</a>
+            <a class="btn-site" href="https://www.softclever.com.br" target="_blank">
+                <span>Saiba Mais</span>
+                <span class="btn-seta">→</span>
+            </a>
         </div>
+    </div>
 
-        <!-- ── SLIDE 3: DISTRIBUIÇÃO ─────────────────────── -->
-        <div class="slide slide-distribuicao" data-slide="3">
-            <div class="modulo-titulo-area">
-                <div class="modulo-badge badge-distribuicao">🚚 Segmento</div>
-                <h2 class="modulo-titulo titulo-distribuicao">Sírius ERP — Distribuição</h2>
-                <p class="modulo-descricao">
-                    Recursos avançados para empresas distribuidoras com controle de rotas,
-                    expedição, beneficiamento e integração fiscal completa.
-                </p>
-            </div>
-            <div class="recursos-grid col-3 recurso-distribuicao">
-                <div class="recurso-card">
-                    <span class="recurso-icone">📦</span>
-                    <div class="recurso-nome">Controle de Estoque</div>
-                    <div class="recurso-desc">Entradas e saídas integradas com compras, vendas e NF-e.</div>
-                </div>
-                <div class="recurso-card">
-                    <span class="recurso-icone">🚛</span>
-                    <div class="recurso-nome">Expedição de Pedidos</div>
-                    <div class="recurso-desc">Controle completo de expedição com impressão de etiquetas e recibos.</div>
-                </div>
-                <div class="recurso-card">
-                    <span class="recurso-icone">🏭</span>
-                    <div class="recurso-nome">Entrada p/ Beneficiamento</div>
-                    <div class="recurso-desc">Controle de entradas de mercadorias para processos de beneficiamento.</div>
-                </div>
-                <div class="recurso-card">
-                    <span class="recurso-icone">📄</span>
-                    <div class="recurso-nome">CT-e</div>
-                    <div class="recurso-desc">Conhecimento de Transporte Eletrônico com autorização junto à SEFAZ.</div>
-                </div>
-                <div class="recurso-card">
-                    <span class="recurso-icone">📋</span>
-                    <div class="recurso-nome">MDF-e</div>
-                    <div class="recurso-desc">Manifesto de Documentos Fiscais para transporte com múltiplos documentos.</div>
-                </div>
-                <div class="recurso-card">
-                    <span class="recurso-icone">💰</span>
-                    <div class="recurso-nome">Financeiro Integrado</div>
-                    <div class="recurso-desc">Contas a pagar e receber, fluxo de caixa e conciliação bancária.</div>
-                </div>
-                <div class="recurso-card">
-                    <span class="recurso-icone">📊</span>
-                    <div class="recurso-nome">Relatórios Gerenciais</div>
-                    <div class="recurso-desc">DRE, Curva ABC de clientes e fornecedores, mapas de vendas.</div>
-                </div>
-                <div class="recurso-card">
-                    <span class="recurso-icone">🌐</span>
-                    <div class="recurso-nome">Força de Vendas</div>
-                    <div class="recurso-desc">Plataforma WEB para representantes com estoque em tempo real.</div>
-                </div>
-                <div class="recurso-card">
-                    <span class="recurso-icone">🔄</span>
-                    <div class="recurso-nome">Trocas e Devoluções</div>
-                    <div class="recurso-desc">Gestão completa de trocas com movimentação financeira automática.</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- ── SLIDE 4: INDÚSTRIA ─────────────────────────── -->
-        <div class="slide slide-industria" data-slide="4">
-            <div class="modulo-titulo-area">
-                <div class="modulo-badge badge-industria">⚙️ Segmento</div>
-                <h2 class="modulo-titulo titulo-industria">Sírius ERP — Indústria</h2>
-                <p class="modulo-descricao">
-                    Controle completo de produção, insumos, ordens de fabricação e
-                    obrigações fiscais específicas para indústrias de todos os portes.
-                </p>
-            </div>
-            <div class="recursos-grid col-3 recurso-industria">
-                <div class="recurso-card">
-                    <span class="recurso-icone">🏭</span>
-                    <div class="recurso-nome">Produção</div>
-                    <div class="recurso-desc">Ordem de produção a partir do pedido, controle por fases e grade.</div>
-                </div>
-                <div class="recurso-card">
-                    <span class="recurso-icone">🧪</span>
-                    <div class="recurso-nome">Matérias Primas</div>
-                    <div class="recurso-desc">Baixa automática de insumos e remessa parcial a terceiros.</div>
-                </div>
-                <div class="recurso-card">
-                    <span class="recurso-icone">📦</span>
-                    <div class="recurso-nome">Produtos Acabados</div>
-                    <div class="recurso-desc">Carga automática de estoque ao finalizar a produção.</div>
-                </div>
-                <div class="recurso-card">
-                    <span class="recurso-icone">📋</span>
-                    <div class="recurso-nome">Ficha Técnica</div>
-                    <div class="recurso-desc">Impressão de ficha técnica e ficha de corte por ordem de produção.</div>
-                </div>
-                <div class="recurso-card">
-                    <span class="recurso-icone">🔢</span>
-                    <div class="recurso-nome">Bloco K</div>
-                    <div class="recurso-desc">Controle de estoque próprio e em poder de terceiros com geração do arquivo.</div>
-                </div>
-                <div class="recurso-card">
-                    <span class="recurso-icone">📊</span>
-                    <div class="recurso-nome">SPED Fiscal</div>
-                    <div class="recurso-desc">Geração mensal do arquivo com CFOP, CST e cálculo automático de impostos.</div>
-                </div>
-                <div class="recurso-card">
-                    <span class="recurso-icone">🛒</span>
-                    <div class="recurso-nome">Compras Integradas</div>
-                    <div class="recurso-desc">Pedidos de compra com importação de XML e integração ao financeiro.</div>
-                </div>
-                <div class="recurso-card">
-                    <span class="recurso-icone">💰</span>
-                    <div class="recurso-nome">Financeiro Completo</div>
-                    <div class="recurso-desc">Pagamento a terceiros, boletos, SISPAG e metas orçamentárias.</div>
-                </div>
-                <div class="recurso-card">
-                    <span class="recurso-icone">📄</span>
-                    <div class="recurso-nome">NF-e Integrada</div>
-                    <div class="recurso-desc">Emissão a partir do pedido de venda com cálculo automático de impostos.</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- ── SLIDE 5: SOLUÇÕES FISCAIS ─────────────────── -->
-        <div class="slide slide-fiscal" data-slide="5">
-            <div class="modulo-titulo-area">
-                <div class="modulo-badge badge-fiscal">📑 Soluções</div>
-                <h2 class="modulo-titulo titulo-fiscal">Soluções Fiscais</h2>
-                <p class="modulo-descricao">
-                    Sistema completo homologado na SEFAZ para emissão de todos os documentos
-                    fiscais exigidos pela legislação. Simples, eficaz e sempre atualizado.
-                </p>
-            </div>
-            <div class="recursos-grid col-2 recurso-fiscal" style="max-width:700px;">
-                <div class="recurso-card" style="padding:24px;">
-                    <span class="recurso-icone" style="font-size:28px;">📄</span>
-                    <div class="recurso-nome" style="font-size:15px; margin-bottom:6px;">NF-e — Nota Fiscal Eletrônica</div>
-                    <div class="recurso-desc" style="font-size:12px;">
-                        Emissão com envio e autorização na SEFAZ. Cancelamento, inutilização,
-                        carta de correção, envio automático de XML e PDF por e-mail e
-                        impressão do DANFE.
-                    </div>
-                </div>
-                <div class="recurso-card" style="padding:24px;">
-                    <span class="recurso-icone" style="font-size:28px;">🚛</span>
-                    <div class="recurso-nome" style="font-size:15px; margin-bottom:6px;">CT-e — Conhecimento de Transporte</div>
-                    <div class="recurso-desc" style="font-size:12px;">
-                        Emissão e autorização junto à SEFAZ. Cadastros de emitente,
-                        remetente, consignatário, tomador e destinatário.
-                        Pré-visualização e impressão do CT-e.
-                    </div>
-                </div>
-                <div class="recurso-card" style="padding:24px;">
-                    <span class="recurso-icone" style="font-size:28px;">📋</span>
-                    <div class="recurso-nome" style="font-size:15px; margin-bottom:6px;">MDF-e — Manifesto de Documentos</div>
-                    <div class="recurso-desc" style="font-size:12px;">
-                        Para empresas com transporte próprio ou terceirizado.
-                        Registro em lote de documentos em trânsito com
-                        múltiplas NF-e ou CT-e.
-                    </div>
-                </div>
-                <div class="recurso-card" style="padding:24px;">
-                    <span class="recurso-icone" style="font-size:28px;">📊</span>
-                    <div class="recurso-nome" style="font-size:15px; margin-bottom:6px;">SPED Fiscal</div>
-                    <div class="recurso-desc" style="font-size:12px;">
-                        Geração mensal do arquivo SPED com CFOP, CST de ICMS,
-                        IPI, PIS e COFINS. Integração com compras e vendas.
-                        Livro fiscal para conferência.
-                    </div>
-                </div>
-                <div class="recurso-card" style="padding:24px; grid-column: 1 / -1;">
-                    <span class="recurso-icone" style="font-size:28px;">🔢</span>
-                    <div class="recurso-nome" style="font-size:15px; margin-bottom:6px;">Bloco K — Controle de Produção e Estoque</div>
-                    <div class="recurso-desc" style="font-size:12px;">
-                        Controle detalhado de saldos de entrada e saída de produtos e insumos.
-                        Geração do arquivo Bloco K 200 e/ou 280 para envio à SEFAZ.
-                        Pode ser contratado separadamente e integrado ao seu sistema existente.
-                    </div>
-                </div>
-            </div>
-        </div>
-
-    </div><!-- /slides-wrapper -->
-
-    <!-- =====================================================
-         BARRA DE NAVEGAÇÃO INFERIOR
-         ===================================================== -->
-    <nav class="nav-bar">
-        <button class="nav-btn" id="btnAnterior" onclick="navegarSlide(-1)" disabled>
-            ← Anterior
-        </button>
-
-        <div class="nav-slides" id="navSlides"></div>
-
-        <button class="nav-btn" id="btnProximo" onclick="navegarSlide(1)">
-            Próxima →
-        </button>
-    </nav>
-
-</div><!-- /app -->
+</div>
 
 <script>
-    /* ============================================================
-       CONFIGURAÇÃO DOS SLIDES
-       ============================================================ */
-    const SLIDES = [
-        { id: 0, label: 'Introdução' },
-        { id: 1, label: 'Varejo'     },
-        { id: 2, label: 'Atacado'    },
-        { id: 3, label: 'Distribuição' },
-        { id: 4, label: 'Indústria'  },
-        { id: 5, label: 'Fiscal'     }
-    ];
+    /* Partículas animadas */
+    const canvas = document.getElementById('particulas');
+    const ctx    = canvas.getContext('2d');
 
-    let slideAtual = 0;
-    let emTransicao = false;
-
-    /* ============================================================
-       INICIALIZAÇÃO: CRIAR INDICADORES E BOTÕES
-       ============================================================ */
-    function inicializar() {
-        const contIndicadores = document.getElementById('indicadores');
-        const contNavSlides   = document.getElementById('navSlides');
-
-        SLIDES.forEach((s, i) => {
-            // Indicador (topo)
-            const dot = document.createElement('div');
-            dot.className = 'indicador' + (i === 0 ? ' ativo' : '');
-            dot.onclick = () => irParaSlide(i);
-            contIndicadores.appendChild(dot);
-
-            // Botão de navegação (rodapé)
-            const btn = document.createElement('button');
-            btn.className = 'nav-slide-btn' + (i === 0 ? ' ativo' : '');
-            btn.textContent = s.label;
-            btn.onclick = () => irParaSlide(i);
-            contNavSlides.appendChild(btn);
-        });
+    function resize() {
+        canvas.width  = window.innerWidth;
+        canvas.height = window.innerHeight;
     }
+    resize();
+    window.addEventListener('resize', resize);
 
-    /* ============================================================
-       NAVEGAÇÃO
-       ============================================================ */
-    function navegarSlide(direcao) {
-        irParaSlide(slideAtual + direcao);
-    }
+    const cores = ['37,99,235', '96,165,250', '16,185,129', '14,165,233'];
+    const ps = Array.from({ length: 40 }, () => ({
+        x:     Math.random() * window.innerWidth,
+        y:     Math.random() * window.innerHeight,
+        r:     Math.random() * 2 + 0.4,
+        vx:    (Math.random() - 0.5) * 0.35,
+        vy:    -(Math.random() * 0.5 + 0.15),
+        alpha: Math.random() * 0.45 + 0.1,
+        cor:   cores[Math.floor(Math.random() * cores.length)]
+    }));
 
-    function irParaSlide(destino) {
-        if (emTransicao) return;
-        if (destino < 0 || destino >= SLIDES.length) return;
-        if (destino === slideAtual) return;
-
-        emTransicao = true;
-
-        const slides = document.querySelectorAll('.slide');
-        const atual  = slides[slideAtual];
-        const prox   = slides[destino];
-
-        // Slide atual sai para esquerda
-        atual.classList.add('saindo-esq');
-
-        // Próximo entra
-        prox.style.transform = destino > slideAtual ? 'translateX(60px)' : 'translateX(-60px)';
-        prox.style.opacity   = '0';
-        prox.classList.add('ativo');
-
-        // Aguardar frame para disparar a animação
-        requestAnimationFrame(() => {
-            requestAnimationFrame(() => {
-                prox.style.transition = 'all 0.45s cubic-bezier(0.4, 0, 0.2, 1)';
-                prox.style.transform  = 'translateX(0)';
-                prox.style.opacity    = '1';
-            });
+    function anim() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ps.forEach(p => {
+            p.x += p.vx;
+            p.y += p.vy;
+            if (p.y < -10) { p.y = canvas.height + 10; p.x = Math.random() * canvas.width; }
+            if (p.x < -10) p.x = canvas.width + 10;
+            if (p.x > canvas.width + 10) p.x = -10;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(${p.cor},${p.alpha})`;
+            ctx.fill();
         });
-
-        setTimeout(() => {
-            atual.classList.remove('ativo', 'saindo-esq');
-            prox.style.transition = '';
-            prox.style.transform  = '';
-            prox.style.opacity    = '';
-
-            slideAtual = destino;
-            atualizarUI();
-            emTransicao = false;
-        }, 460);
+        requestAnimationFrame(anim);
     }
-
-    /* ============================================================
-       ATUALIZAR INDICADORES E BOTÕES
-       ============================================================ */
-    function atualizarUI() {
-        // Indicadores
-        document.querySelectorAll('.indicador').forEach((d, i) => {
-            d.classList.toggle('ativo', i === slideAtual);
-        });
-
-        // Botões de slide
-        document.querySelectorAll('.nav-slide-btn').forEach((b, i) => {
-            b.classList.toggle('ativo', i === slideAtual);
-        });
-
-        // Anterior / Próximo
-        document.getElementById('btnAnterior').disabled = slideAtual === 0;
-        document.getElementById('btnProximo').disabled  = slideAtual === SLIDES.length - 1;
-    }
-
-    /* ============================================================
-       TECLADO: setas esquerda/direita
-       ============================================================ */
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'ArrowRight' || e.key === 'ArrowDown') navegarSlide(1);
-        if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   navegarSlide(-1);
-        if (e.key === 'Escape') window.location.href = 'menu-principal.html';
-    });
-
-    /* ============================================================
-       INICIALIZAR
-       ============================================================ */
-    inicializar();
-    console.log('✅ Outros Módulos carregado');
+    anim();
 </script>
 </body>
 </html>
