@@ -5,261 +5,93 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SIRIUS WEB - Menu Principal</title>
     <style>
-        /* ============================================================
-           RESET E BASE
-           ============================================================ */
-        *, *::before, *::after {
-            margin: 0; padding: 0; box-sizing: border-box;
-        }
-        html, body {
-            height: 100%; overflow: hidden;
-            font-family: 'Segoe UI', Roboto, Arial, sans-serif;
-            background: #050e22;
-        }
-
-        /* ============================================================
-           LAYOUT PRINCIPAL
-           ============================================================ */
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; overflow: hidden; font-family: 'Segoe UI', Roboto, Arial, sans-serif; background: #050e22; }
         .app-layout { display: flex; height: 100vh; width: 100vw; }
 
-        /* ============================================================
-           SIDEBAR ESQUERDA
-           ============================================================ */
+        /* ====== SIDEBAR ====== */
         .sidebar {
             width: 270px; min-width: 270px;
             background: linear-gradient(180deg, #0a1628 0%, #0d1f3c 60%, #0a1628 100%);
-            border-right: 1px solid rgba(37,99,235,0.25);
+            border-right: 1px solid rgba(37, 99, 235, 0.25);
             display: flex; flex-direction: column;
             position: relative; z-index: 10;
-            box-shadow: 4px 0 24px rgba(0,0,0,0.5);
+            box-shadow: 4px 0 24px rgba(0, 0, 0, 0.5);
         }
         .sidebar::after {
-            content: ''; position: absolute; top: 0; right: 0;
-            width: 2px; height: 100%;
+            content: ''; position: absolute; top: 0; right: 0; width: 2px; height: 100%;
             background: linear-gradient(180deg, transparent 0%, #2563eb 20%, #00e5a0 50%, #2563eb 80%, transparent 100%);
             opacity: 0.5;
         }
-
-        /* Logo */
-        .sidebar-logo {
-            padding: 28px 24px 24px;
-            border-bottom: 1px solid rgba(255,255,255,0.06);
-        }
+        .sidebar-logo { padding: 28px 24px 24px; border-bottom: 1px solid rgba(255,255,255,0.06); }
         .logo-marca { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
-        .logo-icone {
-            width: 38px; height: 38px;
-            background: linear-gradient(135deg, #2563eb, #1e40af);
-            border-radius: 10px; display: flex; align-items: center;
-            justify-content: center; font-size: 18px;
-            box-shadow: 0 0 14px rgba(37,99,235,0.5);
-        }
+        .logo-icone { width: 38px; height: 38px; background: linear-gradient(135deg, #2563eb, #1e40af); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; box-shadow: 0 0 14px rgba(37, 99, 235, 0.5); }
         .logo-texto { display: flex; flex-direction: column; }
         .logo-titulo { color: #fff; font-size: 20px; font-weight: 800; letter-spacing: 2px; line-height: 1; }
         .logo-subtitulo { color: #64748b; font-size: 10px; letter-spacing: 3px; text-transform: uppercase; margin-top: 2px; }
-        .logo-versao { color: rgba(37,99,235,0.7); font-size: 10px; letter-spacing: 1px; }
-
-        /* Usuário */
-        .sidebar-user {
-            padding: 14px 20px;
-            border-bottom: 1px solid rgba(255,255,255,0.06);
-            display: flex; align-items: center; gap: 10px;
-        }
-        .user-avatar {
-            width: 34px; height: 34px; border-radius: 50%;
-            background: linear-gradient(135deg, #2563eb, #7c3aed);
-            display: flex; align-items: center; justify-content: center;
-            color: white; font-size: 14px; font-weight: 700; flex-shrink: 0;
-        }
+        .logo-versao { color: rgba(37, 99, 235, 0.7); font-size: 10px; letter-spacing: 1px; }
+        .sidebar-user { padding: 14px 20px; border-bottom: 1px solid rgba(255,255,255,0.06); display: flex; align-items: center; gap: 10px; }
+        .user-avatar { width: 34px; height: 34px; border-radius: 50%; background: linear-gradient(135deg, #2563eb, #7c3aed); display: flex; align-items: center; justify-content: center; color: white; font-size: 14px; font-weight: 700; flex-shrink: 0; }
         .user-info-sidebar { display: flex; flex-direction: column; overflow: hidden; }
         .user-nome { color: #e2e8f0; font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .user-plano { color: #10b981; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
-
-        /* Nav */
         .sidebar-nav { flex: 1; padding: 16px 12px; overflow-y: auto; overflow-x: hidden; }
         .sidebar-nav::-webkit-scrollbar { width: 4px; }
         .sidebar-nav::-webkit-scrollbar-track { background: transparent; }
         .sidebar-nav::-webkit-scrollbar-thumb { background: rgba(37,99,235,0.3); border-radius: 4px; }
-
         .nav-label { color: #334155; font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; padding: 8px 12px 4px; }
         .nav-item { position: relative; margin-bottom: 2px; }
-        .nav-link {
-            display: flex; align-items: center; gap: 12px;
-            padding: 11px 14px; border-radius: 10px; color: #94a3b8;
-            text-decoration: none; font-size: 14px; font-weight: 500;
-            cursor: pointer; transition: all 0.2s ease;
-            border: 1px solid transparent; user-select: none;
-        }
-        .nav-link:hover { background: rgba(37,99,235,0.12); color: #e2e8f0; border-color: rgba(37,99,235,0.2); }
-        .nav-link.ativo { background: rgba(37,99,235,0.18); color: #60a5fa; border-color: rgba(37,99,235,0.3); }
+        .nav-link { display: flex; align-items: center; gap: 12px; padding: 11px 14px; border-radius: 10px; color: #94a3b8; text-decoration: none; font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.2s ease; border: 1px solid transparent; user-select: none; }
+        .nav-link:hover { background: rgba(37, 99, 235, 0.12); color: #e2e8f0; border-color: rgba(37, 99, 235, 0.2); }
+        .nav-link.ativo { background: rgba(37, 99, 235, 0.18); color: #60a5fa; border-color: rgba(37, 99, 235, 0.3); }
         .nav-link .nav-icone { font-size: 17px; min-width: 22px; text-align: center; }
         .nav-link .nav-texto { flex: 1; white-space: nowrap; }
         .nav-link .nav-seta { font-size: 11px; transition: transform 0.25s; opacity: 0.6; }
         .nav-link.aberto .nav-seta { transform: rotate(90deg); }
-
-        /* Submenu */
         .submenu { display: none; padding-left: 18px; overflow: hidden; }
         .submenu.aberto { display: block; }
-        .submenu-link {
-            display: flex; align-items: center; gap: 10px;
-            padding: 9px 12px; border-radius: 8px; color: #64748b;
-            text-decoration: none; font-size: 13px;
-            transition: all 0.18s; cursor: pointer;
-        }
-        .submenu-link:hover { background: rgba(37,99,235,0.1); color: #93c5fd; }
+        .submenu-link { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 8px; color: #64748b; text-decoration: none; font-size: 13px; transition: all 0.18s; cursor: pointer; }
+        .submenu-link:hover { background: rgba(37, 99, 235, 0.1); color: #93c5fd; }
         .submenu-link .sub-icone { font-size: 14px; min-width: 18px; text-align: center; }
-
         .nav-separador { height: 1px; background: rgba(255,255,255,0.05); margin: 10px 12px; }
-
-        .nav-link.destaque {
-            background: linear-gradient(135deg, rgba(37,99,235,0.15), rgba(124,58,237,0.15));
-            color: #a78bfa; border-color: rgba(124,58,237,0.3);
-        }
+        .nav-link.destaque { background: linear-gradient(135deg, rgba(37,99,235,0.15), rgba(124,58,237,0.15)); color: #a78bfa; border-color: rgba(124,58,237,0.3); }
         .nav-link.destaque:hover { background: linear-gradient(135deg, rgba(37,99,235,0.25), rgba(124,58,237,0.25)); color: #c4b5fd; }
-
-        /* Footer */
         .sidebar-footer { padding: 14px 16px; border-top: 1px solid rgba(255,255,255,0.06); }
-        .btn-logout {
-            display: flex; align-items: center; gap: 10px; width: 100%;
-            padding: 10px 14px; background: rgba(239,68,68,0.08);
-            border: 1px solid rgba(239,68,68,0.2); border-radius: 9px;
-            color: #f87171; font-size: 13px; font-weight: 500;
-            cursor: pointer; transition: all 0.2s;
-        }
-        .btn-logout:hover { background: rgba(239,68,68,0.15); border-color: rgba(239,68,68,0.4); }
+        .btn-logout { display: flex; align-items: center; gap: 10px; width: 100%; padding: 10px 14px; background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.2); border-radius: 9px; color: #f87171; font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.2s; }
+        .btn-logout:hover { background: rgba(239, 68, 68, 0.15); border-color: rgba(239, 68, 68, 0.4); }
 
-        /* ============================================================
-           ÁREA PRINCIPAL
-           ============================================================ */
-        .main-area {
-            flex: 1; position: relative; overflow: hidden;
-            background: radial-gradient(ellipse at 60% 50%, #0d1f3c 0%, #050e22 70%);
-        }
-        .main-area::before {
-            content: ''; position: absolute; inset: 0;
-            background-image:
-                linear-gradient(rgba(37,99,235,0.04) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(37,99,235,0.04) 1px, transparent 1px);
-            background-size: 50px 50px;
-            pointer-events: none;
-        }
-
-        .main-content {
-            position: relative; z-index: 2; height: 100%;
-            display: flex; flex-direction: column;
-            align-items: center; justify-content: center; padding: 20px;
-        }
-
-        /* Tagline */
+        /* ====== ÁREA PRINCIPAL ====== */
+        .main-area { flex: 1; position: relative; overflow: hidden; background: radial-gradient(ellipse at 60% 50%, #0d1f3c 0%, #050e22 70%); }
+        .main-area::before { content: ''; position: absolute; inset: 0; background-image: linear-gradient(rgba(37,99,235,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(37,99,235,0.04) 1px, transparent 1px); background-size: 50px 50px; pointer-events: none; }
+        .main-content { position: relative; z-index: 2; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
         .main-tagline { text-align: center; margin-bottom: 28px; }
         .main-tagline h2 { color: rgba(255,255,255,0.85); font-size: 26px; font-weight: 300; letter-spacing: 1px; margin-bottom: 8px; }
         .main-tagline h2 strong { color: #60a5fa; font-weight: 700; }
         .main-tagline p { color: #475569; font-size: 13px; letter-spacing: 2px; text-transform: uppercase; }
 
-        /* ============================================================
-           MANDALA
-           ============================================================ */
-        .mandala-wrapper {
-            position: relative;
-            width: 520px; height: 460px;
-            flex-shrink: 0;
-        }
-
-        /* SVG de linhas */
-        .mandala-svg {
-            position: absolute; inset: 0;
-            width: 100%; height: 100%;
-            pointer-events: none;
-        }
-        .conn-line {
-            stroke: rgba(37,99,235,0.2);
-            stroke-width: 1.5; fill: none;
-            stroke-dasharray: 6 4;
-            animation: dash-flow 2.5s linear infinite;
-        }
+        /* ====== MANDALA ====== */
+        .mandala-wrapper { position: relative; width: 520px; height: 460px; flex-shrink: 0; }
+        .mandala-svg { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+        .conn-line { stroke: rgba(37,99,235,0.2); stroke-width: 1.5; fill: none; stroke-dasharray: 6 4; animation: dash-flow 2.5s linear infinite; }
         @keyframes dash-flow { to { stroke-dashoffset: -20; } }
-
-        /* Hub central */
-        .erp-hub {
-            position: absolute;
-            top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
-            width: 108px; height: 108px; border-radius: 50%;
-            background: linear-gradient(135deg, #1e3a8a, #2563eb);
-            display: flex; flex-direction: column;
-            align-items: center; justify-content: center;
-            box-shadow:
-                0 0 0 8px rgba(37,99,235,0.1),
-                0 0 0 16px rgba(37,99,235,0.05),
-                0 0 40px rgba(37,99,235,0.4);
-            z-index: 10;
-            cursor: pointer;
-            transition: transform 0.25s, box-shadow 0.25s;
-            animation: hub-pulse 3s ease-in-out infinite;
-        }
-        .erp-hub:hover {
-            transform: translate(-50%, -50%) scale(1.06);
-            box-shadow:
-                0 0 0 12px rgba(37,99,235,0.15),
-                0 0 0 24px rgba(37,99,235,0.07),
-                0 0 60px rgba(37,99,235,0.6);
-        }
-        @keyframes hub-pulse {
-            0%, 100% { box-shadow: 0 0 0 8px rgba(37,99,235,0.1), 0 0 0 16px rgba(37,99,235,0.05), 0 0 40px rgba(37,99,235,0.4); }
-            50% { box-shadow: 0 0 0 12px rgba(37,99,235,0.15), 0 0 0 24px rgba(37,99,235,0.07), 0 0 60px rgba(37,99,235,0.6); }
-        }
+        .erp-hub { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 108px; height: 108px; border-radius: 50%; background: linear-gradient(135deg, #1e3a8a, #2563eb); display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: 0 0 0 8px rgba(37,99,235,0.1), 0 0 0 16px rgba(37,99,235,0.05), 0 0 40px rgba(37,99,235,0.4); z-index: 10; cursor: pointer; transition: transform 0.25s, box-shadow 0.25s; animation: hub-pulse 3s ease-in-out infinite; }
+        .erp-hub:hover { transform: translate(-50%, -50%) scale(1.06); box-shadow: 0 0 0 12px rgba(37,99,235,0.15), 0 0 0 24px rgba(37,99,235,0.07), 0 0 60px rgba(37,99,235,0.6); }
+        @keyframes hub-pulse { 0%, 100% { box-shadow: 0 0 0 8px rgba(37,99,235,0.1), 0 0 0 16px rgba(37,99,235,0.05), 0 0 40px rgba(37,99,235,0.4); } 50% { box-shadow: 0 0 0 12px rgba(37,99,235,0.15), 0 0 0 24px rgba(37,99,235,0.07), 0 0 60px rgba(37,99,235,0.6); } }
         .hub-icone { font-size: 26px; margin-bottom: 2px; }
         .hub-titulo { color: #fff; font-size: 11px; font-weight: 800; letter-spacing: 2px; }
         .hub-sub { color: rgba(255,255,255,0.5); font-size: 8px; letter-spacing: 1px; }
-
-        /* Legenda abaixo do hub */
-        .hub-legenda {
-            position: absolute;
-            top: calc(50% + 66px);
-            left: 50%; transform: translateX(-50%);
-            color: rgba(148,163,184,0.6);
-            font-size: 9px; font-weight: 500;
-            letter-spacing: 1.5px; text-transform: uppercase;
-            white-space: nowrap; z-index: 5;
-        }
-
-        /* Satélite */
-        .erp-node {
-            position: absolute;
-            width: 76px; height: 76px; border-radius: 50%;
-            display: flex; flex-direction: column;
-            align-items: center; justify-content: center;
-            cursor: pointer; z-index: 5;
-            transition: transform 0.25s ease, box-shadow 0.25s ease;
-        }
+        .hub-legenda { position: absolute; top: calc(50% + 66px); left: 50%; transform: translateX(-50%); color: rgba(148,163,184,0.5); font-size: 9px; font-weight: 500; letter-spacing: 1.5px; text-transform: uppercase; white-space: nowrap; z-index: 5; background: rgba(5,14,34,0.6); padding: 4px 10px; border-radius: 20px; border: 1px solid rgba(37,99,235,0.15); }
+        .erp-node { position: absolute; width: 76px; height: 76px; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; z-index: 5; transition: transform 0.25s ease, box-shadow 0.25s ease; }
         .erp-node:hover { transform: scale(1.12); }
         .erp-node .node-icone { font-size: 20px; margin-bottom: 3px; }
-        .erp-node .node-label {
-            font-size: 7.5px; font-weight: 700; letter-spacing: 0.4px;
-            text-transform: uppercase; text-align: center; line-height: 1.2;
-            padding: 0 4px;
-        }
-
-        /* Posicionamento dos 7 satélites em círculo (r=185px, hub em 260,230) */
-        /* Ângulos: -90°, -38.6°, 12.9°, 64.3°, 115.7°, 167.1°, 218.6° */
-        /* cx=260, cy=230 */
-        /* 1 Varejo:             x=260+0=260,   y=230-185=45   → top:7px;  left:222px */
-        /* 2 Atacado e Dist:     x=260+144=404, y=230-115=115  → top:77px; left:366px */
-        /* 3 Serviços:           x=260+180=440, y=230+41=271   → top:233px;left:402px */
-        /* 4 Fiscal:             x=260+80=340,  y=230+167=397  → top:359px;left:302px */
-        /* 5 Financeiro:         x=260-80=180,  y=230+167=397  → top:359px;left:142px */
-        /* 6 Compras:            x=260-180=80,  y=230+41=271   → top:233px;left:42px  */
-        /* 7 Nossos Diferenciais:x=260-144=116, y=230-115=115  → top:77px; left:78px  */
-        /* (subtraindo metade do diâmetro do nó = 38px de cada coord) */
-
+        .erp-node .node-label { font-size: 7px; font-weight: 700; letter-spacing: 0.4px; text-transform: uppercase; text-align: center; line-height: 1.2; padding: 0 4px; }
         .node-1 { top:  7px; left: 222px; background: linear-gradient(135deg,#064e3b,#10b981); box-shadow: 0 0 22px rgba(16,185,129,0.4);  color: #a7f3d0; }
-        .node-2 { top: 77px; left: 366px; background: linear-gradient(135deg,#1e1b4b,#7c3aed); box-shadow: 0 0 22px rgba(124,58,237,0.4); color: #ddd6fe; }
-        .node-3 { top:233px; left: 402px; background: linear-gradient(135deg,#0c2340,#0ea5e9); box-shadow: 0 0 22px rgba(14,165,233,0.4);  color: #bae6fd; }
-        .node-4 { top:359px; left: 302px; background: linear-gradient(135deg,#3b1f0a,#f97316); box-shadow: 0 0 22px rgba(249,115,22,0.4);  color: #fed7aa; }
-        .node-5 { top:359px; left: 142px; background: linear-gradient(135deg,#0e2a1f,#16a34a); box-shadow: 0 0 22px rgba(22,163,74,0.4);   color: #bbf7d0; }
-        .node-6 { top:233px; left:  42px; background: linear-gradient(135deg,#1c1338,#8b5cf6); box-shadow: 0 0 22px rgba(139,92,246,0.4);  color: #ede9fe; }
-        .node-7 { top: 77px; left:  78px; background: linear-gradient(135deg,#1a1008,#d97706); box-shadow: 0 0 22px rgba(217,119,6,0.4);   color: #fde68a; }
-
-        /* Rodapé de estatísticas */
+        .node-2 { top: 77px; left: 366px; background: linear-gradient(135deg,#1e1b4b,#7c3aed); box-shadow: 0 0 22px rgba(124,58,237,0.4);  color: #ddd6fe; }
+        .node-3 { top:233px; left: 402px; background: linear-gradient(135deg,#0c2340,#0ea5e9); box-shadow: 0 0 22px rgba(14,165,233,0.4);   color: #bae6fd; }
+        .node-4 { top:359px; left: 302px; background: linear-gradient(135deg,#3b1f0a,#f97316); box-shadow: 0 0 22px rgba(249,115,22,0.4);   color: #fed7aa; }
+        .node-5 { top:359px; left: 142px; background: linear-gradient(135deg,#0e2a1f,#16a34a); box-shadow: 0 0 22px rgba(22,163,74,0.4);    color: #bbf7d0; }
+        .node-6 { top:233px; left:  42px; background: linear-gradient(135deg,#1c1338,#8b5cf6); box-shadow: 0 0 22px rgba(139,92,246,0.4);   color: #ede9fe; }
+        .node-7 { top: 77px; left:  78px; background: linear-gradient(135deg,#1a1008,#d97706); box-shadow: 0 0 22px rgba(217,119,6,0.4);    color: #fde68a; }
         .main-footer { margin-top: 24px; }
         .footer-stats { display: flex; gap: 28px; justify-content: center; }
         .stat-item { display: flex; flex-direction: column; align-items: center; gap: 2px; }
@@ -267,179 +99,66 @@
         .stat-desc { color: #475569; font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; }
         .stat-divisor { width: 1px; background: rgba(255,255,255,0.06); align-self: stretch; }
 
-        /* ============================================================
-           PAINEL DE SUB-ITENS (overlay)
-           ============================================================ */
-        .painel-overlay {
-            position: fixed; inset: 0;
-            background: rgba(5,14,34,0.85);
-            backdrop-filter: blur(6px);
-            z-index: 200;
-            display: none; align-items: center; justify-content: flex-end;
-            animation: fadeIn 0.25s ease;
-        }
-        .painel-overlay.visivel { display: flex; }
+        /* ====== PAINEL OVERLAY ====== */
+        .painel-overlay { position: fixed; inset: 0; background: rgba(5,14,34,0.85); backdrop-filter: blur(6px); z-index: 200; display: none; align-items: center; justify-content: flex-end; }
+        .painel-overlay.visivel { display: flex; animation: fadeIn 0.25s ease; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-        .painel-conteudo {
-            width: 580px; height: 100vh;
-            background: linear-gradient(180deg, #0a1628 0%, #0d1f3c 100%);
-            border-left: 1px solid rgba(37,99,235,0.3);
-            display: flex; flex-direction: column;
-            box-shadow: -20px 0 60px rgba(0,0,0,0.6);
-            animation: slideIn 0.3s cubic-bezier(0.16,1,0.3,1);
-        }
+        .painel-conteudo { width: 580px; height: 100vh; background: linear-gradient(180deg, #0a1628 0%, #0d1f3c 100%); border-left: 1px solid rgba(37,99,235,0.3); display: flex; flex-direction: column; box-shadow: -20px 0 60px rgba(0,0,0,0.6); animation: slideIn 0.3s cubic-bezier(0.16,1,0.3,1); }
         @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
-
-        .painel-header {
-            padding: 28px 32px 20px;
-            border-bottom: 1px solid rgba(255,255,255,0.06);
-            display: flex; align-items: center; gap: 16px;
-            flex-shrink: 0;
-        }
-        .painel-icone-grande {
-            width: 56px; height: 56px; border-radius: 16px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 26px; flex-shrink: 0;
-        }
+        .painel-header { padding: 28px 32px 20px; border-bottom: 1px solid rgba(255,255,255,0.06); display: flex; align-items: center; gap: 16px; flex-shrink: 0; }
+        .painel-icone-grande { width: 56px; height: 56px; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 26px; flex-shrink: 0; }
         .painel-titulo-area { flex: 1; }
         .painel-titulo { color: #fff; font-size: 22px; font-weight: 700; }
         .painel-subtitulo { color: #475569; font-size: 12px; letter-spacing: 2px; text-transform: uppercase; margin-top: 3px; }
-        .painel-fechar {
-            width: 36px; height: 36px; border-radius: 50%;
-            background: rgba(255,255,255,0.06);
-            border: 1px solid rgba(255,255,255,0.1);
-            display: flex; align-items: center; justify-content: center;
-            color: #94a3b8; font-size: 18px; cursor: pointer;
-            transition: all 0.2s; flex-shrink: 0;
-        }
+        .painel-fechar { width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; color: #94a3b8; font-size: 18px; cursor: pointer; transition: all 0.2s; flex-shrink: 0; }
         .painel-fechar:hover { background: rgba(239,68,68,0.15); color: #f87171; border-color: rgba(239,68,68,0.3); }
-
-        .painel-grid {
-            flex: 1; overflow-y: auto;
-            padding: 20px 28px; display: grid;
-            grid-template-columns: 1fr 1fr; gap: 12px;
-            align-content: start;
-        }
+        .painel-grid { flex: 1; overflow-y: auto; padding: 20px 28px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; align-content: start; }
         .painel-grid::-webkit-scrollbar { width: 4px; }
         .painel-grid::-webkit-scrollbar-thumb { background: rgba(37,99,235,0.3); border-radius: 4px; }
-
-        .sub-card {
-            background: rgba(255,255,255,0.03);
-            border: 1px solid rgba(255,255,255,0.07);
-            border-radius: 12px; padding: 16px;
-            cursor: pointer; transition: all 0.2s;
-            display: flex; align-items: flex-start; gap: 12px;
-        }
-        .sub-card:hover {
-            background: rgba(37,99,235,0.1);
-            border-color: rgba(37,99,235,0.35);
-            transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(0,0,0,0.3);
-        }
-        .sub-card-icone {
-            width: 36px; height: 36px; border-radius: 10px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 16px; flex-shrink: 0;
-        }
+        .sub-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 12px; padding: 16px; cursor: pointer; transition: all 0.2s; display: flex; align-items: flex-start; gap: 12px; }
+        .sub-card:hover { background: rgba(37,99,235,0.1); border-color: rgba(37,99,235,0.35); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.3); }
+        .sub-card-icone { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
         .sub-card-texto { flex: 1; }
         .sub-card-titulo { color: #e2e8f0; font-size: 13px; font-weight: 600; line-height: 1.3; margin-bottom: 4px; }
         .sub-card-hint { color: #475569; font-size: 11px; }
-
-        .painel-rodape {
-            padding: 16px 28px; border-top: 1px solid rgba(255,255,255,0.05);
-            display: flex; justify-content: center; flex-shrink: 0;
-        }
+        .painel-rodape { padding: 16px 28px; border-top: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: center; flex-shrink: 0; }
         .painel-rodape span { color: #334155; font-size: 11px; letter-spacing: 1px; }
 
-        /* ============================================================
-           MODAL DE DESCRIÇÃO
-           ============================================================ */
-        #modalDescricao {
-            display: none; position: fixed; inset: 0;
-            background: rgba(0,0,0,0.75); z-index: 9999;
-            align-items: center; justify-content: center;
-            padding: 20px;
-        }
+        /* ====== MODAL DESCRIÇÃO ====== */
+        #modalDescricao { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 9999; align-items: center; justify-content: center; padding: 20px; }
         #modalDescricao.visivel { display: flex; }
-
-        .modal-desc-box {
-            background: linear-gradient(160deg, #0d1f3c, #0a1628);
-            border: 1px solid rgba(37,99,235,0.3);
-            border-radius: 16px; padding: 32px;
-            max-width: 480px; width: 100%;
-            box-shadow: 0 24px 80px rgba(0,0,0,0.6);
-            animation: fadeIn 0.2s ease;
-        }
-        .modal-desc-header {
-            display: flex; align-items: center; gap: 14px; margin-bottom: 20px;
-        }
-        .modal-desc-icone {
-            width: 48px; height: 48px; border-radius: 14px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 22px; flex-shrink: 0;
-        }
+        .modal-desc-box { background: linear-gradient(160deg, #0d1f3c, #0a1628); border: 1px solid rgba(37,99,235,0.3); border-radius: 16px; padding: 32px; max-width: 480px; width: 100%; box-shadow: 0 24px 80px rgba(0,0,0,0.6); animation: fadeIn 0.2s ease; }
+        .modal-desc-header { display: flex; align-items: center; gap: 14px; margin-bottom: 20px; }
+        .modal-desc-icone { width: 48px; height: 48px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
         .modal-desc-titulo { color: #fff; font-size: 18px; font-weight: 700; }
         .modal-desc-modulo { color: #475569; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; margin-top: 2px; }
-        .modal-desc-fechar {
-            margin-left: auto; width: 32px; height: 32px; border-radius: 50%;
-            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
-            display: flex; align-items: center; justify-content: center;
-            color: #64748b; font-size: 16px; cursor: pointer;
-            transition: all 0.2s; flex-shrink: 0;
-        }
+        .modal-desc-fechar { margin-left: auto; width: 32px; height: 32px; border-radius: 50%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; color: #64748b; font-size: 16px; cursor: pointer; transition: all 0.2s; flex-shrink: 0; }
         .modal-desc-fechar:hover { background: rgba(239,68,68,0.15); color: #f87171; }
-
-        .modal-desc-separador {
-            height: 1px; background: rgba(37,99,235,0.2); margin-bottom: 16px;
-        }
-        .modal-desc-texto {
-            color: #94a3b8; font-size: 14px; line-height: 1.7; margin-bottom: 24px;
-        }
-        .modal-desc-ok {
-            width: 100%; padding: 12px; background: #2563eb;
-            border: none; border-radius: 10px; color: white;
-            font-size: 14px; font-weight: 600; cursor: pointer; transition: background 0.2s;
-        }
+        .modal-desc-separador { height: 1px; background: rgba(37,99,235,0.2); margin-bottom: 16px; }
+        .modal-desc-texto { color: #94a3b8; font-size: 14px; line-height: 1.7; margin-bottom: 24px; }
+        .modal-desc-ok { width: 100%; padding: 12px; background: #2563eb; border: none; border-radius: 10px; color: white; font-size: 14px; font-weight: 600; cursor: pointer; transition: background 0.2s; }
         .modal-desc-ok:hover { background: #1e40af; }
 
-        /* ============================================================
-           MODAL DE AVISO GENÉRICO
-           ============================================================ */
-        #modalAviso {
-            display: none; position: fixed; inset: 0;
-            background: rgba(0,0,0,0.7); z-index: 9999;
-            align-items: center; justify-content: center;
-        }
+        /* ====== MODAL AVISO ====== */
+        #modalAviso { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 9999; align-items: center; justify-content: center; }
         #modalAviso.visivel { display: flex; }
-        .modal-box {
-            background: #0d1f3c; border: 1px solid rgba(37,99,235,0.3);
-            border-radius: 14px; padding: 28px; max-width: 380px; width: 90%;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-        }
+        .modal-box { background: #0d1f3c; border: 1px solid rgba(37,99,235,0.3); border-radius: 14px; padding: 28px; max-width: 380px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.5); }
         .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
         .modal-titulo { color: #60a5fa; font-size: 16px; font-weight: 600; }
         .modal-fechar { color: #64748b; font-size: 22px; cursor: pointer; line-height: 1; transition: color 0.15s; }
         .modal-fechar:hover { color: #e2e8f0; }
         .modal-mensagem { color: #94a3b8; font-size: 14px; line-height: 1.6; margin-bottom: 20px; }
-        .modal-ok {
-            width: 100%; padding: 11px; background: #2563eb; color: white;
-            border: none; border-radius: 8px; font-size: 14px; font-weight: 600;
-            cursor: pointer; transition: background 0.2s;
-        }
+        .modal-ok { width: 100%; padding: 11px; background: #2563eb; color: white; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; transition: background 0.2s; }
         .modal-ok:hover { background: #1e40af; }
     </style>
 </head>
 <body>
-
 <div class="app-layout">
 
     <!-- ============================================================
-         SIDEBAR ESQUERDA
+         SIDEBAR ESQUERDA — EXATAMENTE COMO NO ORIGINAL
          ============================================================ -->
     <aside class="sidebar">
-
-        <!-- Logo -->
         <div class="sidebar-logo">
             <div class="logo-marca">
                 <div class="logo-icone">⭐</div>
@@ -450,8 +169,6 @@
             </div>
             <div class="logo-versao">Versão Gratuita</div>
         </div>
-
-        <!-- Usuário -->
         <div class="sidebar-user">
             <div class="user-avatar" id="userAvatar">?</div>
             <div class="user-info-sidebar">
@@ -459,206 +176,67 @@
                 <span class="user-plano" id="userPlano">gratuito</span>
             </div>
         </div>
-
-        <!-- Navegação -->
         <nav class="sidebar-nav">
-
             <div class="nav-label">Principal</div>
-
-            <!-- Dashboard -->
             <div class="nav-item">
                 <a href="dashboard.html" class="nav-link">
-                    <span class="nav-icone">📊</span>
-                    <span class="nav-texto">Dashboard</span>
+                    <span class="nav-icone">📊</span><span class="nav-texto">Dashboard</span>
                 </a>
             </div>
-
-            <!-- Produtos -->
             <div class="nav-item">
                 <a href="produtos.html" class="nav-link">
-                    <span class="nav-icone">📦</span>
-                    <span class="nav-texto">Produtos</span>
+                    <span class="nav-icone">📦</span><span class="nav-texto">Produtos</span>
                 </a>
             </div>
-
-            <!-- Clientes -->
             <div class="nav-item">
                 <a href="clientes.html" class="nav-link">
-                    <span class="nav-icone">👥</span>
-                    <span class="nav-texto">Clientes</span>
+                    <span class="nav-icone">👥</span><span class="nav-texto">Clientes</span>
                 </a>
             </div>
-
-            <!-- Varejo (submenu) -->
             <div class="nav-item">
-                <div class="nav-link" id="btnVendas" onclick="toggleSubmenu('submenuVendas','btnVendas')">
-                    <span class="nav-icone">🛒</span>
-                    <span class="nav-texto">Varejo</span>
+                <div class="nav-link" id="btnVendas" onclick="toggleSubmenuVendas()">
+                    <span class="nav-icone">💼</span>
+                    <span class="nav-texto">Vendas</span>
                     <span class="nav-seta">›</span>
                 </div>
                 <div class="submenu" id="submenuVendas">
-                    <a href="pdv.html" class="submenu-link">
-                        <span class="sub-icone">🖥️</span> PDV / Caixa
-                    </a>
-                    <a href="pedidos.html" class="submenu-link">
-                        <span class="sub-icone">📋</span> Vendas Realizadas
-                    </a>
-                    <a href="#" onclick="showMessage('Módulo Controle de Estoque em desenvolvimento!'); return false;" class="submenu-link">
-                        <span class="sub-icone">📦</span> Controle de Estoque
-                    </a>
-                    <a href="#" onclick="showMessage('Módulo Delivery em desenvolvimento!'); return false;" class="submenu-link">
-                        <span class="sub-icone">🛵</span> Delivery
-                    </a>
-                    <a href="#" onclick="showMessage('Módulo Comandas em desenvolvimento!'); return false;" class="submenu-link">
-                        <span class="sub-icone">📝</span> Comandas
-                    </a>
-                    <a href="#" onclick="showMessage('Módulo Controle de Caixa em desenvolvimento!'); return false;" class="submenu-link">
-                        <span class="sub-icone">💰</span> Controle de Caixa
-                    </a>
-                    <a href="#" onclick="showMessage('Módulo NFC-e em desenvolvimento!'); return false;" class="submenu-link">
-                        <span class="sub-icone">🧾</span> NFC-e
-                    </a>
+                    <a href="pdv.html" class="submenu-link"><span class="sub-icone">🛒</span> PDV</a>
+                    <a href="pedidos.html" class="submenu-link"><span class="sub-icone">📋</span> Vendas Realizadas</a>
                 </div>
             </div>
-
-            <!-- Atacado e Distribuição (submenu) -->
-            <div class="nav-item">
-                <div class="nav-link" id="btnAtacado" onclick="toggleSubmenu('submenuAtacado','btnAtacado')">
-                    <span class="nav-icone">🏭</span>
-                    <span class="nav-texto">Atacado / Distribuição</span>
-                    <span class="nav-seta">›</span>
-                </div>
-                <div class="submenu" id="submenuAtacado">
-                    <a href="#" onclick="showMessage('Módulo Orçamentos em desenvolvimento!'); return false;" class="submenu-link">
-                        <span class="sub-icone">📊</span> Orçamentos
-                    </a>
-                    <a href="#" onclick="showMessage('Módulo Força de Vendas em desenvolvimento!'); return false;" class="submenu-link">
-                        <span class="sub-icone">💼</span> Força de Vendas
-                    </a>
-                    <a href="#" onclick="showMessage('Módulo Pedidos de Vendas em desenvolvimento!'); return false;" class="submenu-link">
-                        <span class="sub-icone">📋</span> Pedidos de Vendas
-                    </a>
-                    <a href="#" onclick="showMessage('Módulo NF-e em desenvolvimento!'); return false;" class="submenu-link">
-                        <span class="sub-icone">📄</span> NF-e
-                    </a>
-                </div>
-            </div>
-
-            <!-- Fiscal (submenu) -->
-            <div class="nav-item">
-                <div class="nav-link" id="btnFiscal" onclick="toggleSubmenu('submenuFiscal','btnFiscal')">
-                    <span class="nav-icone">📑</span>
-                    <span class="nav-texto">Fiscal</span>
-                    <span class="nav-seta">›</span>
-                </div>
-                <div class="submenu" id="submenuFiscal">
-                    <a href="#" onclick="showMessage('Módulo SPED Fiscal em desenvolvimento!'); return false;" class="submenu-link">
-                        <span class="sub-icone">📂</span> SPED Fiscal
-                    </a>
-                    <a href="#" onclick="showMessage('Módulo Bloco K em desenvolvimento!'); return false;" class="submenu-link">
-                        <span class="sub-icone">🔷</span> Bloco K
-                    </a>
-                    <a href="#" onclick="showMessage('Módulo NF-e em desenvolvimento!'); return false;" class="submenu-link">
-                        <span class="sub-icone">📄</span> NF-e
-                    </a>
-                    <a href="#" onclick="showMessage('Módulo CT-e em desenvolvimento!'); return false;" class="submenu-link">
-                        <span class="sub-icone">🚛</span> CT-e
-                    </a>
-                    <a href="#" onclick="showMessage('Módulo MDF-e em desenvolvimento!'); return false;" class="submenu-link">
-                        <span class="sub-icone">📋</span> MDF-e
-                    </a>
-                    <a href="#" onclick="showMessage('Módulo NFS-e em desenvolvimento!'); return false;" class="submenu-link">
-                        <span class="sub-icone">🔧</span> NFS-e
-                    </a>
-                </div>
-            </div>
-
-            <!-- Financeiro (submenu) -->
-            <div class="nav-item">
-                <div class="nav-link" id="btnFinanceiro" onclick="toggleSubmenu('submenuFinanceiro','btnFinanceiro')">
-                    <span class="nav-icone">💳</span>
-                    <span class="nav-texto">Financeiro</span>
-                    <span class="nav-seta">›</span>
-                </div>
-                <div class="submenu" id="submenuFinanceiro">
-                    <a href="#" onclick="showMessage('Módulo Gestão Financeira em desenvolvimento!'); return false;" class="submenu-link">
-                        <span class="sub-icone">💰</span> Gestão Financeira
-                    </a>
-                </div>
-            </div>
-
-            <!-- Compras (submenu) -->
-            <div class="nav-item">
-                <div class="nav-link" id="btnCompras" onclick="toggleSubmenu('submenuCompras','btnCompras')">
-                    <span class="nav-icone">🛍️</span>
-                    <span class="nav-texto">Compras</span>
-                    <span class="nav-seta">›</span>
-                </div>
-                <div class="submenu" id="submenuCompras">
-                    <a href="#" onclick="showMessage('Módulo Gestão de Compras em desenvolvimento!'); return false;" class="submenu-link">
-                        <span class="sub-icone">🛒</span> Gestão de Compras
-                    </a>
-                </div>
-            </div>
-
             <div class="nav-separador"></div>
             <div class="nav-label">Sistema</div>
-
-            <!-- Configurações -->
             <div class="nav-item">
-                <div class="nav-link" id="btnConfiguracoes" onclick="toggleSubmenu('submenuConfiguracoes','btnConfiguracoes')">
+                <div class="nav-link" id="btnConfiguracoes" onclick="toggleSubmenu()">
                     <span class="nav-icone">⚙️</span>
                     <span class="nav-texto">Configurações</span>
                     <span class="nav-seta">›</span>
                 </div>
                 <div class="submenu" id="submenuConfiguracoes">
-                    <a href="vendedores.html" class="submenu-link">
-                        <span class="sub-icone">👨‍💼</span> Vendedores
-                    </a>
-                    <a href="formas-pagamento.html" class="submenu-link">
-                        <span class="sub-icone">💳</span> Formas de Pagamento
-                    </a>
-                    <a href="regimes-tributarios.html" class="submenu-link">
-                        <span class="sub-icone">📋</span> Regimes Tributários
-                    </a>
-                    <a href="#" onclick="showMessage('Módulo Caixas Cadastradas em desenvolvimento!'); return false;" class="submenu-link">
-                        <span class="sub-icone">💰</span> Caixas Cadastradas
-                    </a>
-                    <a href="#" onclick="showMessage('Módulo Usuários em desenvolvimento!'); return false;" class="submenu-link" id="linkUsuarios">
-                        <span class="sub-icone">🔒</span> Usuários
-                    </a>
-                    <a href="parametros-config.html" class="submenu-link" id="linkParametros" style="display:none;">
-                        <span class="sub-icone">🛠️</span> Parâmetros
-                    </a>
+                    <a href="vendedores.html" class="submenu-link"><span class="sub-icone">👨‍💼</span> Vendedores</a>
+                    <a href="formas-pagamento.html" class="submenu-link"><span class="sub-icone">💳</span> Formas de Pagamento</a>
+                    <a href="regimes-tributarios.html" class="submenu-link"><span class="sub-icone">📋</span> Regimes Tributários</a>
+                    <a href="#" onclick="showMessage('Módulo Caixas Cadastradas em desenvolvimento!'); return false;" class="submenu-link"><span class="sub-icone">💰</span> Caixas Cadastradas</a>
+                    <a href="#" onclick="showMessage('Módulo Usuários em desenvolvimento!'); return false;" class="submenu-link" id="linkUsuarios"><span class="sub-icone">🔒</span> Usuários</a>
+                    <a href="parametros-config.html" class="submenu-link" id="linkParametros" style="display:none;"><span class="sub-icone">🛠️</span> Parâmetros</a>
                 </div>
             </div>
-
-            <!-- Outros Módulos -->
             <div class="nav-item">
                 <a href="outros-modulos.html" class="nav-link destaque">
-                    <span class="nav-icone">🚀</span>
-                    <span class="nav-texto">Outros Módulos</span>
+                    <span class="nav-icone">🚀</span><span class="nav-texto">Outros Módulos</span>
                 </a>
             </div>
-
-            <!-- Manual -->
             <div class="nav-item">
                 <a href="manual.html" class="nav-link">
-                    <span class="nav-icone">📚</span>
-                    <span class="nav-texto">Manual</span>
+                    <span class="nav-icone">📚</span><span class="nav-texto">Manual</span>
                 </a>
             </div>
-
         </nav>
-
-        <!-- Logout -->
         <div class="sidebar-footer">
             <button class="btn-logout" onclick="logout()">
-                <span>🚪</span>
-                <span>Sair do Sistema</span>
+                <span>🚪</span><span>Sair do Sistema</span>
             </button>
         </div>
-
     </aside>
 
     <!-- ============================================================
@@ -666,114 +244,52 @@
          ============================================================ -->
     <main class="main-area">
         <div class="main-content">
-
-            <!-- Tagline -->
             <div class="main-tagline">
                 <h2>Bem-vindo ao <strong>SIRIUS Web ERP</strong></h2>
                 <p>Gestão empresarial completa &nbsp;·&nbsp; Simples &nbsp;·&nbsp; Eficiente</p>
             </div>
-
-            <!-- Mandala -->
             <div class="mandala-wrapper">
-
-                <!-- SVG de linhas de conexão -->
                 <svg class="mandala-svg" viewBox="0 0 520 460">
-                    <!-- Hub: 260, 230 -->
-                    <!-- 1 Varejo    → 260, 45   (+ raio nó 38 = 260,83 → to 260,160 hub borda) -->
                     <line class="conn-line" x1="260" y1="230" x2="260" y2="83"  style="animation-delay:0s"/>
-                    <!-- 2 Atacado   → 404, 115 -->
                     <line class="conn-line" x1="260" y1="230" x2="380" y2="153" style="animation-delay:-0.4s"/>
-                    <!-- 3 Serviços  → 440, 271 -->
                     <line class="conn-line" x1="260" y1="230" x2="402" y2="271" style="animation-delay:-0.8s"/>
-                    <!-- 4 Fiscal    → 340, 397 -->
                     <line class="conn-line" x1="260" y1="230" x2="320" y2="359" style="animation-delay:-1.2s"/>
-                    <!-- 5 Financeiro→ 180, 397 -->
                     <line class="conn-line" x1="260" y1="230" x2="200" y2="359" style="animation-delay:-1.6s"/>
-                    <!-- 6 Compras   → 80, 271 -->
                     <line class="conn-line" x1="260" y1="230" x2="118" y2="271" style="animation-delay:-2.0s"/>
-                    <!-- 7 Nos Dif   → 116, 115 -->
                     <line class="conn-line" x1="260" y1="230" x2="154" y2="153" style="animation-delay:-2.4s"/>
                 </svg>
-
                 <!-- Hub Central — clicável → outros-modulos.html -->
-                <div class="erp-hub" onclick="window.location.href='outros-modulos.html'" title="Clique para ver a Introdução">
+                <div class="erp-hub" onclick="window.location.href='outros-modulos.html'" title="Ver Introdução">
                     <div class="hub-icone">⭐</div>
                     <div class="hub-titulo">SIRIUS</div>
                     <div class="hub-sub">ERP</div>
                 </div>
-
-                <!-- Legenda de módulos pagos -->
                 <div class="hub-legenda">Módulos disponíveis nas versões pagas</div>
-
                 <!-- 7 Satélites -->
-                <div class="erp-node node-1" onclick="abrirPainel('varejo')" title="Varejo">
-                    <div class="node-icone">🛒</div>
-                    <div class="node-label">Varejo</div>
-                </div>
-
-                <div class="erp-node node-2" onclick="abrirPainel('atacado')" title="Atacado e Distribuição">
-                    <div class="node-icone">🏭</div>
-                    <div class="node-label">Atacado e Distribuição</div>
-                </div>
-
-                <div class="erp-node node-3" onclick="abrirPainel('servicos')" title="Serviços">
-                    <div class="node-icone">🔧</div>
-                    <div class="node-label">Serviços</div>
-                </div>
-
-                <div class="erp-node node-4" onclick="abrirPainel('fiscal')" title="Fiscal">
-                    <div class="node-icone">📑</div>
-                    <div class="node-label">Fiscal</div>
-                </div>
-
-                <div class="erp-node node-5" onclick="abrirPainel('financeiro')" title="Financeiro">
-                    <div class="node-icone">💰</div>
-                    <div class="node-label">Financeiro</div>
-                </div>
-
-                <div class="erp-node node-6" onclick="abrirPainel('compras')" title="Compras">
-                    <div class="node-icone">🛍️</div>
-                    <div class="node-label">Compras</div>
-                </div>
-
-                <div class="erp-node node-7" onclick="abrirPainel('diferenciais')" title="Nossos Diferenciais">
-                    <div class="node-icone">⚡</div>
-                    <div class="node-label">Nossos Diferenciais</div>
-                </div>
-
+                <div class="erp-node node-1" onclick="abrirPainel('varejo')"><div class="node-icone">🛒</div><div class="node-label">Varejo</div></div>
+                <div class="erp-node node-2" onclick="abrirPainel('atacado')"><div class="node-icone">🏭</div><div class="node-label">Atacado e Distribuição</div></div>
+                <div class="erp-node node-3" onclick="abrirPainel('servicos')"><div class="node-icone">🔧</div><div class="node-label">Serviços</div></div>
+                <div class="erp-node node-4" onclick="abrirPainel('fiscal')"><div class="node-icone">📑</div><div class="node-label">Fiscal</div></div>
+                <div class="erp-node node-5" onclick="abrirPainel('financeiro')"><div class="node-icone">💰</div><div class="node-label">Financeiro</div></div>
+                <div class="erp-node node-6" onclick="abrirPainel('compras')"><div class="node-icone">🛍️</div><div class="node-label">Compras</div></div>
+                <div class="erp-node node-7" onclick="abrirPainel('diferenciais')"><div class="node-icone">⚡</div><div class="node-label">Nossos Diferenciais</div></div>
             </div>
-
-            <!-- Estatísticas -->
             <div class="main-footer">
                 <div class="footer-stats">
-                    <div class="stat-item">
-                        <span class="stat-numero">30+</span>
-                        <span class="stat-desc">Anos de mercado</span>
-                    </div>
+                    <div class="stat-item"><span class="stat-numero">30+</span><span class="stat-desc">Anos de mercado</span></div>
                     <div class="stat-divisor"></div>
-                    <div class="stat-item">
-                        <span class="stat-numero">12K+</span>
-                        <span class="stat-desc">Usuários atendidos</span>
-                    </div>
+                    <div class="stat-item"><span class="stat-numero">12K+</span><span class="stat-desc">Usuários atendidos</span></div>
                     <div class="stat-divisor"></div>
-                    <div class="stat-item">
-                        <span class="stat-numero">3.700+</span>
-                        <span class="stat-desc">Projetos executados</span>
-                    </div>
+                    <div class="stat-item"><span class="stat-numero">3.700+</span><span class="stat-desc">Projetos executados</span></div>
                 </div>
             </div>
-
         </div>
     </main>
-
 </div>
 
-<!-- ============================================================
-     PAINEL DE SUB-ITENS (overlay deslizante)
-     ============================================================ -->
+<!-- Painel Overlay -->
 <div id="painelOverlay" class="painel-overlay" onclick="fecharPainelFora(event)">
-    <div class="painel-conteudo" id="painelConteudo">
-
+    <div class="painel-conteudo">
         <div class="painel-header">
             <div class="painel-icone-grande" id="painelIcone"></div>
             <div class="painel-titulo-area">
@@ -782,19 +298,12 @@
             </div>
             <div class="painel-fechar" onclick="fecharPainel()">✕</div>
         </div>
-
         <div class="painel-grid" id="painelGrid"></div>
-
-        <div class="painel-rodape">
-            <span>Disponível nas versões pagas · softclever.com.br</span>
-        </div>
-
+        <div class="painel-rodape"><span>Disponível nas versões pagas · softclever.com.br</span></div>
     </div>
 </div>
 
-<!-- ============================================================
-     MODAL DE DESCRIÇÃO DO SUB-ITEM
-     ============================================================ -->
+<!-- Modal Descrição -->
 <div id="modalDescricao" onclick="fecharModalDescFora(event)">
     <div class="modal-desc-box">
         <div class="modal-desc-header">
@@ -811,7 +320,7 @@
     </div>
 </div>
 
-<!-- Modal de Aviso Genérico -->
+<!-- Modal Aviso -->
 <div id="modalAviso">
     <div class="modal-box">
         <div class="modal-header">
@@ -824,344 +333,155 @@
 </div>
 
 <script>
-    /* ============================================================
-       CONFIGURAÇÃO DE AMBIENTE
-       ============================================================ */
-    const isDev = ['localhost','127.0.0.1',''].includes(window.location.hostname)
-               || window.location.protocol === 'file:';
-    const API_URL = isDev
-        ? 'http://localhost:3000'
-        : 'https://sirius-web-api-adonis.vercel.app';
+    const isDev = ['localhost','127.0.0.1',''].includes(window.location.hostname) || window.location.protocol === 'file:';
+    const API_URL = isDev ? 'http://localhost:3000' : 'https://sirius-web-api-adonis.vercel.app';
 
-    /* ============================================================
-       DADOS DOS MÓDULOS / SATÉLITES
-       ============================================================ */
     const MODULOS = {
         varejo: {
-            titulo: 'Varejo',
-            icone: '🛒',
-            corFundo: 'linear-gradient(135deg,#064e3b,#10b981)',
-            corTexto: '#a7f3d0',
+            titulo: 'Varejo', icone: '🛒', corFundo: 'linear-gradient(135deg,#064e3b,#10b981)',
             subItens: [
-                {
-                    icone: '📋', titulo: 'Pré Vendas',
-                    desc: 'Pedidos e orçamentos de vendas. Fácil e ágil. Integra o pedido de venda com o caixa (emissão de cupom fiscal).'
-                },
-                {
-                    icone: '💰', titulo: 'Controle de Caixa',
-                    desc: 'Permite ao usuário acompanhamento diário das movimentações do caixa. Rotinas de abertura e fechamento do caixa, reforços e sangrias e muito mais.'
-                },
-                {
-                    icone: '📦', titulo: 'Controle de Estoque',
-                    desc: 'Rotinas simplificadas que facilitam o controle de entrada e saída de produtos. Totalmente integrado com o pedido de compras, pré-vendas e cupom fiscal.'
-                },
-                {
-                    icone: '🛵', titulo: 'Delivery',
-                    desc: 'Localize rapidamente o cadastro do cliente. Emissão de comandas e controle simplificado dos pedidos para a entrega. Permite finalizar a venda através da emissão do cupom fiscal.'
-                },
-                {
-                    icone: '📝', titulo: 'Comandas',
-                    desc: 'Atende comércios que necessitem controlar mesas e/ou comandas. Fácil inclusão e alteração de produtos além de ser possível finalizar a venda através da emissão do cupom fiscal.'
-                },
-                {
-                    icone: '📱', titulo: 'App Pré Vendas',
-                    desc: 'Aplicativo desenvolvido para celulares Android. Permite a geração de pré-vendas e comandas facilitando e agilizando as vendas para emissão do cupom fiscal.'
-                },
-                {
-                    icone: '💳', titulo: 'Financeiro',
-                    desc: 'Integrado com compras e vendas, permite ao usuário controle detalhado das contas a pagar e a receber, além de diversas opções de filtros e relatórios facilitando a gestão financeira.'
-                },
-                {
-                    icone: '📊', titulo: 'Relatórios',
-                    desc: 'Relatórios com totais de vendas e totais de comissões por vendedores e muito mais. Facilita a gestão das vendas realizadas e auxilia no pagamento de comissões.'
-                },
-                {
-                    icone: '🍔', titulo: 'Integração iFood',
-                    desc: 'Captura os pedidos do iFood, monta o pedido de venda e executa o despacho de forma rápida e fácil.'
-                },
-                {
-                    icone: '🛒', titulo: 'Pedidos de Compras',
-                    desc: 'Totalmente integrado com o estoque e financeiro a pagar. Permite ao usuário gerar pedidos de compras para os fornecedores, facilitando o controle de estoque e a gestão financeira.'
-                },
-                {
-                    icone: '🧾', titulo: 'NFC-e',
-                    desc: 'Emissão de cupom fiscal eletrônico rápido e fácil.'
-                }
+                { icone:'📋', titulo:'Pré Vendas', desc:'Pedidos e orçamentos de vendas. Fácil e ágil. Integra o pedido de venda com o caixa (emissão de cupom fiscal).' },
+                { icone:'💰', titulo:'Controle de Caixa', desc:'Permite ao usuário acompanhamento diário das movimentações do caixa. Rotinas de abertura e fechamento do caixa, reforços e sangrias e muito mais.' },
+                { icone:'📦', titulo:'Controle de Estoque', desc:'Rotinas simplificadas que facilitam o controle de entrada e saída de produtos. Totalmente integrado com o pedido de compras, pré-vendas e cupom fiscal.' },
+                { icone:'🛵', titulo:'Delivery', desc:'Localize rapidamente o cadastro do cliente. Emissão de comandas e controle simplificado dos pedidos para a entrega. Permite finalizar a venda através da emissão do cupom fiscal.' },
+                { icone:'📝', titulo:'Comandas', desc:'Atende comércios que necessitem controlar mesas e/ou comandas. Fácil inclusão e alteração de produtos além de ser possível finalizar a venda através da emissão do cupom fiscal.' },
+                { icone:'📱', titulo:'App Pré Vendas', desc:'Aplicativo desenvolvido para celulares Android. Permite a geração de pré-vendas e comandas facilitando e agilizando as vendas para emissão do cupom fiscal.' },
+                { icone:'💳', titulo:'Financeiro', desc:'Integrado com compras e vendas, permite ao usuário controle detalhado das contas a pagar e a receber, além de diversas opções de filtros e relatórios facilitando a gestão financeira.' },
+                { icone:'📊', titulo:'Relatórios', desc:'Relatórios com totais de vendas e totais de comissões por vendedores e muito mais. Facilita a gestão das vendas realizadas e auxilia no pagamento de comissões.' },
+                { icone:'🍔', titulo:'Integração iFood', desc:'Captura os pedidos do iFood, monta o pedido de venda e executa o despacho de forma rápida e fácil.' },
+                { icone:'🛒', titulo:'Pedidos de Compras', desc:'Totalmente integrado com o estoque e financeiro a pagar. Permite ao usuário gerar pedidos de compras para os fornecedores, facilitando o controle de estoque e a gestão financeira.' },
+                { icone:'🧾', titulo:'NFC-e', desc:'Emissão de cupom fiscal eletrônico rápido e fácil.' }
             ]
         },
         atacado: {
-            titulo: 'Atacado e Distribuição',
-            icone: '🏭',
-            corFundo: 'linear-gradient(135deg,#1e1b4b,#7c3aed)',
-            corTexto: '#ddd6fe',
+            titulo: 'Atacado e Distribuição', icone: '🏭', corFundo: 'linear-gradient(135deg,#1e1b4b,#7c3aed)',
             subItens: [
-                {
-                    icone: '📊', titulo: 'Orçamentos',
-                    desc: 'Digitação e controle completo dos orçamentos. Permite ao usuário envio parcial dos produtos para os pedidos de vendas. Controle de saldos, curva ABC de orçamentos, opções de relatórios comparativos (Orçado x Faturado x Saldo), status Pendente e Realizado, Follow-Up e impressão de orçamentos.'
-                },
-                {
-                    icone: '💼', titulo: 'Força de Vendas',
-                    desc: 'Plataforma WEB para pedidos de venda integrada ao Sírius, ideal para vendedores externos, oferecendo rapidez nas vendas, controle de estoque em tempo real e emissão ágil de NF-e.'
-                },
-                {
-                    icone: '📈', titulo: 'Relatórios Gerenciais e DRE',
-                    desc: 'Essenciais para o controle completo e gestão financeira da empresa. Permite ao usuário diversas opções de filtros e relatórios com totais de vendas detalhado por período, movimentações de vendas e saídas, movimentações do caixa com opções de resumo por forma e condição de pagamento, Curva ABC de Clientes, Produtos e Vendedores e Fornecedores e mapas de vendas.'
-                },
-                {
-                    icone: '🛒', titulo: 'Compras',
-                    desc: 'Totalmente integrado com o estoque e financeiro. Permite ao usuário gerar pedidos de compras para serviços ou produtos. Também é possível importar arquivos XMLs enviado pelos fornecedores. Impressão de diversos modelos de pedidos de compra e diversas opções de filtros e relatórios.'
-                },
-                {
-                    icone: '📋', titulo: 'Pedidos de Vendas',
-                    desc: 'Sistema de gestão integrado com estoque e financeiro, que permite a emissão rápida ou detalhada de pedidos de vendas, com várias opções de filtros e relatórios. Também oferece funções como geração de orçamentos, controle de entregas parciais, criação de ordem de produção, gestão de trocas e devoluções, movimentações financeiras, expedição de pedidos e impressão de documentos como recibos, etiquetas e pedidos.'
-                },
-                {
-                    icone: '💳', titulo: 'Financeiro',
-                    desc: 'Sistema integrado com compras e vendas que realiza o controle detalhado das contas a pagar e a receber, oferecendo diversas opções de filtros e relatórios. Inclui funcionalidades como controle de contas contábeis, centro de custos, conciliação bancária, emissão de boletos, integração com pagamentos bancários via SISPAG, lançamento de despesas, projeção de novas despesas, registro de pagamentos, controle de fluxo de caixa, metas orçamentárias e gerenciamento de saldos e transferências entre contas.'
-                },
-                {
-                    icone: '📄', titulo: 'Nota Fiscal de Produtos',
-                    desc: 'Totalmente integrado com o estoque e financeiro, Nota Fiscal Eletrônica (NF-e) com envio e autorização junto a Secretaria da Fazenda SEFAZ. Rotinas de cancelamento e inutilização por faixa numérica, carta de correção, envio automático de e-mail com XML e PDF para o cliente, configurações de diversos tipos de operações com cálculo automático de impostos, pré-visualização e impressão do DANFE e opções de relatórios fiscais.'
-                }
+                { icone:'📊', titulo:'Orçamentos', desc:'Digitação e controle completo dos orçamentos. Permite ao usuário envio parcial dos produtos para os pedidos de vendas. Controle de saldos, curva ABC de orçamentos, opções de relatórios comparativos (Orçado x Faturado x Saldo), status Pendente e Realizado, Follow-Up e impressão de orçamentos.' },
+                { icone:'💼', titulo:'Força de Vendas', desc:'Plataforma WEB para pedidos de venda integrada ao Sírius, ideal para vendedores externos, oferecendo rapidez nas vendas, controle de estoque em tempo real e emissão ágil de NF-e.' },
+                { icone:'📈', titulo:'Relatórios Gerenciais e DRE', desc:'Essenciais para o controle completo e gestão financeira da empresa. Permite ao usuário diversas opções de filtros e relatórios com totais de vendas por período, Curva ABC de Clientes, Produtos, Vendedores, Fornecedores e mapas de vendas.' },
+                { icone:'🛒', titulo:'Compras', desc:'Totalmente integrado com o estoque e financeiro. Permite ao usuário gerar pedidos de compras para serviços ou produtos. Também é possível importar arquivos XMLs enviado pelos fornecedores.' },
+                { icone:'📋', titulo:'Pedidos de Vendas', desc:'Sistema de gestão integrado com estoque e financeiro, que permite a emissão rápida ou detalhada de pedidos de vendas. Oferece geração de orçamentos, controle de entregas parciais, criação de ordem de produção, gestão de trocas e devoluções, expedição de pedidos e impressão de documentos.' },
+                { icone:'💳', titulo:'Financeiro', desc:'Sistema integrado com compras e vendas que realiza o controle detalhado das contas a pagar e a receber. Inclui controle de contas contábeis, centro de custos, conciliação bancária, emissão de boletos, integração via SISPAG, controle de fluxo de caixa e metas orçamentárias.' },
+                { icone:'📄', titulo:'Nota Fiscal de Produtos', desc:'Totalmente integrado com o estoque e financeiro, NF-e com envio e autorização junto à SEFAZ. Rotinas de cancelamento, carta de correção, envio automático de e-mail com XML e PDF, cálculo automático de impostos, pré-visualização e impressão do DANFE.' }
             ]
         },
         servicos: {
-            titulo: 'Serviços',
-            icone: '🔧',
-            corFundo: 'linear-gradient(135deg,#0c2340,#0ea5e9)',
-            corTexto: '#bae6fd',
+            titulo: 'Serviços', icone: '🔧', corFundo: 'linear-gradient(135deg,#0c2340,#0ea5e9)',
             subItens: [
-                {
-                    icone: '🔩', titulo: 'Ordens de Serviços e Assistência Técnica',
-                    desc: 'Totalmente integrado com as vendas, estoque e financeiro. Controle de entradas dos itens que serão consertados. Geração de orçamentos e ordens de serviços. Envio para pedido de vendas e geração de nota fiscal. Baixa automática das peças utilizadas, diversas opções de status, filtros, relatório e rotinas com exportação para Excel.'
-                },
-                {
-                    icone: '📄', titulo: 'Nota Fiscal de Serviços',
-                    desc: 'Nota Fiscal de Serviços Eletrônica (NFS-e), com envio rápido e em lote para o sistema da prefeitura. Gerada a partir do pedido de venda e integrada com o financeiro. Envio automático de PDF por email.'
-                }
+                { icone:'🔩', titulo:'Ordens de Serviços e Assistência Técnica', desc:'Totalmente integrado com as vendas, estoque e financeiro. Controle de entradas dos itens que serão consertados. Geração de orçamentos e ordens de serviços. Envio para pedido de vendas e geração de nota fiscal. Baixa automática das peças utilizadas, diversas opções de status, filtros, relatório e rotinas com exportação para Excel.' },
+                { icone:'📄', titulo:'Nota Fiscal de Serviços', desc:'Nota Fiscal de Serviços Eletrônica (NFS-e), com envio rápido e em lote para o sistema da prefeitura. Gerada a partir do pedido de venda e integrada com o financeiro. Envio automático de PDF por email.' }
             ]
         },
         fiscal: {
-            titulo: 'Fiscal',
-            icone: '📑',
-            corFundo: 'linear-gradient(135deg,#3b1f0a,#f97316)',
-            corTexto: '#fed7aa',
+            titulo: 'Fiscal', icone: '📑', corFundo: 'linear-gradient(135deg,#3b1f0a,#f97316)',
             subItens: [
-                {
-                    icone: '📂', titulo: 'SPED Fiscal',
-                    desc: 'Totalmente integrado com compras e vendas. Cálculo de impostos de entrada e saída. Captura do arquivo XML. Atribuição automática das CFOPs de entrada e das CSTs de ICMS, IPI, PIS e COFINS. Geração mensal do arquivo Sped para envio a SEFAZ e contabilidade. Geração de livro fiscal para conferência com livro da contabilidade. Permite conversão das unidades de medidas (compra x venda) e rateio de impostos. Pode ser contratado separadamente de nosso ERP e integrado ao seu sistema.'
-                },
-                {
-                    icone: '🔷', titulo: 'Bloco K',
-                    desc: 'Totalmente integrado com as compras, estoque e produção. O Bloco K atua como um componente do Sped Fiscal para controle detalhado dos saldos de entrada e saída de produtos e insumos. Geração mensal do arquivo Bloco K 200 e/ou 280 para envio a SEFAZ e para a contabilidade. Controla estoque próprio e estoque em poder de terceiros. Pode ser contratado separadamente de nosso ERP e integrado ao seu sistema.'
-                },
-                {
-                    icone: '📄', titulo: 'Nota Fiscal Eletrônica',
-                    desc: 'Emissão de Nota Fiscal Eletrônica (NF-e) com envio e autorização junto a SEFAZ. Rotinas de cancelamento e inutilização por faixa numérica, carta de correção, envio automático de e-mail com XML e PDF. Configurações de diversos tipos de operações com cálculo automático de impostos. Pré-visualização e impressão do DANFE e opções de relatórios fiscais.'
-                },
-                {
-                    icone: '🚛', titulo: 'Conhecimento de Transporte Eletrônico',
-                    desc: 'Emissão de Conhecimento de Transporte Eletrônico (CT-e) com envio e autorização junto a SEFAZ. Diversos processos automatizados. Filtros e relatórios gerenciais. Cadastros de emitente, remetente, consignatário, redespacho, tomador, expedidor, recebedor e destinatário. Pré-visualização e impressão do Conhecimento de Transporte.'
-                },
-                {
-                    icone: '📋', titulo: 'Manifesto de Documentos Fiscais',
-                    desc: 'Emissão de Manifestação de Documentos Fiscais com a finalidade de atender empresas prestadoras de serviço cujo transporte seja realizado em veículos próprios, arrendados, ou mediante a contratação de transportador autônomo de cargas. A finalidade do MDF-e é agilizar o registro em lote de documentos fiscais em trânsito e identificar a unidade de carga utilizada e demais características do transporte.'
-                },
-                {
-                    icone: '🏛️', titulo: 'NFS-e',
-                    desc: 'Nota Fiscal de Serviços Eletrônica (NFS-e), com envio rápido e em lote para o sistema da prefeitura. Gerada a partir do pedido de venda e integrada com o financeiro. Envio automático de PDF por email.'
-                }
+                { icone:'📂', titulo:'SPED Fiscal', desc:'Totalmente integrado com compras e vendas. Cálculo de impostos de entrada e saída. Atribuição automática das CFOPs e CSTs de ICMS, IPI, PIS e COFINS. Geração mensal do arquivo Sped para envio à SEFAZ e contabilidade. Pode ser contratado separadamente de nosso ERP.' },
+                { icone:'🔷', titulo:'Bloco K', desc:'Totalmente integrado com as compras, estoque e produção. Componente do Sped Fiscal para controle detalhado dos saldos de entrada e saída de produtos e insumos. Controla estoque próprio e estoque em poder de terceiros. Pode ser contratado separadamente.' },
+                { icone:'📄', titulo:'Nota Fiscal Eletrônica', desc:'Emissão de NF-e com envio e autorização junto à SEFAZ. Rotinas de cancelamento e inutilização por faixa numérica, carta de correção, envio automático de e-mail com XML e PDF, cálculo automático de impostos, pré-visualização e impressão do DANFE.' },
+                { icone:'🚛', titulo:'Conhecimento de Transporte Eletrônico', desc:'Emissão de CT-e com envio e autorização junto à SEFAZ. Diversos processos automatizados. Filtros e relatórios gerenciais. Cadastros de emitente, remetente, consignatário, redespacho, tomador, expedidor, recebedor e destinatário. Pré-visualização e impressão do Conhecimento de Transporte.' },
+                { icone:'📋', titulo:'Manifesto de Documentos Fiscais', desc:'Emissão de MDF-e para empresas prestadoras de serviço cujo transporte seja realizado em veículos próprios, arrendados ou mediante transportador autônomo. Agiliza o registro em lote de documentos fiscais em trânsito.' },
+                { icone:'🏛️', titulo:'NFS-e', desc:'Nota Fiscal de Serviços Eletrônica (NFS-e), com envio rápido e em lote para o sistema da prefeitura. Gerada a partir do pedido de venda e integrada com o financeiro. Envio automático de PDF por email.' }
             ]
         },
         financeiro: {
-            titulo: 'Financeiro',
-            icone: '💰',
-            corFundo: 'linear-gradient(135deg,#0e2a1f,#16a34a)',
-            corTexto: '#bbf7d0',
+            titulo: 'Financeiro', icone: '💰', corFundo: 'linear-gradient(135deg,#0e2a1f,#16a34a)',
             subItens: [
-                {
-                    icone: '💳', titulo: 'Gestão Financeira',
-                    desc: 'Sistema integrado com compras e vendas que realiza o controle detalhado das contas a pagar e a receber, oferecendo diversas opções de filtros e relatórios. Inclui funcionalidades como controle de contas contábeis, centro de custos, conciliação bancária, emissão de boletos, integração com pagamentos bancários via SISPAG, lançamento de despesas, projeção de novas despesas, registro de pagamentos, controle de fluxo de caixa, metas orçamentárias e gerenciamento de saldos e transferências entre contas.'
-                }
+                { icone:'💳', titulo:'Gestão Financeira', desc:'Sistema integrado com compras e vendas que realiza o controle detalhado das contas a pagar e a receber, oferecendo diversas opções de filtros e relatórios. Inclui funcionalidades como controle de contas contábeis, centro de custos, conciliação bancária, emissão de boletos, integração com pagamentos bancários via SISPAG, lançamento de despesas, projeção de novas despesas, registro de pagamentos, controle de fluxo de caixa, metas orçamentárias e gerenciamento de saldos e transferências entre contas.' }
             ]
         },
         compras: {
-            titulo: 'Compras',
-            icone: '🛍️',
-            corFundo: 'linear-gradient(135deg,#1c1338,#8b5cf6)',
-            corTexto: '#ede9fe',
+            titulo: 'Compras', icone: '🛍️', corFundo: 'linear-gradient(135deg,#1c1338,#8b5cf6)',
             subItens: [
-                {
-                    icone: '🛒', titulo: 'Gestão de Compras',
-                    desc: 'Totalmente integrado com o estoque e financeiro. Permite ao usuário gerar pedidos de compras para serviços ou produtos. Também é possível importar arquivos XMLs enviado pelos fornecedores. Impressão de diversos modelos de pedidos de compra e diversas opções de filtros e relatórios.'
-                }
+                { icone:'🛒', titulo:'Gestão de Compras', desc:'Totalmente integrado com o estoque e financeiro. Permite ao usuário gerar pedidos de compras para serviços ou produtos. Também é possível importar arquivos XMLs enviado pelos fornecedores. Impressão de diversos modelos de pedidos de compra e diversas opções de filtros e relatórios.' }
             ]
         },
         diferenciais: {
-            titulo: 'Nossos Diferenciais',
-            icone: '⚡',
-            corFundo: 'linear-gradient(135deg,#1a1008,#d97706)',
-            corTexto: '#fde68a',
+            titulo: 'Nossos Diferenciais', icone: '⚡', corFundo: 'linear-gradient(135deg,#1a1008,#d97706)',
             subItens: [
-                {
-                    icone: '📡', titulo: 'Livre da Internet',
-                    desc: 'Tudo continua funcionando mesmo sem conexão com a internet. Sua operação nunca para.'
-                },
-                {
-                    icone: '⌨️', titulo: 'Livre do Mouse',
-                    desc: 'Para maior agilidade, as rotinas de vendas podem ser operadas exclusivamente pelo teclado.'
-                },
-                {
-                    icone: '☁️', titulo: 'Modos de Uso',
-                    desc: 'Local, Híbrido e Nuvem. Escolha o modelo que melhor se adapta à sua estrutura de TI e necessidades operacionais.'
-                },
-                {
-                    icone: '⚡', titulo: 'Máxima Velocidade',
-                    desc: 'Maior velocidade em todas as telas e rotinas, garantindo produtividade no dia a dia.'
-                }
+                { icone:'📡', titulo:'Livre da Internet', desc:'Tudo continua funcionando mesmo sem conexão com a internet. Sua operação nunca para.' },
+                { icone:'⌨️', titulo:'Livre do Mouse', desc:'Para maior agilidade, as rotinas de vendas podem ser operadas exclusivamente pelo teclado.' },
+                { icone:'☁️', titulo:'Modos de Uso', desc:'Local, Híbrido e Nuvem. Escolha o modelo que melhor se adapta à sua estrutura de TI e necessidades operacionais.' },
+                { icone:'⚡', titulo:'Máxima Velocidade', desc:'Maior velocidade em todas as telas e rotinas, garantindo produtividade no dia a dia.' }
             ]
         }
     };
 
-    /* ============================================================
-       ABRIR PAINEL DE SUB-ITENS
-       ============================================================ */
     function abrirPainel(modulo) {
         const dados = MODULOS[modulo];
         if (!dados) return;
-
-        // Cabeçalho
         const icone = document.getElementById('painelIcone');
         icone.textContent = dados.icone;
         icone.style.background = dados.corFundo;
-
         document.getElementById('painelTitulo').textContent = dados.titulo;
-
-        // Grid de sub-itens
         const grid = document.getElementById('painelGrid');
         grid.innerHTML = '';
-
         dados.subItens.forEach(item => {
             const card = document.createElement('div');
             card.className = 'sub-card';
-            card.innerHTML = `
-                <div class="sub-card-icone" style="background:${dados.corFundo};">${item.icone}</div>
-                <div class="sub-card-texto">
-                    <div class="sub-card-titulo">${item.titulo}</div>
-                    <div class="sub-card-hint">Clique para saber mais</div>
-                </div>
-            `;
+            card.innerHTML = `<div class="sub-card-icone" style="background:${dados.corFundo};">${item.icone}</div><div class="sub-card-texto"><div class="sub-card-titulo">${item.titulo}</div><div class="sub-card-hint">Clique para saber mais</div></div>`;
             card.addEventListener('click', () => abrirModalDesc(item, dados));
             grid.appendChild(card);
         });
-
-        // Exibir overlay
         document.getElementById('painelOverlay').classList.add('visivel');
-        document.body.style.overflow = 'hidden';
     }
+    function fecharPainel() { document.getElementById('painelOverlay').classList.remove('visivel'); }
+    function fecharPainelFora(e) { if (e.target === document.getElementById('painelOverlay')) fecharPainel(); }
 
-    function fecharPainel() {
-        document.getElementById('painelOverlay').classList.remove('visivel');
-        document.body.style.overflow = '';
-    }
-
-    function fecharPainelFora(e) {
-        if (e.target === document.getElementById('painelOverlay')) fecharPainel();
-    }
-
-    /* ============================================================
-       ABRIR MODAL DE DESCRIÇÃO
-       ============================================================ */
     function abrirModalDesc(item, modDados) {
-        document.getElementById('modalDescIcone').textContent  = item.icone;
+        document.getElementById('modalDescIcone').textContent = item.icone;
         document.getElementById('modalDescIcone').style.background = modDados.corFundo;
         document.getElementById('modalDescTitulo').textContent = item.titulo;
         document.getElementById('modalDescModulo').textContent = modDados.titulo;
-        document.getElementById('modalDescTexto').textContent  = item.desc;
+        document.getElementById('modalDescTexto').textContent = item.desc;
         document.getElementById('modalDescricao').classList.add('visivel');
     }
+    function fecharModalDesc() { document.getElementById('modalDescricao').classList.remove('visivel'); }
+    function fecharModalDescFora(e) { if (e.target === document.getElementById('modalDescricao')) fecharModalDesc(); }
 
-    function fecharModalDesc() {
-        document.getElementById('modalDescricao').classList.remove('visivel');
-    }
-
-    function fecharModalDescFora(e) {
-        if (e.target === document.getElementById('modalDescricao')) fecharModalDesc();
-    }
-
-    /* ============================================================
-       SUBMENUS DA SIDEBAR (genérico)
-       ============================================================ */
-    function toggleSubmenu(submenuId, btnId) {
-        const submenu = document.getElementById(submenuId);
-        const btn     = document.getElementById(btnId);
-        const aberto  = submenu.classList.contains('aberto');
+    /* Submenus originais */
+    function toggleSubmenuVendas() {
+        const btn = document.getElementById('btnVendas');
+        const submenu = document.getElementById('submenuVendas');
+        const aberto = submenu.classList.contains('aberto');
         submenu.classList.toggle('aberto', !aberto);
         btn.classList.toggle('aberto', !aberto);
     }
-
-    /* ============================================================
-       MODAL DE AVISO
-       ============================================================ */
-    function showMessage(msg) {
-        document.getElementById('mensagemAviso').textContent = msg;
-        document.getElementById('modalAviso').classList.add('visivel');
+    function toggleSubmenu() {
+        const btn = document.getElementById('btnConfiguracoes');
+        const submenu = document.getElementById('submenuConfiguracoes');
+        const estaAberto = submenu.classList.contains('aberto');
+        if (estaAberto) { submenu.classList.remove('aberto'); btn.classList.remove('aberto'); }
+        else { submenu.classList.add('aberto'); btn.classList.add('aberto'); }
     }
-    function closeMessage() {
-        document.getElementById('modalAviso').classList.remove('visivel');
-    }
-    document.getElementById('modalAviso').addEventListener('click', function(e) {
-        if (e.target === this) closeMessage();
-    });
+    function showMessage(msg) { document.getElementById('mensagemAviso').textContent = msg; document.getElementById('modalAviso').classList.add('visivel'); }
+    function closeMessage() { document.getElementById('modalAviso').classList.remove('visivel'); }
+    document.getElementById('modalAviso').addEventListener('click', function(e) { if (e.target === this) closeMessage(); });
 
-    /* ============================================================
-       AUTENTICAÇÃO
-       ============================================================ */
     function checkAuth() {
         const token = localStorage.getItem('sirius_token');
         if (!token) { window.location.href = 'index.html'; return null; }
         return token;
     }
-
     function logout() {
         localStorage.removeItem('sirius_token');
         localStorage.removeItem('sirius_usuario');
         localStorage.removeItem('sirius_empresas');
         window.location.href = 'index.html';
     }
-
-    /* ============================================================
-       CARREGAR DADOS DO USUÁRIO
-       ============================================================ */
     function carregarUsuario() {
         const token = checkAuth();
         if (!token) return;
-
         try {
             const usuario  = JSON.parse(localStorage.getItem('sirius_usuario') || '{}');
             const empresas = JSON.parse(localStorage.getItem('sirius_empresas') || '[]');
             const empresa  = Array.isArray(empresas) ? empresas[0] : empresas;
-
             const nome = usuario.nome || 'Usuário';
             document.getElementById('userName').textContent = nome;
-
-            const iniciais = nome.split(' ').map(p => p[0]).slice(0,2).join('').toUpperCase();
-            document.getElementById('userAvatar').textContent = iniciais || '?';
-
-            const plano = empresa?.plano || 'Gratuito';
-            document.getElementById('userPlano').textContent = plano;
-
-            if (empresa?.is_admin) {
-                document.getElementById('linkParametros').style.display = 'flex';
-            }
-        } catch (e) {
-            console.error('Erro ao carregar usuário:', e);
-        }
+            document.getElementById('userAvatar').textContent = nome.split(' ').map(p => p[0]).slice(0,2).join('').toUpperCase() || '?';
+            document.getElementById('userPlano').textContent = empresa?.plano || 'Gratuito';
+            if (empresa?.is_admin) document.getElementById('linkParametros').style.display = 'flex';
+        } catch(e) { console.error('Erro ao carregar usuário:', e); }
     }
-
-    /* ============================================================
-       INICIALIZAÇÃO
-       ============================================================ */
     carregarUsuario();
     console.log('✅ Menu Principal carregado |', isDev ? 'DEV' : 'PROD');
 </script>

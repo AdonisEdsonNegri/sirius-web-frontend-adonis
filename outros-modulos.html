@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SIRIUS WEB – Introdução</title>
+    <title>SIRIUS WEB – Outros Módulos</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@300;400;600;700&display=swap" rel="stylesheet">
@@ -11,12 +11,11 @@
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
         :root {
-            --azul:    #2563eb;
-            --azul2:   #60a5fa;
-            --verde:   #10b981;
-            --ouro:    #f59e0b;
-            --branco:  #ffffff;
-            --cinza:   #94a3b8;
+            --azul:  #2563eb;
+            --azul2: #60a5fa;
+            --verde: #10b981;
+            --ouro:  #f59e0b;
+            --cinza: #94a3b8;
         }
 
         html, body {
@@ -26,379 +25,750 @@
         }
 
         /* ============================================================
-           FUNDO
+           ESTRUTURA PRINCIPAL
            ============================================================ */
-        .fundo {
-            width: 100vw; height: 100vh; position: relative;
+        .pagina {
+            width: 100vw; height: 100vh;
+            display: flex; flex-direction: column;
+            position: relative; overflow: hidden;
+        }
+
+        /* ============================================================
+           ÁREA DE CONTEÚDO (ocupa toda a altura exceto o rodapé)
+           ============================================================ */
+        .area-conteudo {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Cada seção ocupa 100% da área */
+        .secao {
+            position: absolute; inset: 0;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 0 5vw;
+        }
+        .secao.ativa { display: flex; }
+
+        /* ============================================================
+           FUNDO ANIMADO (compartilhado)
+           ============================================================ */
+        .fundo-base {
+            position: absolute; inset: 0;
             background:
                 radial-gradient(ellipse 70% 55% at 50% 10%, rgba(37,99,235,0.18) 0%, transparent 65%),
                 radial-gradient(ellipse 40% 50% at 85% 80%, rgba(16,185,129,0.08) 0%, transparent 60%),
                 linear-gradient(160deg, #040c1e 0%, #071530 55%, #040c1e 100%);
-            display: flex; flex-direction: column;
-            align-items: center; justify-content: center;
-            overflow: hidden;
         }
-
-        /* Grade de pontos */
-        .fundo::before {
+        .fundo-base::before {
             content: ''; position: absolute; inset: -5%;
             background-image: radial-gradient(circle, rgba(37,99,235,0.25) 1px, transparent 1px);
             background-size: 38px 38px;
             animation: moverGrade 22s linear infinite;
-            opacity: 0.35;
+            opacity: 0.3;
         }
         @keyframes moverGrade { 0% { transform: translate(0,0); } 100% { transform: translate(38px,38px); } }
 
-        /* Linha horizontal decorativa */
-        .fundo::after {
+        /* ============================================================
+           SEÇÃO: INTRODUÇÃO
+           ============================================================ */
+        #sec-introducao .fundo-base::after {
             content: ''; position: absolute; left: 0; top: 38%;
             width: 100%; height: 1px;
             background: linear-gradient(90deg, transparent 0%, var(--azul) 30%, var(--verde) 60%, var(--azul) 85%, transparent 100%);
-            opacity: 0.15; filter: blur(1px);
+            opacity: 0.15;
         }
 
-        /* ============================================================
-           CONTEÚDO PRINCIPAL
-           ============================================================ */
-        .conteudo {
+        .intro-conteudo {
             position: relative; z-index: 10;
             display: flex; flex-direction: column;
-            align-items: center;
-            width: 100%; padding: 0 5vw;
-            max-width: 1100px;
+            align-items: center; width: 100%; max-width: 1100px;
         }
 
-        /* Marca */
         .marca {
-            font-weight: 300; font-size: clamp(11px, 1.2vw, 15px);
+            font-weight: 300; font-size: clamp(11px,1.2vw,15px);
             letter-spacing: 8px; text-transform: uppercase;
             color: rgba(255,255,255,0.25);
-            opacity: 0; animation: subir 0.6s ease 0.05s forwards;
+            animation: subir 0.6s ease 0.05s both;
             margin-bottom: 4px;
         }
 
-        /* Badge */
         .badge-intro {
             display: inline-flex; align-items: center; gap: 6px;
-            background: rgba(37,99,235,0.1);
-            border: 1px solid rgba(37,99,235,0.3);
+            background: rgba(37,99,235,0.1); border: 1px solid rgba(37,99,235,0.3);
             border-radius: 20px; padding: 5px 16px;
-            color: var(--azul2); font-size: 12px;
-            font-weight: 600; letter-spacing: 2px; text-transform: uppercase;
-            opacity: 0; animation: subir 0.6s ease 0.15s forwards;
+            color: var(--azul2); font-size: 12px; font-weight: 600;
+            letter-spacing: 2px; text-transform: uppercase;
+            animation: subir 0.6s ease 0.15s both;
             margin-bottom: 14px;
         }
-        .badge-ponto { width: 6px; height: 6px; border-radius: 50%; background: var(--verde); animation: piscar 1.5s ease infinite; }
-        @keyframes piscar { 0%,100% { opacity: 1; } 50% { opacity: 0.2; } }
+        .badge-ponto {
+            width: 6px; height: 6px; border-radius: 50%;
+            background: var(--verde); animation: piscar 1.5s ease infinite;
+        }
+        @keyframes piscar { 0%,100%{opacity:1}50%{opacity:0.2} }
 
-        /* Título principal */
         .titulo-principal {
             font-family: 'Bebas Neue', sans-serif;
-            font-size: clamp(58px, 9vw, 110px);
+            font-size: clamp(58px,9vw,110px);
             line-height: 0.9; letter-spacing: -2px;
             color: transparent;
-            background: linear-gradient(130deg, #ffffff 0%, #bfdbfe 30%, var(--azul2) 55%, var(--verde) 85%);
+            background: linear-gradient(130deg,#ffffff 0%,#bfdbfe 30%,var(--azul2) 55%,var(--verde) 85%);
             -webkit-background-clip: text; background-clip: text;
-            opacity: 0; transform: translateY(20px);
-            animation: subir 0.8s cubic-bezier(0.16,1,0.3,1) 0.3s forwards;
             filter: drop-shadow(0 0 40px rgba(37,99,235,0.4));
+            animation: subir 0.8s cubic-bezier(0.16,1,0.3,1) 0.3s both;
             text-align: center; margin-bottom: 8px;
         }
 
-        /* Subtítulo */
         .subtitulo {
-            font-size: clamp(13px, 1.8vw, 20px); font-weight: 600;
+            font-size: clamp(13px,1.8vw,20px); font-weight: 600;
             letter-spacing: 4px; text-transform: uppercase;
             color: transparent;
             background: linear-gradient(90deg, var(--azul2), var(--verde));
             -webkit-background-clip: text; background-clip: text;
-            opacity: 0; transform: translateY(16px);
-            animation: subir 0.7s ease 0.5s forwards;
+            animation: subir 0.7s ease 0.5s both;
             text-align: center; margin-bottom: 36px;
         }
 
-        /* ============================================================
-           CARDS DE TÓPICOS
-           ============================================================ */
+        /* Cards de tópicos */
         .topicos-grid {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 14px;
-            width: 100%;
-            opacity: 0; transform: translateY(20px);
-            animation: subir 0.7s ease 0.75s forwards;
+            display: grid; grid-template-columns: repeat(5,1fr);
+            gap: 14px; width: 100%;
+            animation: subir 0.7s ease 0.75s both;
         }
-
         .topico-card {
             background: rgba(255,255,255,0.03);
             border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 16px;
-            padding: 20px 16px;
+            border-radius: 16px; padding: 20px 16px;
             display: flex; flex-direction: column;
             align-items: center; text-align: center;
-            transition: all 0.3s ease;
-            cursor: default;
+            transition: all 0.3s ease; cursor: default;
             position: relative; overflow: hidden;
         }
-        .topico-card::before {
-            content: ''; position: absolute; inset: 0;
-            background: var(--cor-card, rgba(37,99,235,0.06));
-            opacity: 0; transition: opacity 0.3s;
-            border-radius: 16px;
-        }
-        .topico-card:hover::before { opacity: 1; }
-        .topico-card:hover {
-            border-color: var(--borda-card, rgba(37,99,235,0.4));
-            transform: translateY(-4px);
-            box-shadow: 0 12px 40px rgba(0,0,0,0.35);
+        .topico-card::before { content:''; position:absolute; inset:0; background: var(--cor-card,rgba(37,99,235,0.06)); opacity:0; transition:opacity 0.3s; border-radius:16px; }
+        .topico-card:hover::before { opacity:1; }
+        .topico-card:hover { border-color: var(--borda-card,rgba(37,99,235,0.4)); transform: translateY(-4px); box-shadow: 0 12px 40px rgba(0,0,0,0.35); }
+        .topico-icone-wrap { width:52px; height:52px; border-radius:16px; display:flex; align-items:center; justify-content:center; font-size:24px; margin-bottom:14px; background: var(--bg-icone,rgba(37,99,235,0.15)); border: 1px solid var(--borda-icone,rgba(37,99,235,0.3)); box-shadow: 0 0 18px var(--sombra-icone,rgba(37,99,235,0.2)); position:relative; z-index:1; }
+        .topico-titulo { color:#e2e8f0; font-size:13px; font-weight:700; letter-spacing:1px; text-transform:uppercase; margin-bottom:8px; position:relative; z-index:1; }
+        .topico-divisor { width:30px; height:2px; border-radius:2px; background: var(--linha-card,rgba(37,99,235,0.5)); margin:8px auto; }
+        .topico-desc { color:#64748b; font-size:12px; line-height:1.5; position:relative; z-index:1; }
+
+        .card-internet { --cor-card:rgba(37,99,235,0.06); --borda-card:rgba(37,99,235,0.4); --bg-icone:rgba(37,99,235,0.15); --borda-icone:rgba(37,99,235,0.3); --sombra-icone:rgba(37,99,235,0.25); --linha-card:#2563eb; }
+        .card-mouse    { --cor-card:rgba(16,185,129,0.06); --borda-card:rgba(16,185,129,0.4); --bg-icone:rgba(16,185,129,0.12); --borda-icone:rgba(16,185,129,0.3); --sombra-icone:rgba(16,185,129,0.2); --linha-card:#10b981; }
+        .card-seguranca{ --cor-card:rgba(139,92,246,0.06); --borda-card:rgba(139,92,246,0.4); --bg-icone:rgba(139,92,246,0.12); --borda-icone:rgba(139,92,246,0.3); --sombra-icone:rgba(139,92,246,0.2); --linha-card:#8b5cf6; }
+        .card-velocidade{ --cor-card:rgba(245,158,11,0.06); --borda-card:rgba(245,158,11,0.4); --bg-icone:rgba(245,158,11,0.12); --borda-icone:rgba(245,158,11,0.3); --sombra-icone:rgba(245,158,11,0.2); --linha-card:#f59e0b; }
+        .card-modos    { --cor-card:rgba(14,165,233,0.06); --borda-card:rgba(14,165,233,0.4); --bg-icone:rgba(14,165,233,0.12); --borda-icone:rgba(14,165,233,0.3); --sombra-icone:rgba(14,165,233,0.2); --linha-card:#0ea5e9; }
+
+        /* ============================================================
+           SEÇÕES DE MÓDULO (Varejo, Atacado, Distribuição, etc.)
+           ============================================================ */
+        .modulo-conteudo {
+            position: relative; z-index: 10;
+            display: flex; flex-direction: column;
+            align-items: flex-start; width: 100%; max-width: 1000px;
         }
 
-        .topico-icone-wrap {
-            width: 52px; height: 52px; border-radius: 16px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 24px; margin-bottom: 14px;
-            background: var(--bg-icone, rgba(37,99,235,0.15));
-            border: 1px solid var(--borda-icone, rgba(37,99,235,0.3));
-            box-shadow: 0 0 18px var(--sombra-icone, rgba(37,99,235,0.2));
-            position: relative; z-index: 1;
+        .modulo-badge {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 5px 14px; border-radius: 20px;
+            font-size: 11px; font-weight: 700; letter-spacing: 3px;
+            text-transform: uppercase; margin-bottom: 12px;
+            animation: subir 0.5s ease 0.1s both;
         }
 
-        .topico-titulo {
-            color: #e2e8f0; font-size: 13px; font-weight: 700;
-            letter-spacing: 1px; text-transform: uppercase;
-            margin-bottom: 8px; position: relative; z-index: 1;
+        .modulo-titulo {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: clamp(50px,8vw,100px);
+            line-height: 0.88; letter-spacing: -2px;
+            color: transparent; margin-bottom: 10px;
+            animation: entrarEsq 0.7s cubic-bezier(0.16,1,0.3,1) 0.2s both;
         }
 
-        .topico-desc {
-            color: #64748b; font-size: 12px; line-height: 1.5;
-            position: relative; z-index: 1;
+        .modulo-subtitulo {
+            font-size: 14px; font-weight: 600; letter-spacing: 3px;
+            text-transform: uppercase; margin-bottom: 28px;
+            animation: subir 0.6s ease 0.4s both;
         }
 
-        .topico-divisor {
-            width: 30px; height: 2px; border-radius: 2px;
-            background: var(--linha-card, rgba(37,99,235,0.5));
-            margin: 8px auto;
+        .modulo-separador {
+            width: 0; height: 2px; border-radius: 2px;
+            margin-bottom: 28px;
+            animation: expandir 0.7s ease 0.6s both;
         }
 
-        /* Variações de cores por card */
-        .card-internet {
-            --cor-card: rgba(37,99,235,0.06);
-            --borda-card: rgba(37,99,235,0.4);
-            --bg-icone: rgba(37,99,235,0.15);
-            --borda-icone: rgba(37,99,235,0.3);
-            --sombra-icone: rgba(37,99,235,0.25);
-            --linha-card: #2563eb;
+        .modulo-chips {
+            display: flex; flex-wrap: wrap; gap: 10px;
+            animation: subir 0.6s ease 0.75s both;
         }
-        .card-mouse {
-            --cor-card: rgba(16,185,129,0.06);
-            --borda-card: rgba(16,185,129,0.4);
-            --bg-icone: rgba(16,185,129,0.12);
-            --borda-icone: rgba(16,185,129,0.3);
-            --sombra-icone: rgba(16,185,129,0.2);
-            --linha-card: #10b981;
+
+        .chip-item {
+            font-size: 12px; font-weight: 600; letter-spacing: 1.5px;
+            text-transform: uppercase; padding: 7px 16px;
+            border-radius: 24px; border: 1px solid;
+            cursor: default; transition: transform 0.2s;
         }
-        .card-seguranca {
-            --cor-card: rgba(139,92,246,0.06);
-            --borda-card: rgba(139,92,246,0.4);
-            --bg-icone: rgba(139,92,246,0.12);
-            --borda-icone: rgba(139,92,246,0.3);
-            --sombra-icone: rgba(139,92,246,0.2);
-            --linha-card: #8b5cf6;
+        .chip-item:hover { transform: translateY(-2px); }
+
+        /* Painel decorativo de hexágonos (direita) */
+        .deco-hexs {
+            position: absolute; right: 3vw; top: 50%;
+            transform: translateY(-50%);
+            width: 220px; height: 240px;
+            opacity: 0; animation: entrarDeco 0.9s ease 0.5s forwards;
         }
-        .card-velocidade {
-            --cor-card: rgba(245,158,11,0.06);
-            --borda-card: rgba(245,158,11,0.4);
-            --bg-icone: rgba(245,158,11,0.12);
-            --borda-icone: rgba(245,158,11,0.3);
-            --sombra-icone: rgba(245,158,11,0.2);
-            --linha-card: #f59e0b;
+        .hex {
+            position: absolute; width: 52px; height: 46px;
+            clip-path: polygon(25% 0%,75% 0%,100% 50%,75% 100%,25% 100%,0% 50%);
         }
-        .card-modos {
-            --cor-card: rgba(14,165,233,0.06);
-            --borda-card: rgba(14,165,233,0.4);
-            --bg-icone: rgba(14,165,233,0.12);
-            --borda-icone: rgba(14,165,233,0.3);
-            --sombra-icone: rgba(14,165,233,0.2);
-            --linha-card: #0ea5e9;
+        .hex:nth-child(1){top:0;left:70px;}
+        .hex:nth-child(2){top:52px;left:18px;}
+        .hex:nth-child(3){top:52px;left:122px;}
+        .hex:nth-child(4){top:104px;left:70px;}
+        .hex:nth-child(5){top:104px;left:174px;}
+        .hex:nth-child(6){top:156px;left:18px;}
+        .hex:nth-child(7){top:156px;left:122px;}
+        .hex:nth-child(8){top:208px;left:70px;}
+        @keyframes entrarDeco{from{opacity:0;transform:translateY(-40%);}to{opacity:1;transform:translateY(-50%);}}
+
+        /* Descrição modal de chip */
+        .chip-desc {
+            display: none; position: fixed; inset: 0;
+            background: rgba(0,0,0,0.75); z-index: 9999;
+            align-items: center; justify-content: center; padding: 20px;
+        }
+        .chip-desc.visivel { display: flex; }
+        .chip-desc-box {
+            background: linear-gradient(160deg,#0d1f3c,#0a1628);
+            border: 1px solid rgba(37,99,235,0.3);
+            border-radius: 16px; padding: 32px;
+            max-width: 500px; width: 100%;
+            box-shadow: 0 24px 80px rgba(0,0,0,0.6);
+            animation: subir 0.2s ease;
+        }
+        .chip-desc-header { display:flex; align-items:center; gap:12px; margin-bottom:16px; }
+        .chip-desc-icone { font-size:28px; }
+        .chip-desc-titulo { color:#fff; font-size:18px; font-weight:700; flex:1; }
+        .chip-desc-fechar { width:32px; height:32px; border-radius:50%; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); display:flex; align-items:center; justify-content:center; color:#64748b; font-size:16px; cursor:pointer; transition:all 0.2s; }
+        .chip-desc-fechar:hover { background:rgba(239,68,68,0.15); color:#f87171; }
+        .chip-desc-sep { height:1px; background:rgba(37,99,235,0.2); margin-bottom:14px; }
+        .chip-desc-texto { color:#94a3b8; font-size:14px; line-height:1.7; margin-bottom:24px; }
+        .chip-desc-ok { width:100%; padding:12px; background:#2563eb; border:none; border-radius:10px; color:white; font-size:14px; font-weight:600; cursor:pointer; transition:background 0.2s; }
+        .chip-desc-ok:hover { background:#1e40af; }
+
+        /* ============================================================
+           CANVAS DE PARTÍCULAS
+           ============================================================ */
+        #particulas { position: absolute; inset: 0; pointer-events: none; z-index: 5; }
+
+        /* ============================================================
+           RODAPÉ DE NAVEGAÇÃO
+           ============================================================ */
+        .nav-rodape {
+            flex-shrink: 0;
+            height: 64px;
+            background: rgba(4,9,26,0.97);
+            border-top: 1px solid rgba(37,99,235,0.2);
+            display: flex; align-items: center;
+            padding: 0 20px; gap: 10px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 -4px 24px rgba(0,0,0,0.4);
+            z-index: 100;
+        }
+
+        /* Botões Anterior / Próxima */
+        .nav-btn {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 8px 18px; border-radius: 8px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: var(--cinza); font-family: 'Barlow', sans-serif;
+            font-size: 13px; font-weight: 600; letter-spacing: 1px;
+            cursor: pointer; transition: all 0.2s; white-space: nowrap;
+            flex-shrink: 0;
+        }
+        .nav-btn:hover { background: rgba(37,99,235,0.12); color: #e2e8f0; border-color: rgba(37,99,235,0.3); }
+        .nav-btn:disabled { opacity: 0.3; cursor: default; pointer-events: none; }
+
+        /* Abas centrais */
+        .nav-abas {
+            flex: 1; display: flex; align-items: center;
+            justify-content: center; gap: 6px;
+            overflow-x: auto; padding: 0 4px;
+        }
+        .nav-abas::-webkit-scrollbar { display: none; }
+
+        .nav-aba {
+            display: inline-flex; align-items: center; gap: 5px;
+            padding: 8px 16px; border-radius: 8px;
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.07);
+            color: #475569; font-family: 'Barlow', sans-serif;
+            font-size: 13px; font-weight: 600;
+            cursor: pointer; transition: all 0.2s; white-space: nowrap;
+        }
+        .nav-aba:hover { background: rgba(37,99,235,0.1); color: #94a3b8; border-color: rgba(37,99,235,0.2); }
+        .nav-aba.ativa {
+            background: rgba(37,99,235,0.2);
+            border-color: rgba(37,99,235,0.5);
+            color: #60a5fa;
+            box-shadow: 0 0 12px rgba(37,99,235,0.2);
         }
 
         /* ============================================================
-           RODAPÉ
+           ANIMAÇÕES GLOBAIS
            ============================================================ */
-        .rodape {
-            position: absolute; bottom: 0; left: 0; right: 0;
-            z-index: 20; display: flex;
-            align-items: center; justify-content: space-between;
-            padding: 18px 5vw;
-            background: linear-gradient(0deg, rgba(4,12,30,0.95) 0%, transparent 100%);
-            opacity: 0; animation: subir 0.6s ease 1.1s forwards;
-        }
-        .rodape-marca {
-            font-weight: 600; font-size: 12px; letter-spacing: 3px;
-            text-transform: uppercase; color: rgba(255,255,255,0.15);
-        }
-        .rodape-acoes { display: flex; align-items: center; gap: 16px; }
-
-        .btn-voltar {
-            display: inline-flex; align-items: center; gap: 8px;
-            padding: 10px 24px;
-            background: rgba(255,255,255,0.04);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 40px; color: var(--cinza);
-            font-family: 'Barlow', sans-serif; font-weight: 600;
-            font-size: 13px; letter-spacing: 2px; text-transform: uppercase;
-            text-decoration: none; cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        .btn-voltar:hover { background: rgba(37,99,235,0.12); color: #e2e8f0; border-color: rgba(37,99,235,0.3); }
-
-        .btn-site {
-            display: inline-flex; align-items: center; gap: 10px;
-            padding: 10px 28px;
-            background: transparent;
-            border: 1px solid rgba(37,99,235,0.4);
-            border-radius: 40px; color: var(--cinza);
-            font-family: 'Barlow', sans-serif; font-weight: 600;
-            font-size: 13px; letter-spacing: 2px; text-transform: uppercase;
-            text-decoration: none; cursor: pointer;
-            transition: all 0.3s ease; position: relative; overflow: hidden;
-        }
-        .btn-site::before {
-            content: ''; position: absolute; inset: 0;
-            background: linear-gradient(135deg, var(--azul), var(--verde));
-            opacity: 0; transition: opacity 0.3s; border-radius: 40px;
-        }
-        .btn-site:hover::before { opacity: 1; }
-        .btn-site span, .btn-seta { position: relative; z-index: 1; }
-        .btn-site:hover { color: white; border-color: transparent; box-shadow: 0 0 24px rgba(37,99,235,0.4); }
-        .btn-seta { transition: transform 0.3s; }
-        .btn-site:hover .btn-seta { transform: translateX(4px); }
-
-        /* Animações */
-        @keyframes subir { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes subir     { from{opacity:0;transform:translateY(16px);} to{opacity:1;transform:translateY(0);} }
+        @keyframes entrarEsq { from{opacity:0;transform:translateX(-30px);} to{opacity:1;transform:translateX(0);} }
+        @keyframes expandir  { from{width:0;opacity:0;} to{width:200px;opacity:1;} }
     </style>
 </head>
 <body>
 
-<div class="fundo">
+<div class="pagina">
 
-    <!-- Partículas -->
-    <canvas id="particulas" style="position:absolute;inset:0;pointer-events:none;z-index:5;"></canvas>
+    <!-- ============================================================
+         CANVAS DE PARTÍCULAS (fundo de toda a página)
+         ============================================================ -->
+    <canvas id="particulas"></canvas>
 
-    <!-- Conteúdo central -->
-    <div class="conteudo">
+    <!-- ============================================================
+         ÁREA DE CONTEÚDO — 8 SEÇÕES
+         ============================================================ -->
+    <div class="area-conteudo">
 
-        <div class="marca">SIRIUS WEB</div>
-
-        <div class="badge-intro">
-            <div class="badge-ponto"></div>
-            Sistema integrado de gestão empresarial
+        <!-- ── INTRODUÇÃO ─────────────────────────────────────── -->
+        <div id="sec-introducao" class="secao ativa">
+            <div class="fundo-base"></div>
+            <div class="intro-conteudo">
+                <div class="marca">SIRIUS WEB</div>
+                <div class="badge-intro">
+                    <div class="badge-ponto"></div>
+                    Sistema integrado de gestão empresarial
+                </div>
+                <h1 class="titulo-principal">SIRIUS ERP</h1>
+                <p class="subtitulo">Completa e Robusta</p>
+                <div class="topicos-grid">
+                    <div class="topico-card card-internet">
+                        <div class="topico-icone-wrap">📡</div>
+                        <div class="topico-titulo">Livre da Internet</div>
+                        <div class="topico-divisor"></div>
+                        <div class="topico-desc">Tudo continua funcionando mesmo sem conexão. Sua operação nunca para.</div>
+                    </div>
+                    <div class="topico-card card-mouse">
+                        <div class="topico-icone-wrap">⌨️</div>
+                        <div class="topico-titulo">Livre do Mouse</div>
+                        <div class="topico-divisor"></div>
+                        <div class="topico-desc">As rotinas de vendas podem ser operadas exclusivamente pelo teclado para máxima agilidade.</div>
+                    </div>
+                    <div class="topico-card card-seguranca">
+                        <div class="topico-icone-wrap">🔐</div>
+                        <div class="topico-titulo">Segurança Total</div>
+                        <div class="topico-divisor"></div>
+                        <div class="topico-desc">Controle de acesso por perfil, criptografia de dados e auditoria completa das operações.</div>
+                    </div>
+                    <div class="topico-card card-velocidade">
+                        <div class="topico-icone-wrap">⚡</div>
+                        <div class="topico-titulo">Máxima Velocidade</div>
+                        <div class="topico-divisor"></div>
+                        <div class="topico-desc">Maior velocidade em todas as telas e rotinas, garantindo produtividade no dia a dia.</div>
+                    </div>
+                    <div class="topico-card card-modos">
+                        <div class="topico-icone-wrap">☁️</div>
+                        <div class="topico-titulo">Modos de Uso</div>
+                        <div class="topico-divisor"></div>
+                        <div class="topico-desc">Local, Híbrido e Nuvem. Escolha o modelo que melhor atende à sua operação.</div>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <h1 class="titulo-principal">SIRIUS ERP</h1>
-
-        <p class="subtitulo">Completa e Robusta</p>
-
-        <!-- 5 Cards de tópicos -->
-        <div class="topicos-grid">
-
-            <!-- 1. Livre da Internet -->
-            <div class="topico-card card-internet">
-                <div class="topico-icone-wrap">📡</div>
-                <div class="topico-titulo">Livre da Internet</div>
-                <div class="topico-divisor"></div>
-                <div class="topico-desc">Tudo continua funcionando mesmo sem conexão. Sua operação nunca para.</div>
+        <!-- ── VAREJO ──────────────────────────────────────────── -->
+        <div id="sec-varejo" class="secao">
+            <div class="fundo-base"></div>
+            <div class="deco-hexs">
+                <div class="hex" style="background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.3);"></div>
+                <div class="hex" style="background:rgba(16,185,129,0.04);border:1px solid rgba(16,185,129,0.15);"></div>
+                <div class="hex" style="background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.3);"></div>
+                <div class="hex" style="background:rgba(16,185,129,0.04);border:1px solid rgba(16,185,129,0.15);"></div>
+                <div class="hex" style="background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.3);"></div>
+                <div class="hex" style="background:rgba(16,185,129,0.04);border:1px solid rgba(16,185,129,0.15);"></div>
+                <div class="hex" style="background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.3);"></div>
+                <div class="hex" style="background:rgba(16,185,129,0.04);border:1px solid rgba(16,185,129,0.15);"></div>
             </div>
-
-            <!-- 2. Livre do Mouse -->
-            <div class="topico-card card-mouse">
-                <div class="topico-icone-wrap">⌨️</div>
-                <div class="topico-titulo">Livre do Mouse</div>
-                <div class="topico-divisor"></div>
-                <div class="topico-desc">As rotinas de vendas podem ser operadas exclusivamente pelo teclado para máxima agilidade.</div>
+            <div class="modulo-conteudo">
+                <div class="modulo-badge" style="background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.3);color:#6ee7b7;">🛒 Módulo Varejo</div>
+                <h2 class="modulo-titulo" style="background:linear-gradient(130deg,#fff,#6ee7b7,#10b981);-webkit-background-clip:text;background-clip:text;">VAREJO</h2>
+                <p class="modulo-subtitulo" style="color:#6ee7b7;">Vendas ágeis · Estoque controlado · Resultado garantido</p>
+                <div class="modulo-separador" style="background:linear-gradient(90deg,#10b981,#6ee7b7);"></div>
+                <div class="modulo-chips" id="chips-varejo"></div>
             </div>
-
-            <!-- 3. Segurança Total -->
-            <div class="topico-card card-seguranca">
-                <div class="topico-icone-wrap">🔐</div>
-                <div class="topico-titulo">Segurança Total</div>
-                <div class="topico-divisor"></div>
-                <div class="topico-desc">Controle de acesso por perfil, criptografia de dados e auditoria completa das operações.</div>
-            </div>
-
-            <!-- 4. Máxima Velocidade -->
-            <div class="topico-card card-velocidade">
-                <div class="topico-icone-wrap">⚡</div>
-                <div class="topico-titulo">Máxima Velocidade</div>
-                <div class="topico-divisor"></div>
-                <div class="topico-desc">Maior velocidade em todas as telas e rotinas, garantindo produtividade no dia a dia.</div>
-            </div>
-
-            <!-- 5. Modos de Uso -->
-            <div class="topico-card card-modos">
-                <div class="topico-icone-wrap">☁️</div>
-                <div class="topico-titulo">Modos de Uso</div>
-                <div class="topico-divisor"></div>
-                <div class="topico-desc">Local, Híbrido e Nuvem. Escolha o modelo que melhor atende à sua operação.</div>
-            </div>
-
         </div>
 
+        <!-- ── ATACADO ─────────────────────────────────────────── -->
+        <div id="sec-atacado" class="secao">
+            <div class="fundo-base"></div>
+            <div class="deco-hexs">
+                <div class="hex" style="background:rgba(124,58,237,0.08);border:1px solid rgba(124,58,237,0.3);"></div>
+                <div class="hex" style="background:rgba(124,58,237,0.04);border:1px solid rgba(124,58,237,0.15);"></div>
+                <div class="hex" style="background:rgba(124,58,237,0.08);border:1px solid rgba(124,58,237,0.3);"></div>
+                <div class="hex" style="background:rgba(124,58,237,0.04);border:1px solid rgba(124,58,237,0.15);"></div>
+                <div class="hex" style="background:rgba(124,58,237,0.08);border:1px solid rgba(124,58,237,0.3);"></div>
+                <div class="hex" style="background:rgba(124,58,237,0.04);border:1px solid rgba(124,58,237,0.15);"></div>
+                <div class="hex" style="background:rgba(124,58,237,0.08);border:1px solid rgba(124,58,237,0.3);"></div>
+                <div class="hex" style="background:rgba(124,58,237,0.04);border:1px solid rgba(124,58,237,0.15);"></div>
+            </div>
+            <div class="modulo-conteudo">
+                <div class="modulo-badge" style="background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.3);color:#c4b5fd;">🏭 Módulo Atacado</div>
+                <h2 class="modulo-titulo" style="background:linear-gradient(130deg,#fff,#c4b5fd,#7c3aed);-webkit-background-clip:text;background-clip:text;">ATACADO</h2>
+                <p class="modulo-subtitulo" style="color:#c4b5fd;">Orçamentos · Força de Vendas · NF-e Integrada</p>
+                <div class="modulo-separador" style="background:linear-gradient(90deg,#7c3aed,#c4b5fd);"></div>
+                <div class="modulo-chips" id="chips-atacado"></div>
+            </div>
+        </div>
+
+        <!-- ── DISTRIBUIÇÃO ────────────────────────────────────── -->
+        <div id="sec-distribuicao" class="secao">
+            <div class="fundo-base"></div>
+            <div class="deco-hexs">
+                <div class="hex" style="background:rgba(14,165,233,0.08);border:1px solid rgba(14,165,233,0.3);"></div>
+                <div class="hex" style="background:rgba(14,165,233,0.04);border:1px solid rgba(14,165,233,0.15);"></div>
+                <div class="hex" style="background:rgba(14,165,233,0.08);border:1px solid rgba(14,165,233,0.3);"></div>
+                <div class="hex" style="background:rgba(14,165,233,0.04);border:1px solid rgba(14,165,233,0.15);"></div>
+                <div class="hex" style="background:rgba(14,165,233,0.08);border:1px solid rgba(14,165,233,0.3);"></div>
+                <div class="hex" style="background:rgba(14,165,233,0.04);border:1px solid rgba(14,165,233,0.15);"></div>
+                <div class="hex" style="background:rgba(14,165,233,0.08);border:1px solid rgba(14,165,233,0.3);"></div>
+                <div class="hex" style="background:rgba(14,165,233,0.04);border:1px solid rgba(14,165,233,0.15);"></div>
+            </div>
+            <div class="modulo-conteudo">
+                <div class="modulo-badge" style="background:rgba(14,165,233,0.1);border:1px solid rgba(14,165,233,0.3);color:#7dd3fc;">🚛 Módulo Distribuição</div>
+                <h2 class="modulo-titulo" style="background:linear-gradient(130deg,#fff,#7dd3fc,#0ea5e9);-webkit-background-clip:text;background-clip:text;">DISTRIBUIÇÃO</h2>
+                <p class="modulo-subtitulo" style="color:#7dd3fc;">CT-e · MDF-e · Logística Integrada</p>
+                <div class="modulo-separador" style="background:linear-gradient(90deg,#0ea5e9,#7dd3fc);"></div>
+                <div class="modulo-chips" id="chips-distribuicao"></div>
+            </div>
+        </div>
+
+        <!-- ── INDÚSTRIA ───────────────────────────────────────── -->
+        <div id="sec-industria" class="secao">
+            <div class="fundo-base"></div>
+            <div class="deco-hexs">
+                <div class="hex" style="background:rgba(249,115,22,0.08);border:1px solid rgba(249,115,22,0.3);"></div>
+                <div class="hex" style="background:rgba(249,115,22,0.04);border:1px solid rgba(249,115,22,0.15);"></div>
+                <div class="hex" style="background:rgba(249,115,22,0.08);border:1px solid rgba(249,115,22,0.3);"></div>
+                <div class="hex" style="background:rgba(249,115,22,0.04);border:1px solid rgba(249,115,22,0.15);"></div>
+                <div class="hex" style="background:rgba(249,115,22,0.08);border:1px solid rgba(249,115,22,0.3);"></div>
+                <div class="hex" style="background:rgba(249,115,22,0.04);border:1px solid rgba(249,115,22,0.15);"></div>
+                <div class="hex" style="background:rgba(249,115,22,0.08);border:1px solid rgba(249,115,22,0.3);"></div>
+                <div class="hex" style="background:rgba(249,115,22,0.04);border:1px solid rgba(249,115,22,0.15);"></div>
+            </div>
+            <div class="modulo-conteudo">
+                <div class="modulo-badge" style="background:rgba(249,115,22,0.1);border:1px solid rgba(249,115,22,0.3);color:#fdba74;">🏗️ Módulo Indústria</div>
+                <h2 class="modulo-titulo" style="background:linear-gradient(130deg,#fff,#fdba74,#f97316);-webkit-background-clip:text;background-clip:text;">INDÚSTRIA</h2>
+                <p class="modulo-subtitulo" style="color:#fdba74;">Produção · Bloco K · Controle Completo</p>
+                <div class="modulo-separador" style="background:linear-gradient(90deg,#f97316,#fdba74);"></div>
+                <div class="modulo-chips" id="chips-industria"></div>
+            </div>
+        </div>
+
+        <!-- ── FISCAL ──────────────────────────────────────────── -->
+        <div id="sec-fiscal" class="secao">
+            <div class="fundo-base"></div>
+            <div class="deco-hexs">
+                <div class="hex" style="background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.3);"></div>
+                <div class="hex" style="background:rgba(245,158,11,0.04);border:1px solid rgba(245,158,11,0.15);"></div>
+                <div class="hex" style="background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.3);"></div>
+                <div class="hex" style="background:rgba(245,158,11,0.04);border:1px solid rgba(245,158,11,0.15);"></div>
+                <div class="hex" style="background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.3);"></div>
+                <div class="hex" style="background:rgba(245,158,11,0.04);border:1px solid rgba(245,158,11,0.15);"></div>
+                <div class="hex" style="background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.3);"></div>
+                <div class="hex" style="background:rgba(245,158,11,0.04);border:1px solid rgba(245,158,11,0.15);"></div>
+            </div>
+            <div class="modulo-conteudo">
+                <div class="modulo-badge" style="background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.3);color:#fcd34d;">📑 Módulo Fiscal</div>
+                <h2 class="modulo-titulo" style="background:linear-gradient(130deg,#fff,#fcd34d,#f59e0b);-webkit-background-clip:text;background-clip:text;">FISCAL</h2>
+                <p class="modulo-subtitulo" style="color:#fcd34d;">SPED · NF-e · CT-e · MDF-e · NFS-e</p>
+                <div class="modulo-separador" style="background:linear-gradient(90deg,#f59e0b,#fcd34d);"></div>
+                <div class="modulo-chips" id="chips-fiscal"></div>
+            </div>
+        </div>
+
+        <!-- ── FINANCEIRO ──────────────────────────────────────── -->
+        <div id="sec-financeiro" class="secao">
+            <div class="fundo-base"></div>
+            <div class="deco-hexs">
+                <div class="hex" style="background:rgba(22,163,74,0.08);border:1px solid rgba(22,163,74,0.3);"></div>
+                <div class="hex" style="background:rgba(22,163,74,0.04);border:1px solid rgba(22,163,74,0.15);"></div>
+                <div class="hex" style="background:rgba(22,163,74,0.08);border:1px solid rgba(22,163,74,0.3);"></div>
+                <div class="hex" style="background:rgba(22,163,74,0.04);border:1px solid rgba(22,163,74,0.15);"></div>
+                <div class="hex" style="background:rgba(22,163,74,0.08);border:1px solid rgba(22,163,74,0.3);"></div>
+                <div class="hex" style="background:rgba(22,163,74,0.04);border:1px solid rgba(22,163,74,0.15);"></div>
+                <div class="hex" style="background:rgba(22,163,74,0.08);border:1px solid rgba(22,163,74,0.3);"></div>
+                <div class="hex" style="background:rgba(22,163,74,0.04);border:1px solid rgba(22,163,74,0.15);"></div>
+            </div>
+            <div class="modulo-conteudo">
+                <div class="modulo-badge" style="background:rgba(22,163,74,0.1);border:1px solid rgba(22,163,74,0.3);color:#86efac;">💰 Módulo Financeiro</div>
+                <h2 class="modulo-titulo" style="background:linear-gradient(130deg,#fff,#86efac,#16a34a);-webkit-background-clip:text;background-clip:text;">FINANCEIRO</h2>
+                <p class="modulo-subtitulo" style="color:#86efac;">Contas a Pagar · Contas a Receber · Fluxo de Caixa</p>
+                <div class="modulo-separador" style="background:linear-gradient(90deg,#16a34a,#86efac);"></div>
+                <div class="modulo-chips" id="chips-financeiro"></div>
+            </div>
+        </div>
+
+        <!-- ── COMPRAS ─────────────────────────────────────────── -->
+        <div id="sec-compras" class="secao">
+            <div class="fundo-base"></div>
+            <div class="deco-hexs">
+                <div class="hex" style="background:rgba(139,92,246,0.08);border:1px solid rgba(139,92,246,0.3);"></div>
+                <div class="hex" style="background:rgba(139,92,246,0.04);border:1px solid rgba(139,92,246,0.15);"></div>
+                <div class="hex" style="background:rgba(139,92,246,0.08);border:1px solid rgba(139,92,246,0.3);"></div>
+                <div class="hex" style="background:rgba(139,92,246,0.04);border:1px solid rgba(139,92,246,0.15);"></div>
+                <div class="hex" style="background:rgba(139,92,246,0.08);border:1px solid rgba(139,92,246,0.3);"></div>
+                <div class="hex" style="background:rgba(139,92,246,0.04);border:1px solid rgba(139,92,246,0.15);"></div>
+                <div class="hex" style="background:rgba(139,92,246,0.08);border:1px solid rgba(139,92,246,0.3);"></div>
+                <div class="hex" style="background:rgba(139,92,246,0.04);border:1px solid rgba(139,92,246,0.15);"></div>
+            </div>
+            <div class="modulo-conteudo">
+                <div class="modulo-badge" style="background:rgba(139,92,246,0.1);border:1px solid rgba(139,92,246,0.3);color:#c4b5fd;">🛍️ Módulo Compras</div>
+                <h2 class="modulo-titulo" style="background:linear-gradient(130deg,#fff,#c4b5fd,#8b5cf6);-webkit-background-clip:text;background-clip:text;">COMPRAS</h2>
+                <p class="modulo-subtitulo" style="color:#c4b5fd;">Pedidos · XML de Fornecedores · Estoque Integrado</p>
+                <div class="modulo-separador" style="background:linear-gradient(90deg,#8b5cf6,#c4b5fd);"></div>
+                <div class="modulo-chips" id="chips-compras"></div>
+            </div>
+        </div>
+
+    </div><!-- /area-conteudo -->
+
+    <!-- ============================================================
+         RODAPÉ DE NAVEGAÇÃO
+         ============================================================ -->
+    <nav class="nav-rodape">
+        <button class="nav-btn" id="btnAnterior" onclick="navegarAnterior()">← Anterior</button>
+
+        <div class="nav-abas">
+            <button class="nav-aba ativa" data-secao="introducao" onclick="irParaAba('introducao')">Introdução</button>
+            <button class="nav-aba"       data-secao="varejo"      onclick="irParaAba('varejo')">Varejo</button>
+            <button class="nav-aba"       data-secao="atacado"     onclick="irParaAba('atacado')">Atacado</button>
+            <button class="nav-aba"       data-secao="distribuicao" onclick="irParaAba('distribuicao')">Distribuição</button>
+            <button class="nav-aba"       data-secao="industria"   onclick="irParaAba('industria')">Indústria</button>
+            <button class="nav-aba"       data-secao="fiscal"      onclick="irParaAba('fiscal')">Fiscal</button>
+            <button class="nav-aba"       data-secao="financeiro"  onclick="irParaAba('financeiro')">Financeiro</button>
+            <button class="nav-aba"       data-secao="compras"     onclick="irParaAba('compras')">Compras</button>
+        </div>
+
+        <button class="nav-btn" id="btnProxima" onclick="navegarProxima()">Próxima →</button>
+    </nav>
+
+</div><!-- /pagina -->
+
+<!-- ============================================================
+     MODAL DE DESCRIÇÃO DO CHIP
+     ============================================================ -->
+<div id="chipDesc" class="chip-desc" onclick="fecharChipDescFora(event)">
+    <div class="chip-desc-box">
+        <div class="chip-desc-header">
+            <span class="chip-desc-icone" id="cdIcone"></span>
+            <span class="chip-desc-titulo" id="cdTitulo"></span>
+            <div class="chip-desc-fechar" onclick="fecharChipDesc()">✕</div>
+        </div>
+        <div class="chip-desc-sep"></div>
+        <p class="chip-desc-texto" id="cdTexto"></p>
+        <button class="chip-desc-ok" onclick="fecharChipDesc()">Entendi</button>
     </div>
-
-    <!-- Rodapé -->
-    <div class="rodape">
-        <div class="rodape-marca">Soft Clever Informática</div>
-        <div class="rodape-acoes">
-            <a class="btn-voltar" href="menu-principal.html">← Voltar ao Menu</a>
-            <a class="btn-site" href="https://www.softclever.com.br" target="_blank">
-                <span>Saiba Mais</span>
-                <span class="btn-seta">→</span>
-            </a>
-        </div>
-    </div>
-
 </div>
 
 <script>
-    /* Partículas animadas */
+    /* ============================================================
+       DADOS DOS MÓDULOS
+       ============================================================ */
+    const DADOS_SECOES = {
+        varejo: {
+            chips: [
+                { icone:'📋', titulo:'Pré Vendas',         cor:'rgba(16,185,129,0.15)', borda:'rgba(16,185,129,0.4)', texto:'#6ee7b7', desc:'Pedidos e orçamentos de vendas. Fácil e ágil. Integra o pedido de venda com o caixa (emissão de cupom fiscal).' },
+                { icone:'💰', titulo:'Controle de Caixa',  cor:'rgba(16,185,129,0.15)', borda:'rgba(16,185,129,0.4)', texto:'#6ee7b7', desc:'Permite ao usuário acompanhamento diário das movimentações do caixa. Rotinas de abertura e fechamento do caixa, reforços e sangrias e muito mais.' },
+                { icone:'📦', titulo:'Controle de Estoque',cor:'rgba(16,185,129,0.15)', borda:'rgba(16,185,129,0.4)', texto:'#6ee7b7', desc:'Rotinas simplificadas que facilitam o controle de entrada e saída de produtos. Totalmente integrado com o pedido de compras, pré-vendas e cupom fiscal.' },
+                { icone:'🛵', titulo:'Delivery',           cor:'rgba(16,185,129,0.15)', borda:'rgba(16,185,129,0.4)', texto:'#6ee7b7', desc:'Localize rapidamente o cadastro do cliente. Emissão de comandas e controle simplificado dos pedidos para a entrega. Permite finalizar a venda através da emissão do cupom fiscal.' },
+                { icone:'📝', titulo:'Comandas',           cor:'rgba(16,185,129,0.15)', borda:'rgba(16,185,129,0.4)', texto:'#6ee7b7', desc:'Atende comércios que necessitem controlar mesas e/ou comandas. Fácil inclusão e alteração de produtos além de ser possível finalizar a venda através da emissão do cupom fiscal.' },
+                { icone:'📱', titulo:'App Pré Vendas',     cor:'rgba(16,185,129,0.1)',  borda:'rgba(16,185,129,0.3)', texto:'#a7f3d0', desc:'Aplicativo desenvolvido para celulares Android. Permite a geração de pré-vendas e comandas facilitando e agilizando as vendas para emissão do cupom fiscal.' },
+                { icone:'💳', titulo:'Financeiro',         cor:'rgba(16,185,129,0.1)',  borda:'rgba(16,185,129,0.3)', texto:'#a7f3d0', desc:'Integrado com compras e vendas, permite ao usuário controle detalhado das contas a pagar e a receber, além de diversas opções de filtros e relatórios facilitando a gestão financeira.' },
+                { icone:'📊', titulo:'Relatórios',         cor:'rgba(16,185,129,0.1)',  borda:'rgba(16,185,129,0.3)', texto:'#a7f3d0', desc:'Relatórios com totais de vendas e totais de comissões por vendedores e muito mais. Facilita a gestão das vendas realizadas e auxilia no pagamento de comissões.' },
+                { icone:'🍔', titulo:'Integração iFood',   cor:'rgba(16,185,129,0.1)',  borda:'rgba(16,185,129,0.3)', texto:'#a7f3d0', desc:'Captura os pedidos do iFood, monta o pedido de venda e executa o despacho de forma rápida e fácil.' },
+                { icone:'🛒', titulo:'Pedidos de Compras', cor:'rgba(16,185,129,0.1)',  borda:'rgba(16,185,129,0.3)', texto:'#a7f3d0', desc:'Totalmente integrado com o estoque e financeiro a pagar. Permite ao usuário gerar pedidos de compras para os fornecedores, facilitando o controle de estoque e a gestão financeira.' },
+                { icone:'🧾', titulo:'NFC-e',              cor:'rgba(16,185,129,0.15)', borda:'rgba(16,185,129,0.4)', texto:'#6ee7b7', desc:'Emissão de cupom fiscal eletrônico rápido e fácil.' }
+            ]
+        },
+        atacado: {
+            chips: [
+                { icone:'📊', titulo:'Orçamentos',              cor:'rgba(124,58,237,0.15)', borda:'rgba(124,58,237,0.4)', texto:'#c4b5fd', desc:'Digitação e controle completo dos orçamentos. Permite ao usuário envio parcial dos produtos para os pedidos de vendas. Controle de saldos, curva ABC, relatórios comparativos (Orçado x Faturado x Saldo), status Pendente e Realizado, Follow-Up e impressão de orçamentos.' },
+                { icone:'💼', titulo:'Força de Vendas',          cor:'rgba(124,58,237,0.15)', borda:'rgba(124,58,237,0.4)', texto:'#c4b5fd', desc:'Plataforma WEB para pedidos de venda integrada ao Sírius, ideal para vendedores externos, oferecendo rapidez nas vendas, controle de estoque em tempo real e emissão ágil de NF-e.' },
+                { icone:'📈', titulo:'Relatórios Gerenciais/DRE',cor:'rgba(124,58,237,0.15)', borda:'rgba(124,58,237,0.4)', texto:'#c4b5fd', desc:'Essenciais para o controle completo e gestão financeira da empresa. Permite ao usuário diversas opções de filtros e relatórios com totais de vendas por período, Curva ABC de Clientes, Produtos, Vendedores e Fornecedores, e mapas de vendas.' },
+                { icone:'🛒', titulo:'Compras',                  cor:'rgba(124,58,237,0.1)',  borda:'rgba(124,58,237,0.3)', texto:'#ddd6fe', desc:'Totalmente integrado com o estoque e financeiro. Permite ao usuário gerar pedidos de compras para serviços ou produtos. Também é possível importar arquivos XMLs enviado pelos fornecedores.' },
+                { icone:'📋', titulo:'Pedidos de Vendas',        cor:'rgba(124,58,237,0.1)',  borda:'rgba(124,58,237,0.3)', texto:'#ddd6fe', desc:'Sistema de gestão integrado com estoque e financeiro, que permite a emissão rápida ou detalhada de pedidos de vendas. Oferece geração de orçamentos, controle de entregas parciais, criação de ordem de produção, gestão de trocas e devoluções, expedição de pedidos e impressão de documentos.' },
+                { icone:'💳', titulo:'Financeiro',               cor:'rgba(124,58,237,0.1)',  borda:'rgba(124,58,237,0.3)', texto:'#ddd6fe', desc:'Sistema integrado com compras e vendas que realiza o controle detalhado das contas a pagar e a receber. Inclui controle de contas contábeis, centro de custos, conciliação bancária, emissão de boletos, integração via SISPAG, controle de fluxo de caixa e metas orçamentárias.' },
+                { icone:'📄', titulo:'Nota Fiscal de Produtos',  cor:'rgba(124,58,237,0.15)', borda:'rgba(124,58,237,0.4)', texto:'#c4b5fd', desc:'Totalmente integrado com o estoque e financeiro, NF-e com envio e autorização junto à SEFAZ. Rotinas de cancelamento, carta de correção, envio automático de e-mail com XML e PDF, cálculo automático de impostos, pré-visualização e impressão do DANFE.' }
+            ]
+        },
+        distribuicao: {
+            chips: [
+                { icone:'🚛', titulo:'CT-e',                      cor:'rgba(14,165,233,0.15)', borda:'rgba(14,165,233,0.4)', texto:'#7dd3fc', desc:'Emissão de Conhecimento de Transporte Eletrônico (CT-e) com envio e autorização junto à SEFAZ. Diversos processos automatizados. Filtros e relatórios gerenciais. Cadastros de emitente, remetente, consignatário, redespacho, tomador, expedidor, recebedor e destinatário.' },
+                { icone:'📋', titulo:'MDF-e',                      cor:'rgba(14,165,233,0.15)', borda:'rgba(14,165,233,0.4)', texto:'#7dd3fc', desc:'Emissão de Manifestação de Documentos Fiscais com a finalidade de atender empresas prestadoras de serviço cujo transporte seja realizado em veículos próprios, arrendados, ou mediante transportador autônomo de cargas. Agiliza o registro em lote de documentos fiscais em trânsito.' },
+                { icone:'📦', titulo:'Controle de Estoque',        cor:'rgba(14,165,233,0.1)',  borda:'rgba(14,165,233,0.3)', texto:'#bae6fd', desc:'Rotinas simplificadas que facilitam o controle de entrada e saída de produtos. Totalmente integrado com o pedido de compras, pré-vendas e cupom fiscal.' },
+                { icone:'📊', titulo:'Relatórios de Distribuição', cor:'rgba(14,165,233,0.1)',  borda:'rgba(14,165,233,0.3)', texto:'#bae6fd', desc:'Controle completo de movimentações logísticas. Relatórios de entregas, rotas, volumes e fretes com diversas opções de filtros por período, destinatário e região.' },
+                { icone:'💼', titulo:'Força de Vendas',            cor:'rgba(14,165,233,0.1)',  borda:'rgba(14,165,233,0.3)', texto:'#bae6fd', desc:'Plataforma WEB para pedidos de venda integrada ao Sírius, ideal para vendedores externos, oferecendo rapidez nas vendas, controle de estoque em tempo real e emissão ágil de NF-e.' }
+            ]
+        },
+        industria: {
+            chips: [
+                { icone:'🏗️', titulo:'Ordem de Produção',  cor:'rgba(249,115,22,0.15)', borda:'rgba(249,115,22,0.4)', texto:'#fdba74', desc:'Controle completo das ordens de produção, integradas com estoque de insumos e produtos acabados. Permite acompanhamento detalhado de cada etapa do processo produtivo.' },
+                { icone:'🔷', titulo:'Bloco K',            cor:'rgba(249,115,22,0.15)', borda:'rgba(249,115,22,0.4)', texto:'#fdba74', desc:'Totalmente integrado com as compras, estoque e produção. O Bloco K atua como um componente do Sped Fiscal para controle detalhado dos saldos de entrada e saída de produtos e insumos. Geração mensal do arquivo para envio à SEFAZ. Controla estoque próprio e em poder de terceiros.' },
+                { icone:'📦', titulo:'Estoque de Insumos', cor:'rgba(249,115,22,0.1)',  borda:'rgba(249,115,22,0.3)', texto:'#fed7aa', desc:'Controle preciso do estoque de matérias-primas e insumos, integrado com as ordens de produção. Permite gestão eficiente do consumo e reposição automática conforme necessidade produtiva.' },
+                { icone:'📊', titulo:'Relatórios',         cor:'rgba(249,115,22,0.1)',  borda:'rgba(249,115,22,0.3)', texto:'#fed7aa', desc:'Relatórios gerenciais de produção, consumo de insumos, produtos acabados e análise de custos. Fornece informações detalhadas para tomada de decisão e planejamento da produção.' },
+                { icone:'📄', titulo:'NF-e de Saída',      cor:'rgba(249,115,22,0.15)', borda:'rgba(249,115,22,0.4)', texto:'#fdba74', desc:'Emissão de NF-e totalmente integrada com o estoque e financeiro. Autorização junto à SEFAZ, cálculo automático de impostos, envio automático de XML e DANFE por e-mail.' }
+            ]
+        },
+        fiscal: {
+            chips: [
+                { icone:'📂', titulo:'SPED Fiscal',                    cor:'rgba(245,158,11,0.15)', borda:'rgba(245,158,11,0.4)', texto:'#fcd34d', desc:'Totalmente integrado com compras e vendas. Cálculo de impostos de entrada e saída. Atribuição automática das CFOPs e CSTs de ICMS, IPI, PIS e COFINS. Geração mensal do arquivo Sped para envio à SEFAZ e contabilidade. Pode ser contratado separadamente de nosso ERP.' },
+                { icone:'🔷', titulo:'Bloco K',                        cor:'rgba(245,158,11,0.15)', borda:'rgba(245,158,11,0.4)', texto:'#fcd34d', desc:'Totalmente integrado com as compras, estoque e produção. Componente do Sped Fiscal para controle detalhado dos saldos de entrada e saída de produtos e insumos. Controla estoque próprio e em poder de terceiros.' },
+                { icone:'📄', titulo:'NF-e',                           cor:'rgba(245,158,11,0.1)',  borda:'rgba(245,158,11,0.3)', texto:'#fde68a', desc:'Emissão de NF-e com envio e autorização junto à SEFAZ. Rotinas de cancelamento e inutilização por faixa numérica, carta de correção, envio automático de e-mail com XML e PDF, cálculo automático de impostos, pré-visualização e impressão do DANFE.' },
+                { icone:'🚛', titulo:'CT-e',                           cor:'rgba(245,158,11,0.1)',  borda:'rgba(245,158,11,0.3)', texto:'#fde68a', desc:'Emissão de Conhecimento de Transporte Eletrônico (CT-e) com envio e autorização junto à SEFAZ. Diversos processos automatizados. Filtros e relatórios gerenciais.' },
+                { icone:'📋', titulo:'MDF-e',                          cor:'rgba(245,158,11,0.1)',  borda:'rgba(245,158,11,0.3)', texto:'#fde68a', desc:'Emissão de Manifestação de Documentos Fiscais. A finalidade do MDF-e é agilizar o registro em lote de documentos fiscais em trânsito e identificar a unidade de carga utilizada e demais características do transporte.' },
+                { icone:'🏛️', titulo:'NFS-e',                          cor:'rgba(245,158,11,0.15)', borda:'rgba(245,158,11,0.4)', texto:'#fcd34d', desc:'Nota Fiscal de Serviços Eletrônica (NFS-e), com envio rápido e em lote para o sistema da prefeitura. Gerada a partir do pedido de venda e integrada com o financeiro. Envio automático de PDF por email.' }
+            ]
+        },
+        financeiro: {
+            chips: [
+                { icone:'💳', titulo:'Gestão Financeira',      cor:'rgba(22,163,74,0.15)', borda:'rgba(22,163,74,0.4)', texto:'#86efac', desc:'Sistema integrado com compras e vendas que realiza o controle detalhado das contas a pagar e a receber, oferecendo diversas opções de filtros e relatórios. Inclui funcionalidades como controle de contas contábeis, centro de custos, conciliação bancária, emissão de boletos, integração com pagamentos bancários via SISPAG, lançamento de despesas, projeção de novas despesas, registro de pagamentos, controle de fluxo de caixa, metas orçamentárias e gerenciamento de saldos e transferências entre contas.' },
+                { icone:'🏦', titulo:'Conciliação Bancária',   cor:'rgba(22,163,74,0.1)',  borda:'rgba(22,163,74,0.3)', texto:'#bbf7d0', desc:'Rotinas completas de conciliação bancária permitindo ao usuário confrontar os extratos bancários com os lançamentos do sistema, garantindo precisão nas informações financeiras.' },
+                { icone:'📊', titulo:'Fluxo de Caixa',         cor:'rgba(22,163,74,0.1)',  borda:'rgba(22,163,74,0.3)', texto:'#bbf7d0', desc:'Controle detalhado do fluxo de caixa com projeções de recebimentos e pagamentos. Facilita a gestão financeira e o planejamento de recursos da empresa.' },
+                { icone:'💰', titulo:'Centro de Custos',       cor:'rgba(22,163,74,0.1)',  borda:'rgba(22,163,74,0.3)', texto:'#bbf7d0', desc:'Permite a classificação e controle de despesas por centro de custo, facilitando a análise de rentabilidade por departamento, projeto ou unidade de negócio.' },
+                { icone:'📄', titulo:'Emissão de Boletos',     cor:'rgba(22,163,74,0.15)', borda:'rgba(22,163,74,0.4)', texto:'#86efac', desc:'Geração e controle de boletos bancários integrados com as contas a receber. Permite o envio automático por e-mail e o registro bancário conforme as regras de cada banco.' }
+            ]
+        },
+        compras: {
+            chips: [
+                { icone:'🛒', titulo:'Gestão de Compras',       cor:'rgba(139,92,246,0.15)', borda:'rgba(139,92,246,0.4)', texto:'#c4b5fd', desc:'Totalmente integrado com o estoque e financeiro. Permite ao usuário gerar pedidos de compras para serviços ou produtos. Também é possível importar arquivos XMLs enviado pelos fornecedores. Impressão de diversos modelos de pedidos de compra e diversas opções de filtros e relatórios.' },
+                { icone:'📄', titulo:'Importação de XML',        cor:'rgba(139,92,246,0.15)', borda:'rgba(139,92,246,0.4)', texto:'#c4b5fd', desc:'Importação automática dos arquivos XML enviados pelos fornecedores. O sistema identifica os produtos, quantidades e valores, agilizando o processo de entrada de notas fiscais e atualizando automaticamente o estoque.' },
+                { icone:'📦', titulo:'Integração com Estoque',   cor:'rgba(139,92,246,0.1)',  borda:'rgba(139,92,246,0.3)', texto:'#ede9fe', desc:'Ao confirmar um pedido de compra, o estoque é atualizado automaticamente com os produtos recebidos, mantendo sempre as informações de saldo corretas e em tempo real.' },
+                { icone:'💳', titulo:'Integração Financeira',    cor:'rgba(139,92,246,0.1)',  borda:'rgba(139,92,246,0.3)', texto:'#ede9fe', desc:'As compras realizadas geram automaticamente os títulos a pagar no módulo financeiro, garantindo controle completo das obrigações da empresa com seus fornecedores.' },
+                { icone:'📊', titulo:'Relatórios de Compras',    cor:'rgba(139,92,246,0.1)',  borda:'rgba(139,92,246,0.3)', texto:'#ede9fe', desc:'Diversas opções de relatórios e filtros para análise das compras realizadas por período, fornecedor, produto e categoria, auxiliando nas decisões de reabastecimento e negociação.' }
+            ]
+        }
+    };
+
+    /* ============================================================
+       GERAR CHIPS PARA CADA SEÇÃO
+       ============================================================ */
+    function gerarChips() {
+        Object.entries(DADOS_SECOES).forEach(([secao, dados]) => {
+            const container = document.getElementById(`chips-${secao}`);
+            if (!container) return;
+            dados.chips.forEach(chip => {
+                const el = document.createElement('button');
+                el.className = 'chip-item';
+                el.style.background = chip.cor;
+                el.style.borderColor = chip.borda;
+                el.style.color = chip.texto;
+                el.textContent = `${chip.icone} ${chip.titulo}`;
+                el.addEventListener('click', () => abrirChipDesc(chip));
+                container.appendChild(el);
+            });
+        });
+    }
+
+    /* ============================================================
+       MODAL DE CHIP
+       ============================================================ */
+    function abrirChipDesc(chip) {
+        document.getElementById('cdIcone').textContent = chip.icone;
+        document.getElementById('cdTitulo').textContent = chip.titulo;
+        document.getElementById('cdTexto').textContent = chip.desc;
+        document.getElementById('chipDesc').classList.add('visivel');
+    }
+    function fecharChipDesc() { document.getElementById('chipDesc').classList.remove('visivel'); }
+    function fecharChipDescFora(e) { if (e.target === document.getElementById('chipDesc')) fecharChipDesc(); }
+
+    /* ============================================================
+       NAVEGAÇÃO POR ABAS
+       ============================================================ */
+    const ORDEM_ABAS = ['introducao','varejo','atacado','distribuicao','industria','fiscal','financeiro','compras'];
+    let abaAtual = 0;
+
+    function irParaAba(id) {
+        const idx = ORDEM_ABAS.indexOf(id);
+        if (idx === -1) return;
+
+        // Esconder seção atual
+        document.querySelectorAll('.secao').forEach(s => s.classList.remove('ativa'));
+        document.querySelectorAll('.nav-aba').forEach(a => a.classList.remove('ativa'));
+
+        // Mostrar nova seção
+        document.getElementById(`sec-${id}`)?.classList.add('ativa');
+        document.querySelector(`.nav-aba[data-secao="${id}"]`)?.classList.add('ativa');
+
+        abaAtual = idx;
+        atualizarBotoes();
+    }
+
+    function navegarAnterior() {
+        if (abaAtual > 0) irParaAba(ORDEM_ABAS[abaAtual - 1]);
+    }
+    function navegarProxima() {
+        if (abaAtual < ORDEM_ABAS.length - 1) irParaAba(ORDEM_ABAS[abaAtual + 1]);
+    }
+
+    function atualizarBotoes() {
+        document.getElementById('btnAnterior').disabled = abaAtual === 0;
+        document.getElementById('btnProxima').disabled  = abaAtual === ORDEM_ABAS.length - 1;
+    }
+
+    /* ============================================================
+       PARTÍCULAS ANIMADAS
+       ============================================================ */
     const canvas = document.getElementById('particulas');
     const ctx    = canvas.getContext('2d');
-
-    function resize() {
-        canvas.width  = window.innerWidth;
-        canvas.height = window.innerHeight;
-    }
-    resize();
-    window.addEventListener('resize', resize);
-
-    const cores = ['37,99,235', '96,165,250', '16,185,129', '14,165,233'];
-    const ps = Array.from({ length: 40 }, () => ({
-        x:     Math.random() * window.innerWidth,
-        y:     Math.random() * window.innerHeight,
-        r:     Math.random() * 2 + 0.4,
-        vx:    (Math.random() - 0.5) * 0.35,
-        vy:    -(Math.random() * 0.5 + 0.15),
-        alpha: Math.random() * 0.45 + 0.1,
-        cor:   cores[Math.floor(Math.random() * cores.length)]
+    function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+    resize(); window.addEventListener('resize', resize);
+    const cores = ['37,99,235','96,165,250','16,185,129','14,165,233'];
+    const ps = Array.from({length:40}, () => ({
+        x: Math.random() * window.innerWidth,
+        y: Math.random() * window.innerHeight,
+        r: Math.random() * 2 + 0.4,
+        vx: (Math.random() - 0.5) * 0.3,
+        vy: -(Math.random() * 0.45 + 0.1),
+        alpha: Math.random() * 0.4 + 0.1,
+        cor: cores[Math.floor(Math.random() * cores.length)]
     }));
-
     function anim() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ps.forEach(p => {
-            p.x += p.vx;
-            p.y += p.vy;
+            p.x += p.vx; p.y += p.vy;
             if (p.y < -10) { p.y = canvas.height + 10; p.x = Math.random() * canvas.width; }
             if (p.x < -10) p.x = canvas.width + 10;
             if (p.x > canvas.width + 10) p.x = -10;
-            ctx.beginPath();
-            ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-            ctx.fillStyle = `rgba(${p.cor},${p.alpha})`;
-            ctx.fill();
+            ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
+            ctx.fillStyle = `rgba(${p.cor},${p.alpha})`; ctx.fill();
         });
         requestAnimationFrame(anim);
     }
     anim();
+
+    /* ============================================================
+       INICIALIZAÇÃO
+       ============================================================ */
+    gerarChips();
+    atualizarBotoes();
+
+    /* Suporte a parâmetro na URL: outros-modulos.html?aba=varejo */
+    const params = new URLSearchParams(window.location.search);
+    const abaParam = params.get('aba');
+    if (abaParam && ORDEM_ABAS.includes(abaParam)) {
+        irParaAba(abaParam);
+    }
+
+    console.log('✅ Outros Módulos carregado');
 </script>
 </body>
 </html>
