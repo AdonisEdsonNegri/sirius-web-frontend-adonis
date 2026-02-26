@@ -4,193 +4,790 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SIRIUS WEB - Pedidos</title>
-    <link rel="stylesheet" href="css/pedidos.css">
+    <style>
+        /* ============================================================
+           RESET E BASE
+           ============================================================ */
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+            font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+            background: #050e22;
+            overflow: hidden;
+        }
+
+        /* ============================================================
+           LAYOUT: SIDEBAR ÍCONES + ÁREA PRINCIPAL
+           ============================================================ */
+        .app-layout {
+            display: flex;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        /* ============================================================
+           SIDEBAR DE ÍCONES — estreita, compacta, fundo navy escuro
+           ============================================================ */
+        .sidebar-icones {
+            width: 80px;
+            min-width: 80px;
+            background: linear-gradient(180deg, #0a1628 0%, #0d1f3c 60%, #0a1628 100%);
+            border-right: 1px solid rgba(37, 99, 235, 0.25);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 16px 0 12px;
+            position: relative;
+            z-index: 10;
+            box-shadow: 4px 0 20px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Linha decorativa lateral */
+        .sidebar-icones::after {
+            content: '';
+            position: absolute;
+            top: 0; right: 0;
+            width: 2px;
+            height: 100%;
+            background: linear-gradient(180deg,
+                transparent 0%,
+                #2563eb 25%,
+                #00e5a0 50%,
+                #2563eb 75%,
+                transparent 100%
+            );
+            opacity: 0.5;
+        }
+
+        /* Logo do módulo no topo */
+        .sidebar-modulo-logo {
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, #2563eb, #1e40af);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            box-shadow: 0 0 16px rgba(37, 99, 235, 0.5);
+            margin-bottom: 10px;
+            flex-shrink: 0;
+        }
+
+        /* Divisor horizontal */
+        .sidebar-divisor {
+            width: 40px;
+            height: 1px;
+            background: rgba(255, 255, 255, 0.07);
+            margin: 6px 0;
+            flex-shrink: 0;
+        }
+
+        /* Empurra o botão Voltar para o rodapé */
+        .sidebar-spacer { flex: 1; }
+
+        /* ---- Botão de ação da sidebar ---- */
+        .sidebar-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            width: 64px;
+            padding: 10px 4px;
+            border-radius: 12px;
+            border: 1px solid transparent;
+            background: transparent;
+            color: #64748b;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            position: relative;
+            flex-shrink: 0;
+            margin-bottom: 2px;
+        }
+
+        .sidebar-btn:hover {
+            background: rgba(37, 99, 235, 0.14);
+            color: #93c5fd;
+            border-color: rgba(37, 99, 235, 0.25);
+        }
+
+        .sidebar-btn.ativo {
+            background: rgba(37, 99, 235, 0.20);
+            color: #60a5fa;
+            border-color: rgba(37, 99, 235, 0.35);
+        }
+
+        /* Ícone */
+        .btn-icone {
+            font-size: 20px;
+            line-height: 1;
+        }
+
+        /* Rótulo */
+        .btn-label {
+            font-size: 9px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            text-align: center;
+            line-height: 1.2;
+            white-space: nowrap;
+        }
+
+        /* Botão Voltar — visual diferenciado */
+        .sidebar-btn.btn-voltar {
+            color: #475569;
+            margin-top: 4px;
+        }
+        .sidebar-btn.btn-voltar:hover {
+            background: rgba(148, 163, 184, 0.10);
+            color: #94a3b8;
+            border-color: rgba(148, 163, 184, 0.18);
+        }
+
+        /* ---- Tooltip ao hover ---- */
+        .sidebar-btn::before {
+            content: attr(data-tooltip);
+            position: absolute;
+            left: calc(100% + 14px);
+            top: 50%;
+            transform: translateY(-50%);
+            background: #0d1f3c;
+            color: #e2e8f0;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 6px 12px;
+            border-radius: 8px;
+            border: 1px solid rgba(37, 99, 235, 0.3);
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.15s ease;
+            z-index: 300;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45);
+        }
+
+        /* Seta do tooltip */
+        .sidebar-btn::after {
+            content: '';
+            position: absolute;
+            left: calc(100% + 7px);
+            top: 50%;
+            transform: translateY(-50%);
+            border: 5px solid transparent;
+            border-right-color: rgba(37, 99, 235, 0.3);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.15s ease;
+            z-index: 300;
+        }
+
+        .sidebar-btn:hover::before,
+        .sidebar-btn:hover::after {
+            opacity: 1;
+        }
+
+        /* ============================================================
+           ÁREA PRINCIPAL
+           ============================================================ */
+        .main-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            background: linear-gradient(160deg, #071122 0%, #0a1628 100%);
+        }
+
+        /* Barra de título (painel superior azul) */
+        .page-topbar {
+            padding: 15px 22px 13px;
+            border-bottom: 1px solid rgba(37, 99, 235, 0.12);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-shrink: 0;
+            background: rgba(10, 22, 40, 0.55);
+        }
+
+        .page-titulo {
+            color: #e2e8f0;
+            font-size: 17px;
+            font-weight: 700;
+            letter-spacing: 0.4px;
+        }
+
+        .page-subtitulo {
+            color: #475569;
+            font-size: 12px;
+            letter-spacing: 0.6px;
+        }
+
+        /* Área de scroll */
+        .content-scroll {
+            flex: 1;
+            overflow-y: auto;
+            padding: 18px 22px 30px;
+        }
+
+        .content-scroll::-webkit-scrollbar { width: 5px; }
+        .content-scroll::-webkit-scrollbar-track { background: transparent; }
+        .content-scroll::-webkit-scrollbar-thumb { background: rgba(37,99,235,0.3); border-radius: 4px; }
+
+        /* Card branco */
+        .card {
+            background: #ffffff;
+            border-radius: 14px;
+            padding: 22px;
+            box-shadow:
+                0 8px 32px rgba(0, 0, 0, 0.5),
+                0 0 0 1px rgba(37, 99, 235, 0.08);
+        }
+
+        /* ============================================================
+           FILTRO ATIVO
+           ============================================================ */
+        .filtro-ativo {
+            background: linear-gradient(135deg, #eff6ff, #dbeafe);
+            border: 1px solid #bfdbfe;
+            color: #1e40af;
+            padding: 10px 16px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13px;
+        }
+
+        .btn-limpar-filtro {
+            background: #2563eb; color: white; border: none;
+            padding: 5px 12px; border-radius: 6px; cursor: pointer;
+            font-weight: 600; font-size: 12px; transition: background 0.2s;
+        }
+        .btn-limpar-filtro:hover { background: #1d4ed8; }
+
+        /* ============================================================
+           TABELA
+           ============================================================ */
+        table {
+            width: 100%; border-collapse: collapse; margin-bottom: 16px;
+            border-radius: 10px; overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+        }
+
+        thead { background: linear-gradient(135deg, #1e40af 0%, #2563eb 100%); color: white; }
+        th, td { padding: 12px 10px; text-align: left; font-size: 13px; }
+        tbody tr { border-bottom: 1px solid #f1f5f9; transition: background 0.18s; }
+        tbody tr:hover { background: #f8faff; }
+
+        .btn-small {
+            padding: 5px 10px; font-size: 11px; margin: 2px; border-radius: 6px;
+            border: none; cursor: pointer; font-weight: 600;
+            transition: all 0.18s; white-space: nowrap;
+        }
+        .btn-view    { background: linear-gradient(135deg, #2563eb, #3b82f6); color: white; }
+        .btn-print   { background: linear-gradient(135deg, #0ea5e9, #38bdf8); color: white; }
+        .btn-delete  { background: linear-gradient(135deg, #ef4444, #f87171); color: white; }
+        .btn-small:hover { transform: translateY(-1px); box-shadow: 0 3px 8px rgba(0,0,0,0.18); }
+
+        /* Badges de status */
+        .badge {
+            display: inline-block; padding: 3px 10px; border-radius: 20px;
+            font-size: 11px; font-weight: 700; letter-spacing: 0.3px;
+        }
+        .badge-aberto     { background: #dbeafe; color: #1e40af; }
+        .badge-faturado   { background: #d1fae5; color: #065f46; }
+        .badge-cancelado  { background: #fee2e2; color: #991b1b; }
+        .badge-pendente   { background: #fef3c7; color: #92400e; }
+
+        /* ============================================================
+           PAGINAÇÃO
+           ============================================================ */
+        .pagination {
+            display: flex; justify-content: center; align-items: center;
+            gap: 18px; margin-top: 16px;
+        }
+
+        .pagination button {
+            background: linear-gradient(135deg, #1d4ed8, #2563eb); color: white;
+            border: none; padding: 8px 18px; border-radius: 8px;
+            cursor: pointer; font-size: 13px; font-weight: 700; transition: all 0.2s;
+        }
+        .pagination button:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(37,99,235,0.35); }
+        .pagination button:disabled { opacity: 0.4; cursor: not-allowed; }
+        .pagination span { font-size: 13px; font-weight: 600; color: #334155; }
+
+        /* ============================================================
+           LOADING E MENSAGENS
+           ============================================================ */
+        .loading, .mensagem {
+            padding: 12px; margin-bottom: 14px; border-radius: 8px;
+            text-align: center; font-weight: 600; font-size: 13px;
+        }
+        .loading          { background: #eff6ff; color: #1d4ed8; }
+        .mensagem.success { background: #d1fae5; color: #065f46; }
+        .mensagem.error   { background: #fee2e2; color: #991b1b; }
+
+        /* ============================================================
+           DROPDOWNS FLUTUANTES
+           (surgem à direita da sidebar ao clicar nos ícones)
+           ============================================================ */
+        .dropdown-flutuante {
+            display: none;
+            position: fixed;
+            left: 92px;
+            background: #0d1f3c;
+            border: 1px solid rgba(37, 99, 235, 0.3);
+            border-radius: 12px;
+            min-width: 220px;
+            box-shadow: 0 8px 28px rgba(0, 0, 0, 0.55);
+            z-index: 500;
+            overflow: hidden;
+            animation: fadeSlide 0.15s ease;
+        }
+
+        @keyframes fadeSlide {
+            from { opacity: 0; transform: translateX(-8px); }
+            to   { opacity: 1; transform: translateX(0); }
+        }
+
+        .dropdown-flutuante.visivel { display: block; }
+
+        .dropdown-flutuante-titulo {
+            padding: 11px 16px 8px;
+            color: #60a5fa;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            border-bottom: 1px solid rgba(37,99,235,0.15);
+        }
+
+        .dropdown-flutuante a {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 16px;
+            color: #94a3b8;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .dropdown-flutuante a:hover {
+            background: rgba(37, 99, 235, 0.14);
+            color: #e2e8f0;
+        }
+
+        /* ============================================================
+           MODAIS GENÉRICOS
+           ============================================================ */
+        .modal {
+            display: none; position: fixed; z-index: 1000;
+            left: 0; top: 0; width: 100%; height: 100%;
+            overflow: auto; background: rgba(5,14,34,0.82);
+            backdrop-filter: blur(3px);
+        }
+
+        .modal-content {
+            background: white; padding: 0;
+            border-radius: 16px; width: 90%; max-width: 860px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            max-height: 90vh; overflow: hidden;
+            display: flex; flex-direction: column;
+            margin: 3% auto;
+        }
+
+        .modal-content.modal-small { max-width: 460px; }
+
+        .modal-header {
+            padding: 20px 28px; border-bottom: 2px solid #e2e8f0;
+            display: flex; justify-content: space-between; align-items: center;
+            background: linear-gradient(135deg, #f8faff, #eff6ff);
+            flex-shrink: 0;
+        }
+        .modal-header h3 { color: #1e40af; font-size: 17px; font-weight: 700; margin: 0; }
+
+        .modal-close {
+            color: #94a3b8; font-size: 26px; font-weight: bold;
+            cursor: pointer; line-height: 1; transition: color 0.2s;
+        }
+        .modal-close:hover { color: #1e293b; }
+
+        .modal-body {
+            padding: 24px; overflow-y: auto;
+            max-height: calc(90vh - 140px); flex: 1;
+        }
+
+        .modal-footer {
+            padding: 16px 28px; border-top: 2px solid #e2e8f0;
+            display: flex; justify-content: flex-end; gap: 10px;
+            background: #f8faff; flex-shrink: 0;
+        }
+
+        /* ---- Campos do formulário (modais de filtro) ---- */
+        .form-group { display: flex; flex-direction: column; margin-bottom: 16px; }
+        .form-group label { margin-bottom: 5px; font-weight: 600; color: #334155; font-size: 13px; }
+        .form-group input {
+            padding: 9px 12px; border: 2px solid #e2e8f0; border-radius: 7px;
+            font-size: 14px; transition: border-color 0.2s; font-family: inherit;
+        }
+        .form-group input:focus { outline: none; border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
+
+        /* Botões dos modais */
+        .btn {
+            background: linear-gradient(135deg, #1d4ed8, #2563eb); color: white;
+            border: none; padding: 10px 22px; border-radius: 8px;
+            cursor: pointer; font-size: 13px; font-weight: 700; transition: all 0.2s;
+        }
+        .btn:hover { background: linear-gradient(135deg, #1e40af, #1d4ed8); }
+
+        .btn-cancel {
+            background: #64748b; color: white; border: none;
+            padding: 10px 22px; border-radius: 8px;
+            cursor: pointer; font-size: 13px; font-weight: 600; transition: background 0.2s;
+        }
+        .btn-cancel:hover { background: #475569; }
+
+        .btn-relatorio {
+            background: linear-gradient(135deg, #059669, #10b981); color: white;
+            border: none; padding: 10px 22px; border-radius: 8px;
+            cursor: pointer; font-size: 13px; font-weight: 700; transition: all 0.2s;
+        }
+        .btn-relatorio:hover { background: linear-gradient(135deg, #047857, #059669); }
+
+        /* ---- Busca de clientes dentro do modal ---- */
+        .resultados-busca {
+            margin-top: 10px; max-height: 200px; overflow-y: auto;
+            border: 1px solid #e2e8f0; border-radius: 8px;
+        }
+        .resultado-item {
+            padding: 10px 14px; cursor: pointer; font-size: 13px;
+            border-bottom: 1px solid #f1f5f9; transition: background 0.15s;
+        }
+        .resultado-item:last-child { border-bottom: none; }
+        .resultado-item:hover { background: #eff6ff; color: #1d4ed8; }
+
+        /* ---- Conteúdo do modal de visualização do pedido ---- */
+        .pedido-secao {
+            margin-bottom: 22px;
+        }
+        .pedido-secao-titulo {
+            color: #1e40af; font-size: 13px; font-weight: 700;
+            padding-bottom: 6px; border-bottom: 1px solid #dbeafe;
+            margin-bottom: 12px;
+        }
+        .pedido-info-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 10px;
+        }
+        .pedido-info-item { display: flex; flex-direction: column; gap: 2px; }
+        .pedido-info-label { font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; }
+        .pedido-info-valor { font-size: 14px; color: #1e293b; font-weight: 500; }
+        .pedido-total-box {
+            background: linear-gradient(135deg, #eff6ff, #dbeafe);
+            border: 1px solid #bfdbfe; border-radius: 10px;
+            padding: 14px 18px; text-align: right;
+            font-size: 18px; font-weight: 700; color: #1e40af;
+        }
+
+    </style>
 </head>
 <body>
-    <!-- Header -->
-    <div class="header">
-        <div class="header-content">
-            <h1>SIRIUS WEB - Pedidos</h1>
-            <div class="user-info">
-                <span id="userName">Carregando...</span>
-                <button class="btn-logout" onclick="logout()">Sair</button>
+
+<div class="app-layout">
+
+    <!-- ============================================================
+         SIDEBAR DE ÍCONES — compacta, exclusiva do módulo Pedidos
+         ============================================================ -->
+    <aside class="sidebar-icones">
+
+        <!-- Ícone/logo do módulo -->
+        <div class="sidebar-modulo-logo" title="Pedidos de Venda">📋</div>
+
+        <div class="sidebar-divisor"></div>
+
+        <!-- Ordenação -->
+        <button class="sidebar-btn"
+                id="btnOrdenacao"
+                data-tooltip="Ordenação"
+                onclick="toggleDrop('dropOrdenacao', this)">
+            <span class="btn-icone">📊</span>
+            <span class="btn-label">Ordenar</span>
+        </button>
+
+        <!-- Filtros -->
+        <button class="sidebar-btn"
+                id="btnFiltros"
+                data-tooltip="Filtros"
+                onclick="toggleDrop('dropFiltros', this)">
+            <span class="btn-icone">🔍</span>
+            <span class="btn-label">Filtros</span>
+        </button>
+
+        <!-- Relatórios -->
+        <button class="sidebar-btn"
+                id="btnRelatorios"
+                data-tooltip="Relatórios"
+                onclick="toggleDrop('dropRelatorios', this)">
+            <span class="btn-icone">📄</span>
+            <span class="btn-label">Relat.</span>
+        </button>
+
+        <!-- Espaçador empurra Voltar para o rodapé -->
+        <div class="sidebar-spacer"></div>
+
+        <div class="sidebar-divisor"></div>
+
+        <!-- Voltar ao Menu Principal -->
+        <button class="sidebar-btn btn-voltar"
+                data-tooltip="Voltar ao Menu"
+                onclick="window.location.href='menu-principal.html'">
+            <span class="btn-icone">↩</span>
+            <span class="btn-label">Voltar</span>
+        </button>
+
+    </aside>
+
+    <!-- ============================================================
+         DROPDOWNS FLUTUANTES (surgem à direita da sidebar)
+         ============================================================ -->
+
+    <div id="dropOrdenacao" class="dropdown-flutuante">
+        <div class="dropdown-flutuante-titulo">📊 Ordenação</div>
+        <a href="#" onclick="aplicarOrdenacao('numero_asc');  fecharDropdowns(); return false;">📈 Número Crescente</a>
+        <a href="#" onclick="aplicarOrdenacao('numero_desc'); fecharDropdowns(); return false;">📉 Número Decrescente</a>
+    </div>
+
+    <div id="dropFiltros" class="dropdown-flutuante">
+        <div class="dropdown-flutuante-titulo">🔍 Filtros</div>
+        <a href="#" onclick="fecharDropdowns(); abrirFiltroNumero();   return false;">🔢 Por Número</a>
+        <a href="#" onclick="fecharDropdowns(); aplicarFiltroHoje();    return false;">📅 Hoje</a>
+        <a href="#" onclick="fecharDropdowns(); abrirFiltroData();      return false;">📆 A partir de...</a>
+        <a href="#" onclick="fecharDropdowns(); abrirFiltroCliente();   return false;">👤 Por Cliente</a>
+    </div>
+
+    <div id="dropRelatorios" class="dropdown-flutuante">
+        <div class="dropdown-flutuante-titulo">📄 Relatórios</div>
+        <a href="#" onclick="gerarRelatorioPedidos(); fecharDropdowns(); return false;">📊 Pedidos sob Filtro Atual</a>
+    </div>
+
+    <!-- ============================================================
+         ÁREA PRINCIPAL
+         ============================================================ -->
+    <div class="main-area">
+
+        <!-- Barra de título (painel superior azul) -->
+        <div class="page-topbar">
+            <span class="page-titulo">📋 Pedidos de Venda</span>
+            <span class="page-subtitulo">/ Visualização e controle de pedidos</span>
+            <!-- Elemento exigido pelo pedidos.js para exibir o nome do usuário logado -->
+            <span id="userName" style="margin-left:auto; font-size:12px; color:#475569; font-weight:600;"></span>
+        </div>
+
+        <!-- Conteúdo com scroll -->
+        <div class="content-scroll">
+            <div class="card">
+
+                <!-- Filtro Ativo -->
+                <div id="filtroAtivo" class="filtro-ativo" style="display:none;">
+                    <span id="filtroTexto"></span>
+                    <button class="btn-limpar-filtro" onclick="limparFiltros()">✖ Limpar Filtro</button>
+                </div>
+
+                <!-- Mensagem de feedback -->
+                <div id="mensagem" class="mensagem" style="display:none;"></div>
+
+                <!-- Tabela de Pedidos -->
+                <div id="tabelaContainer">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Número</th>
+                                <th>Data</th>
+                                <th>Cliente</th>
+                                <th>Documento</th>
+                                <th>Valor</th>
+                                <th>Status</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabelaPedidos">
+                            <tr>
+                                <td colspan="7" class="loading" style="text-align:center; padding:40px;">Carregando pedidos...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Paginação -->
+                <div id="paginacao" class="pagination" style="display:none;"></div>
+
             </div>
         </div>
     </div>
 
-    <!-- Navigation -->
-    <div class="nav">
-        <div class="nav-content">
-            <a href="dashboard.html">Dashboard</a>
-            <a href="produtos.html">Produtos</a>
-            <a href="clientes.html">Clientes</a>
-            <a href="#" onclick="showMessage('Módulo Fornecedores em desenvolvimento!'); return false;">Fornecedores</a>
-            <a href="pdv.html">PDV</a>
-            <a href="pedidos.html" class="active">Pedidos</a>
-            
-            <!-- Dropdown Configurações -->
-            <div class="nav-dropdown">
-                <button class="nav-dropdown-btn">⚙️ Configurações ▼</button>
-                <div class="nav-dropdown-content">
-                    <a href="vendedores.html">👨‍💼 Vendedores</a>
-                    <a href="formas-pagamento.html">💳 Formas de Pagamento</a>
-                    <a href="regimes-tributarios.html">📋 Regimes Tributários</a>
-                    <a href="#" onclick="showMessage('Módulo Caixas Cadastradas em desenvolvimento!'); return false;">💰 Caixas Cadastradas</a>
-                    <a href="#" onclick="showMessage('Módulo Usuários em desenvolvimento!'); return false;">👥 Usuários</a>
-                </div>
+</div><!-- /.app-layout -->
+
+<!-- ============================================================
+     MODAL: FILTRO POR NÚMERO
+     ============================================================ -->
+<div id="modalFiltroNumero" class="modal">
+    <div class="modal-content modal-small">
+        <div class="modal-header">
+            <h3>🔢 Filtrar por Número</h3>
+            <span class="modal-close" onclick="fecharModal('modalFiltroNumero')">&times;</span>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label>Número do Pedido:</label>
+                <input type="number" id="filtroNumeroPedido" placeholder="Digite o número do pedido">
             </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-cancel" onclick="fecharModal('modalFiltroNumero')">Cancelar</button>
+            <button class="btn" onclick="aplicarFiltroNumero()">Aplicar Filtro</button>
         </div>
     </div>
+</div>
 
-    <div class="container">
-        <h2>📋 Pedidos de Venda</h2>
-        <p class="subtitle">Visualização e controle de pedidos</p>
-
-        <!-- Mensagem de feedback -->
-        <div id="mensagem" class="mensagem"></div>
-
-        <!-- Toolbar -->
-        <div class="btn-toolbar">
-            <!-- Dropdown Ordenação -->
-            <div class="dropdown">
-                <button class="btn">📊 Ordenação</button>
-                <div class="dropdown-content">
-                    <a href="#" onclick="aplicarOrdenacao('numero_asc'); return false;">📈 Número Crescente</a>
-                    <a href="#" onclick="aplicarOrdenacao('numero_desc'); return false;">📉 Número Decrescente</a>
-                </div>
-            </div>
-
-            <!-- Dropdown Filtros -->
-            <div class="dropdown">
-                <button class="btn btn-filtros">🔍 Filtros</button>
-                <div class="dropdown-content">
-                    <a href="#" onclick="abrirFiltroNumero(); return false;">🔢 Por Número</a>
-                    <a href="#" onclick="aplicarFiltroHoje(); return false;">📅 Hoje</a>
-                    <a href="#" onclick="abrirFiltroData(); return false;">📆 A partir de...</a>
-                    <a href="#" onclick="abrirFiltroCliente(); return false;">👤 Por Cliente</a>
-                </div>
-            </div>
-
-            <!-- Dropdown Relatórios -->
-            <div class="dropdown">
-                <button class="btn btn-relatorio">📄 Relatórios</button>
-                <div class="dropdown-content">
-                    <a href="#" onclick="gerarRelatorioPedidos(); return false;">📊 Pedidos sob Filtro Atual</a>
-                </div>
+<!-- ============================================================
+     MODAL: FILTRO POR DATA
+     ============================================================ -->
+<div id="modalFiltroData" class="modal">
+    <div class="modal-content modal-small">
+        <div class="modal-header">
+            <h3>📆 Filtrar a partir de...</h3>
+            <span class="modal-close" onclick="fecharModal('modalFiltroData')">&times;</span>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label>Data Inicial:</label>
+                <input type="date" id="filtroDataInicial">
             </div>
         </div>
-
-        <!-- Filtro Ativo -->
-        <div id="filtroAtivo" class="filtro-ativo" style="display: none;">
-            <span id="filtroTexto"></span>
-            <button class="btn-limpar-filtro" onclick="limparFiltros()">❌ Limpar Filtro</button>
-        </div>
-
-        <!-- Tabela de Pedidos -->
-        <div id="tabelaContainer">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Número</th>
-                        <th>Data</th>
-                        <th>Cliente</th>
-                        <th>Documento</th>
-                        <th>Valor</th>
-                        <th>Status</th>
-                        <th>Ações</th>
-                    </tr>
-                </thead>
-                <tbody id="tabelaPedidos">
-                    <tr>
-                        <td colspan="7" class="loading">Carregando pedidos...</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-
-        <!-- Paginação -->
-        <div id="paginacao" class="paginacao" style="display: none;"></div>
-    </div>
-
-    <!-- Modais -->
-    <!-- Modal de Filtro por Número -->
-    <div id="modalFiltroNumero" class="modal">
-        <div class="modal-content modal-small">
-            <div class="modal-header">
-                <h3>🔢 Filtrar por Número</h3>
-                <span class="modal-close" onclick="fecharModal('modalFiltroNumero')">&times;</span>
-            </div>
-            <div class="modal-body">
-                <div class="form-group">
-                    <label>Número do Pedido:</label>
-                    <input type="number" id="filtroNumeroPedido" placeholder="Digite o número do pedido">
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-cancel" onclick="fecharModal('modalFiltroNumero')">Cancelar</button>
-                <button class="btn" onclick="aplicarFiltroNumero()">Aplicar Filtro</button>
-            </div>
+        <div class="modal-footer">
+            <button class="btn-cancel" onclick="fecharModal('modalFiltroData')">Cancelar</button>
+            <button class="btn" onclick="aplicarFiltroData()">Aplicar Filtro</button>
         </div>
     </div>
+</div>
 
-    <!-- Modal de Filtro por Data -->
-    <div id="modalFiltroData" class="modal">
-        <div class="modal-content modal-small">
-            <div class="modal-header">
-                <h3>📆 Filtrar a partir de...</h3>
-                <span class="modal-close" onclick="fecharModal('modalFiltroData')">&times;</span>
+<!-- ============================================================
+     MODAL: FILTRO POR CLIENTE
+     ============================================================ -->
+<div id="modalFiltroCliente" class="modal">
+    <div class="modal-content modal-small">
+        <div class="modal-header">
+            <h3>👤 Filtrar por Cliente</h3>
+            <span class="modal-close" onclick="fecharModal('modalFiltroCliente')">&times;</span>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label>Buscar Cliente:</label>
+                <input type="text" id="buscaCliente" placeholder="Digite o nome ou documento do cliente">
+                <small style="color:#64748b; font-size:11px; margin-top:4px; display:block;">💡 Clique no cliente desejado para aplicar o filtro</small>
             </div>
-            <div class="modal-body">
-                <div class="form-group">
-                    <label>Data Inicial:</label>
-                    <input type="date" id="filtroDataInicial">
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-cancel" onclick="fecharModal('modalFiltroData')">Cancelar</button>
-                <button class="btn" onclick="aplicarFiltroData()">Aplicar Filtro</button>
-            </div>
+            <div id="resultadosBuscaCliente" class="resultados-busca"></div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-cancel" onclick="fecharModal('modalFiltroCliente')">Cancelar</button>
         </div>
     </div>
+</div>
 
-    <!-- Modal de Filtro por Cliente -->
-    <div id="modalFiltroCliente" class="modal">
-        <div class="modal-content modal-small">
-            <div class="modal-header">
-                <h3>👤 Filtrar por Cliente</h3>
-                <span class="modal-close" onclick="fecharModal('modalFiltroCliente')">&times;</span>
-            </div>
-            <div class="modal-body">
-                <div class="form-group">
-                    <label>Buscar Cliente:</label>
-                    <input type="text" id="buscaCliente" placeholder="Digite o nome ou documento do cliente">
-                </div>
-                <div id="resultadosBuscaCliente" class="resultados-busca"></div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-cancel" onclick="fecharModal('modalFiltroCliente')">Cancelar</button>
-            </div>
+<!-- ============================================================
+     MODAL: VISUALIZAÇÃO DO PEDIDO
+     ============================================================ -->
+<div id="modalVisualizarPedido" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>📋 Detalhes do Pedido</h3>
+            <span class="modal-close" onclick="fecharModal('modalVisualizarPedido')">&times;</span>
+        </div>
+        <div class="modal-body" id="conteudoPedido">
+            <!-- Conteúdo preenchido dinamicamente pelo JS -->
+        </div>
+        <div class="modal-footer">
+            <button class="btn-cancel" onclick="fecharModal('modalVisualizarPedido')">Fechar</button>
+            <button class="btn-relatorio" onclick="imprimirPedidoAtual()">🖨️ Reimprimir Pedido</button>
         </div>
     </div>
+</div>
 
-    <!-- Modal de Visualização do Pedido -->
-    <div id="modalVisualizarPedido" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>📋 Detalhes do Pedido</h3>
-                <span class="modal-close" onclick="fecharModal('modalVisualizarPedido')">&times;</span>
-            </div>
-            <div class="modal-body" id="conteudoPedido">
-                <!-- Conteúdo será preenchido dinamicamente -->
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-cancel" onclick="fecharModal('modalVisualizarPedido')">Fechar</button>
-                <button class="btn btn-relatorio" onclick="imprimirPedidoAtual()">🖨️ Reimprimir Pedido</button>
-            </div>
-        </div>
-    </div>
+<script src="js/auth.js"></script>
+<script src="js/pedidos.js"></script>
+<script>
+    /* ============================================================
+       CONTROLE DOS DROPDOWNS FLUTUANTES (padrão produtos.html)
+       ============================================================ */
+    function toggleDrop(id, btn) {
+        const drop = document.getElementById(id);
+        const jaAberto = drop.classList.contains('visivel');
 
-    <script src="js/auth.js"></script>
-    <script src="js/pedidos.js"></script>
+        // Fecha todos primeiro
+        fecharDropdowns();
+
+        if (!jaAberto) {
+            // Posiciona verticalmente alinhado ao botão clicado
+            const rect = btn.getBoundingClientRect();
+            drop.style.top = `${rect.top}px`;
+            drop.classList.add('visivel');
+            if (btn) btn.classList.add('ativo');
+        }
+    }
+
+    function fecharDropdowns() {
+        document.querySelectorAll('.dropdown-flutuante').forEach(d => d.classList.remove('visivel'));
+        document.querySelectorAll('.sidebar-btn').forEach(b => b.classList.remove('ativo'));
+    }
+
+    // Fecha dropdowns ao clicar fora
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.sidebar-btn') && !e.target.closest('.dropdown-flutuante')) {
+            fecharDropdowns();
+        }
+    });
+
+    /* ============================================================
+       CONTROLE DOS MODAIS
+       Mantém compatibilidade com as chamadas existentes em pedidos.js
+       ============================================================ */
+    // pedidos.js abre modais via style.display = 'block'
+    // fecharModal deve usar style.display = 'none' para compatibilidade
+    function fecharModal(id) {
+        const el = document.getElementById(id);
+        if (el) el.style.display = 'none';
+    }
+
+    // Fecha modal ao clicar fora do conteúdo
+    document.querySelectorAll('.modal').forEach(function(modal) {
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) fecharModal(modal.id);
+        });
+    });
+
+    /* ============================================================
+       FUNÇÕES AUXILIARES QUE O pedidos.js PODE PRECISAR
+       ============================================================ */
+    function showMessage(msg) {
+        const el = document.getElementById('mensagem');
+        if (!el) return;
+        el.textContent = msg;
+        el.style.display = 'block';
+        el.className = 'mensagem';
+        setTimeout(() => { el.style.display = 'none'; }, 4000);
+    }
+
+</script>
 </body>
 </html>
