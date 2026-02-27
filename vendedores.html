@@ -4,227 +4,908 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SIRIUS WEB - Vendedores</title>
-    <link rel="stylesheet" href="css/vendedores.css">
+    <style>
+        /* ============================================================
+           RESET E BASE
+           ============================================================ */
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+            font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+            background: #050e22;
+            overflow: hidden;
+        }
+
+        /* ============================================================
+           LAYOUT: SIDEBAR ÍCONES + ÁREA PRINCIPAL
+           ============================================================ */
+        .app-layout {
+            display: flex;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        /* ============================================================
+           SIDEBAR DE ÍCONES — estreita, compacta, fundo navy escuro
+           ============================================================ */
+        .sidebar-icones {
+            width: 80px;
+            min-width: 80px;
+            background: linear-gradient(180deg, #0a1628 0%, #0d1f3c 60%, #0a1628 100%);
+            border-right: 1px solid rgba(37, 99, 235, 0.25);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 16px 0 12px;
+            position: relative;
+            z-index: 10;
+            box-shadow: 4px 0 20px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Linha decorativa lateral */
+        .sidebar-icones::after {
+            content: '';
+            position: absolute;
+            top: 0; right: 0;
+            width: 2px;
+            height: 100%;
+            background: linear-gradient(180deg,
+                transparent 0%,
+                #2563eb 25%,
+                #00e5a0 50%,
+                #2563eb 75%,
+                transparent 100%
+            );
+            opacity: 0.5;
+        }
+
+        /* Logo do módulo no topo */
+        .sidebar-modulo-logo {
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, #2563eb, #1e40af);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            box-shadow: 0 0 16px rgba(37, 99, 235, 0.5);
+            margin-bottom: 10px;
+            flex-shrink: 0;
+        }
+
+        /* Divisor horizontal */
+        .sidebar-divisor {
+            width: 40px;
+            height: 1px;
+            background: rgba(255, 255, 255, 0.07);
+            margin: 6px 0;
+            flex-shrink: 0;
+        }
+
+        /* Empurra o botão Voltar para o rodapé */
+        .sidebar-spacer { flex: 1; }
+
+        /* ---- Botão de ação da sidebar ---- */
+        .sidebar-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            width: 64px;
+            padding: 10px 4px;
+            border-radius: 12px;
+            border: 1px solid transparent;
+            background: transparent;
+            color: #64748b;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            position: relative;
+            flex-shrink: 0;
+            margin-bottom: 2px;
+        }
+
+        .sidebar-btn:hover {
+            background: rgba(37, 99, 235, 0.14);
+            color: #93c5fd;
+            border-color: rgba(37, 99, 235, 0.25);
+        }
+
+        .sidebar-btn.ativo {
+            background: rgba(37, 99, 235, 0.20);
+            color: #60a5fa;
+            border-color: rgba(37, 99, 235, 0.35);
+        }
+
+        /* Ícone */
+        .btn-icone {
+            font-size: 20px;
+            line-height: 1;
+        }
+
+        /* Rótulo */
+        .btn-label {
+            font-size: 9px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            text-align: center;
+            line-height: 1.2;
+            white-space: nowrap;
+        }
+
+        /* Botão Voltar — visual diferenciado */
+        .sidebar-btn.btn-voltar {
+            color: #475569;
+            margin-top: 4px;
+        }
+        .sidebar-btn.btn-voltar:hover {
+            background: rgba(148, 163, 184, 0.10);
+            color: #94a3b8;
+            border-color: rgba(148, 163, 184, 0.18);
+        }
+
+        /* ---- Tooltip ao hover ---- */
+        .sidebar-btn::before {
+            content: attr(data-tooltip);
+            position: absolute;
+            left: calc(100% + 14px);
+            top: 50%;
+            transform: translateY(-50%);
+            background: #0d1f3c;
+            color: #e2e8f0;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 6px 12px;
+            border-radius: 8px;
+            border: 1px solid rgba(37, 99, 235, 0.3);
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.15s ease;
+            z-index: 300;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45);
+        }
+
+        /* Seta do tooltip */
+        .sidebar-btn::after {
+            content: '';
+            position: absolute;
+            left: calc(100% + 7px);
+            top: 50%;
+            transform: translateY(-50%);
+            border: 5px solid transparent;
+            border-right-color: rgba(37, 99, 235, 0.3);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.15s ease;
+            z-index: 300;
+        }
+
+        .sidebar-btn:hover::before,
+        .sidebar-btn:hover::after {
+            opacity: 1;
+        }
+
+        /* ============================================================
+           ÁREA PRINCIPAL
+           ============================================================ */
+        .main-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            background: linear-gradient(160deg, #071122 0%, #0a1628 100%);
+        }
+
+        /* Barra de título */
+        .page-topbar {
+            padding: 15px 22px 13px;
+            border-bottom: 1px solid rgba(37, 99, 235, 0.12);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-shrink: 0;
+            background: rgba(10, 22, 40, 0.55);
+        }
+
+        .page-titulo {
+            color: #e2e8f0;
+            font-size: 17px;
+            font-weight: 700;
+            letter-spacing: 0.4px;
+        }
+
+        .page-subtitulo {
+            color: #475569;
+            font-size: 12px;
+            letter-spacing: 0.6px;
+        }
+
+        /* Área de scroll */
+        .content-scroll {
+            flex: 1;
+            overflow-y: auto;
+            padding: 18px 22px 30px;
+        }
+
+        .content-scroll::-webkit-scrollbar { width: 5px; }
+        .content-scroll::-webkit-scrollbar-track { background: transparent; }
+        .content-scroll::-webkit-scrollbar-thumb { background: rgba(37,99,235,0.3); border-radius: 4px; }
+
+        /* Card branco */
+        .card {
+            background: #ffffff;
+            border-radius: 14px;
+            padding: 22px;
+            box-shadow:
+                0 8px 32px rgba(0, 0, 0, 0.5),
+                0 0 0 1px rgba(37, 99, 235, 0.08);
+        }
+
+        /* ============================================================
+           FILTRO ATIVO
+           ============================================================ */
+        .filtro-ativo {
+            background: linear-gradient(135deg, #eff6ff, #dbeafe);
+            border: 1px solid #bfdbfe;
+            color: #1e40af;
+            padding: 10px 16px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13px;
+        }
+
+        .btn-limpar-filtro {
+            background: #2563eb; color: white; border: none;
+            padding: 5px 12px; border-radius: 6px; cursor: pointer;
+            font-weight: 600; font-size: 12px; transition: background 0.2s;
+        }
+        .btn-limpar-filtro:hover { background: #1d4ed8; }
+
+        /* ============================================================
+           TABELA
+           ============================================================ */
+        table {
+            width: 100%; border-collapse: collapse; margin-bottom: 16px;
+            border-radius: 10px; overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+        }
+
+        thead { background: linear-gradient(135deg, #1e40af 0%, #2563eb 100%); color: white; }
+        th, td { padding: 12px 10px; text-align: left; font-size: 13px; }
+        tbody tr { border-bottom: 1px solid #f1f5f9; transition: background 0.18s; }
+        tbody tr:hover { background: #f8faff; }
+
+        .btn-small {
+            padding: 5px 10px; font-size: 11px; margin: 2px; border-radius: 6px;
+            border: none; cursor: pointer; font-weight: 600;
+            transition: all 0.18s; white-space: nowrap;
+        }
+        .btn-edit   { background: linear-gradient(135deg, #2563eb, #3b82f6); color: white; }
+        .btn-delete { background: linear-gradient(135deg, #ef4444, #f87171); color: white; }
+        .btn-view   { background: linear-gradient(135deg, #0ea5e9, #38bdf8); color: white; }
+        .btn-small:hover { transform: translateY(-1px); box-shadow: 0 3px 8px rgba(0,0,0,0.18); }
+
+        /* ============================================================
+           PAGINAÇÃO
+           ============================================================ */
+        .pagination {
+            display: flex; justify-content: center; align-items: center;
+            gap: 18px; margin-top: 16px;
+        }
+
+        .pagination button {
+            background: linear-gradient(135deg, #1d4ed8, #2563eb); color: white;
+            border: none; padding: 8px 18px; border-radius: 8px;
+            cursor: pointer; font-size: 13px; font-weight: 700; transition: all 0.2s;
+        }
+        .pagination button:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(37,99,235,0.35); }
+        .pagination button:disabled { opacity: 0.4; cursor: not-allowed; }
+        .pagination span { font-size: 13px; font-weight: 600; color: #334155; }
+
+        /* ============================================================
+           LOADING E MENSAGENS
+           ============================================================ */
+        .loading, .mensagem {
+            padding: 12px; margin-bottom: 14px; border-radius: 8px;
+            text-align: center; font-weight: 600; font-size: 13px;
+        }
+        .loading           { background: #eff6ff; color: #1d4ed8; }
+        .mensagem.success  { background: #d1fae5; color: #065f46; }
+        .mensagem.error    { background: #fee2e2; color: #991b1b; }
+
+        /* ============================================================
+           DROPDOWNS FLUTUANTES
+           (surgem à direita da sidebar ao clicar nos ícones)
+           ============================================================ */
+        .dropdown-flutuante {
+            display: none;
+            position: fixed;
+            left: 92px;
+            background: #0d1f3c;
+            border: 1px solid rgba(37, 99, 235, 0.3);
+            border-radius: 12px;
+            min-width: 220px;
+            box-shadow: 0 8px 28px rgba(0, 0, 0, 0.55);
+            z-index: 500;
+            overflow: hidden;
+            animation: fadeSlide 0.15s ease;
+        }
+
+        @keyframes fadeSlide {
+            from { opacity: 0; transform: translateX(-8px); }
+            to   { opacity: 1; transform: translateX(0); }
+        }
+
+        .dropdown-flutuante.visivel { display: block; }
+
+        .dropdown-flutuante-titulo {
+            padding: 11px 16px 8px;
+            color: #60a5fa;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            border-bottom: 1px solid rgba(37,99,235,0.15);
+        }
+
+        .dropdown-flutuante a {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 16px;
+            color: #94a3b8;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .dropdown-flutuante a:hover {
+            background: rgba(37, 99, 235, 0.14);
+            color: #e2e8f0;
+        }
+
+        /* ============================================================
+           MODAL DE CADASTRO / EDIÇÃO
+           ============================================================ */
+        .modal {
+            display: none; position: fixed; z-index: 1000;
+            left: 0; top: 0; width: 100%; height: 100%;
+            overflow: auto; background: rgba(5,14,34,0.82);
+            backdrop-filter: blur(3px);
+        }
+
+        .modal-content {
+            background: white; margin: 2% auto; padding: 0;
+            border-radius: 16px; width: 90%; max-width: 860px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            max-height: 90vh; overflow: hidden; display: flex; flex-direction: column;
+        }
+
+        .modal-header {
+            padding: 20px 28px; border-bottom: 2px solid #e2e8f0;
+            display: flex; justify-content: space-between; align-items: center;
+            background: linear-gradient(135deg, #f8faff, #eff6ff);
+        }
+
+        .form-title { color: #1e40af; font-size: 1.5em; margin: 0; font-weight: 700; }
+
+        .close { color: #94a3b8; font-size: 28px; font-weight: bold; cursor: pointer; line-height: 1; transition: color 0.2s; }
+        .close:hover { color: #1e293b; }
+
+        .tabs { display: flex; border-bottom: 2px solid #e2e8f0; background: #f8faff; }
+
+        .tab-button {
+            flex: 1; padding: 12px 12px; border: none; background: transparent;
+            cursor: pointer; font-size: 13px; font-weight: 600; color: #64748b; transition: all 0.25s;
+        }
+        .tab-button.active { background: white; color: #2563eb; border-bottom: 3px solid #2563eb; }
+        .tab-button:hover:not(.active) { background: #eff6ff; color: #1d4ed8; }
+
+        .modal-body { padding: 24px; overflow-y: auto; max-height: calc(90vh - 200px); }
+        .tab-content        { display: none; }
+        .tab-content.active { display: block; }
+
+        .form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin-bottom: 14px; }
+        .form-group { display: flex; flex-direction: column; }
+        .form-group label { margin-bottom: 5px; font-weight: 600; color: #334155; font-size: 13px; }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 9px 12px; border: 2px solid #e2e8f0; border-radius: 7px;
+            font-size: 14px; transition: border-color 0.2s; font-family: inherit;
+        }
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus { outline: none; border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
+
+        .form-group textarea { resize: vertical; }
+
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+        input[type="number"] { -moz-appearance: textfield; }
+
+        .form-buttons {
+            display: flex; gap: 10px; justify-content: flex-end;
+            margin-top: 18px; padding-top: 18px; border-top: 2px solid #e2e8f0;
+        }
+
+        .btn-submit {
+            background: linear-gradient(135deg, #1d4ed8, #2563eb); color: white;
+            border: none; padding: 11px 26px; border-radius: 8px;
+            cursor: pointer; font-size: 14px; font-weight: 700; transition: all 0.2s;
+        }
+        .btn-submit:hover { background: linear-gradient(135deg, #1e40af, #1d4ed8); }
+
+        .btn-cancel {
+            background: #64748b; color: white; border: none;
+            padding: 11px 26px; border-radius: 8px;
+            cursor: pointer; font-size: 14px; font-weight: 600; transition: background 0.2s;
+        }
+        .btn-cancel:hover { background: #475569; }
+
+        /* ============================================================
+           MODAL DE AVISO
+           ============================================================ */
+        #modalAviso {
+            display: none; position: fixed; inset: 0;
+            background: rgba(0,0,0,0.7); z-index: 9999;
+            align-items: center; justify-content: center;
+        }
+        #modalAviso.visivel { display: flex; }
+
+        .modal-box {
+            background: #0d1f3c; border: 1px solid rgba(37,99,235,0.3);
+            border-radius: 14px; padding: 28px; max-width: 380px; width: 90%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+        }
+
+        .modal-box-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+        .modal-box-titulo { color: #60a5fa; font-size: 16px; font-weight: 600; }
+        .modal-box-fechar { color: #64748b; font-size: 22px; cursor: pointer; line-height: 1; transition: color 0.15s; }
+        .modal-box-fechar:hover { color: #e2e8f0; }
+        .modal-box-mensagem { color: #94a3b8; font-size: 14px; line-height: 1.6; margin-bottom: 20px; }
+
+        .modal-box-ok {
+            width: 100%; padding: 11px; background: #2563eb; color: white;
+            border: none; border-radius: 8px; font-size: 14px;
+            font-weight: 600; cursor: pointer; transition: background 0.2s;
+        }
+        .modal-box-ok:hover { background: #1e40af; }
+
+        /* ============================================================
+           MODAL DE DETALHES
+           ============================================================ */
+        .detalhes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 14px;
+            margin-bottom: 20px;
+        }
+
+        .detalhe-item {
+            background: #f8faff;
+            border: 1px solid #dbeafe;
+            border-radius: 8px;
+            padding: 12px 16px;
+        }
+
+        .detalhe-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            margin-bottom: 4px;
+        }
+
+        .detalhe-valor {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .detalhe-secao-titulo {
+            color: #1e40af;
+            font-size: 14px;
+            font-weight: 700;
+            margin: 18px 0 12px;
+            padding-bottom: 6px;
+            border-bottom: 1px solid #dbeafe;
+        }
+
+        /* Badge status */
+        .badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+        .badge-ativo   { background: #d1fae5; color: #065f46; }
+        .badge-inativo { background: #fee2e2; color: #991b1b; }
+    </style>
 </head>
 <body>
-    <div class="container">
-        <h1>👨‍💼 Vendedores</h1>
-        <p class="subtitle">Gestão Completa de Vendedores</p>
-        
-        <!-- Mensagem -->
-        <div id="mensagem" class="mensagem"></div>
-        
-        <!-- Menu Toggle Mobile -->
-        <button class="menu-toggle" onclick="toggleMenu()">☰ Menu</button>
-        
-        <!-- Toolbar -->
-        <div id="toolbar" class="btn-toolbar">
-            <button class="btn" onclick="abrirModal()">➕ Novo Vendedor</button>
-            
-            <!-- Dropdown Filtros -->
-            <div class="dropdown" onclick="toggleDropdown(event, this)">
-                <button class="btn btn-filtros">🔍 Filtros ▼</button>
-                <div class="dropdown-content">
-                    <a href="#" onclick="aplicarFiltro('nome')">Por Nome</a>
-                    <a href="#" onclick="aplicarFiltro('id')">Por Identificador</a>
+
+<div class="app-layout">
+
+    <!-- ============================================================
+         SIDEBAR DE ÍCONES — compacta, exclusiva do módulo Vendedores
+         ============================================================ -->
+    <aside class="sidebar-icones">
+
+        <!-- Ícone/logo do módulo -->
+        <div class="sidebar-modulo-logo" title="Gestão de Vendedores">👨‍💼</div>
+
+        <div class="sidebar-divisor"></div>
+
+        <!-- Novo Vendedor -->
+        <button class="sidebar-btn"
+                data-tooltip="Novo Vendedor"
+                onclick="abrirModal()">
+            <span class="btn-icone">➕</span>
+            <span class="btn-label">Novo</span>
+        </button>
+
+        <!-- Filtros -->
+        <button class="sidebar-btn"
+                id="btnFiltros"
+                data-tooltip="Filtros"
+                onclick="toggleDrop('dropFiltros', this)">
+            <span class="btn-icone">🔍</span>
+            <span class="btn-label">Filtros</span>
+        </button>
+
+        <!-- Ordenação -->
+        <button class="sidebar-btn"
+                id="btnOrdenacao"
+                data-tooltip="Ordenação"
+                onclick="toggleDrop('dropOrdenacao', this)">
+            <span class="btn-icone">📊</span>
+            <span class="btn-label">Ordenar</span>
+        </button>
+
+        <!-- Relatórios -->
+        <button class="sidebar-btn"
+                id="btnRelatorios"
+                data-tooltip="Relatórios"
+                onclick="toggleDrop('dropRelatorios', this)">
+            <span class="btn-icone">📄</span>
+            <span class="btn-label">Relat.</span>
+        </button>
+
+        <!-- Espaçador empurra Voltar para o rodapé -->
+        <div class="sidebar-spacer"></div>
+
+        <div class="sidebar-divisor"></div>
+
+        <!-- Voltar -->
+        <button class="sidebar-btn btn-voltar"
+                data-tooltip="Voltar ao Menu"
+                onclick="window.location.href='menu-principal.html'">
+            <span class="btn-icone">↩</span>
+            <span class="btn-label">Voltar</span>
+        </button>
+
+    </aside>
+
+    <!-- ============================================================
+         DROPDOWNS FLUTUANTES (surgem à direita da sidebar)
+         ============================================================ -->
+
+    <div id="dropFiltros" class="dropdown-flutuante">
+        <div class="dropdown-flutuante-titulo">🔍 Filtros</div>
+        <a href="#" onclick="aplicarFiltro('nome');      fecharDropdowns(); return false;">👤 Por Nome</a>
+        <a href="#" onclick="aplicarFiltro('id');        fecharDropdowns(); return false;">🔢 Por Identificador</a>
+    </div>
+
+    <div id="dropOrdenacao" class="dropdown-flutuante">
+        <div class="dropdown-flutuante-titulo">📊 Ordenação</div>
+        <a href="#" onclick="aplicarOrdenacao('nome');        fecharDropdowns(); return false;">📝 Por Nome</a>
+        <a href="#" onclick="aplicarOrdenacao('data_criacao'); fecharDropdowns(); return false;">📅 Ordem de Digitação</a>
+        <a href="#" onclick="aplicarOrdenacao('ultimos');      fecharDropdowns(); return false;">⏱️ Últimos Lançamentos</a>
+    </div>
+
+    <div id="dropRelatorios" class="dropdown-flutuante">
+        <div class="dropdown-flutuante-titulo">📄 Relatórios</div>
+        <a href="#" onclick="gerarRelatorio(); fecharDropdowns(); return false;">📊 Imprimir Relatório</a>
+    </div>
+
+    <!-- ============================================================
+         ÁREA PRINCIPAL
+         ============================================================ -->
+    <div class="main-area">
+
+        <!-- Barra de título -->
+        <div class="page-topbar">
+            <span class="page-titulo">👨‍💼 Gestão de Vendedores</span>
+            <span class="page-subtitulo">/ Cadastro e controle de vendedores</span>
+        </div>
+
+        <!-- Conteúdo -->
+        <div class="content-scroll">
+            <div class="card">
+
+                <!-- Filtro Ativo -->
+                <div id="filtroAtivo" class="filtro-ativo" style="display:none;">
+                    <div><strong>Filtro ativo:</strong> <span id="textoFiltro"></span></div>
+                    <button class="btn-limpar-filtro" onclick="limparFiltro()">✖ Limpar</button>
                 </div>
-            </div>
-            
-            <!-- Dropdown Ordenação -->
-            <div class="dropdown" onclick="toggleDropdown(event, this)">
-                <button class="btn btn-filtros">🔄 Ordenar ▼</button>
-                <div class="dropdown-content">
-                    <a href="#" onclick="aplicarOrdenacao('nome')">Por Nome</a>
-                    <a href="#" onclick="aplicarOrdenacao('data_criacao')">Ordem de Digitação</a>
-                    <a href="#" onclick="aplicarOrdenacao('ultimos')">Últimos Lançamentos</a>
+
+                <!-- Mensagem -->
+                <div id="mensagem" class="mensagem"></div>
+
+                <!-- Loading -->
+                <div id="loading" class="loading" style="display:none;">⏳ Carregando vendedores...</div>
+
+                <!-- Tabela -->
+                <div id="tabelaContainer">
+                    <table id="tabelaVendedores">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nome</th>
+                                <th>CPF</th>
+                                <th>Telefone</th>
+                                <th>E-mail</th>
+                                <th>Cidade/UF</th>
+                                <th>Status</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbody">
+                            <tr><td colspan="8" style="text-align:center; padding: 40px; color: #94a3b8;">Carregando...</td></tr>
+                        </tbody>
+                    </table>
+
+                    <!-- Paginação -->
+                    <div class="pagination">
+                        <button id="btnPrev" onclick="mudarPagina(-1)">◀ Anterior</button>
+                        <span id="pageInfo">Página 1 de 1</span>
+                        <button id="btnNext" onclick="mudarPagina(1)">Próximo ▶</button>
+                    </div>
                 </div>
-            </div>
-            
-            <button class="btn btn-relatorio" onclick="gerarRelatorio()">📊 Imprimir</button>
-        </div>
-        
-        <!-- Filtro Ativo -->
-        <div id="filtroAtivo" class="filtro-ativo" style="display: none;">
-            <span>📌 Filtro ativo: <strong id="textoFiltro"></strong></span>
-            <button class="btn-limpar-filtro" onclick="limparFiltro()">✖ Limpar</button>
-        </div>
-        
-        <!-- Loading -->
-        <div id="loading" class="loading" style="display: none;">
-            ⏳ Carregando vendedores...
-        </div>
-        
-        <!-- Tabela -->
-        <div id="tabelaContainer">
-            <table>
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Nome</th>
-                        <th>CPF</th>
-                        <th>Telefone</th>
-                        <th>E-mail</th>
-                        <th>Cidade/UF</th>
-                        <th>Status</th>
-                        <th>Ações</th>
-                    </tr>
-                </thead>
-                <tbody id="tbody">
-                    <tr><td colspan="8" style="text-align:center; padding: 40px;">Carregando...</td></tr>
-                </tbody>
-            </table>
-            
-            <!-- Paginação -->
-            <div class="pagination">
-                <button id="btnPrev" onclick="mudarPagina(-1)">◀ Anterior</button>
-                <span id="pageInfo">Página 1 de 1</span>
-                <button id="btnNext" onclick="mudarPagina(1)">Próximo ▶</button>
+
             </div>
         </div>
     </div>
+</div>
 
-    <!-- Modal de Cadastro/Edição -->
-    <div id="modal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 id="modalTitle" class="form-title">Novo Vendedor</h2>
-                <span class="close" onclick="fecharModal()">&times;</span>
-            </div>
-            
-            <!-- Abas -->
-            <div class="tabs">
-                <button class="tab-button active" data-tab="basico" onclick="mudarAba('basico')">📋 Dados Básicos</button>
-                <button class="tab-button" data-tab="endereco" onclick="mudarAba('endereco')">📍 Endereço</button>
-                <button class="tab-button" data-tab="comercial" onclick="mudarAba('comercial')">💼 Comercial</button>
-            </div>
-            
-            <div class="modal-body">
-                <form id="vendedorForm" onsubmit="salvarVendedor(event)">
-                    
-                    <!-- Aba: Dados Básicos -->
-                    <div id="tab-basico" class="tab-content active">
-                        <div class="form-row">
-                            <div class="form-group" style="grid-column: 1 / -1;">
-                                <label>Nome Completo *</label>
-                                <input type="text" id="nome" placeholder="Digite o nome completo do vendedor" required>
-                            </div>
-                        </div>
-                        
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label>CPF</label>
-                                <input type="text" id="cpf" placeholder="000.000.000-00" maxlength="14">
-                            </div>
-                            <div class="form-group">
-                                <label>Telefone *</label>
-                                <input type="text" id="fone" placeholder="(00) 00000-0000" maxlength="15" required>
-                            </div>
-                        </div>
-                        
-                        <div class="form-row">
-                            <div class="form-group" style="grid-column: 1 / -1;">
-                                <label>E-mail *</label>
-                                <input type="email" id="email" placeholder="vendedor@email.com" required>
-                            </div>
+<!-- ============================================================
+     MODAL DE CADASTRO / EDIÇÃO
+     ============================================================ -->
+<div id="modal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 id="modalTitle" class="form-title">Novo Vendedor</h2>
+            <span class="close" onclick="fecharModal()">&times;</span>
+        </div>
+
+        <!-- Abas -->
+        <div class="tabs">
+            <button class="tab-button active" data-tab="basico"    onclick="mudarAba('basico')">📋 Dados Básicos</button>
+            <button class="tab-button"        data-tab="endereco"  onclick="mudarAba('endereco')">📍 Endereço</button>
+            <button class="tab-button"        data-tab="comercial" onclick="mudarAba('comercial')">💼 Comercial</button>
+        </div>
+
+        <div class="modal-body">
+            <form id="vendedorForm" onsubmit="salvarVendedor(event)">
+
+                <!-- Aba: Dados Básicos -->
+                <div id="tab-basico" class="tab-content active">
+                    <div class="form-row">
+                        <div class="form-group" style="grid-column: 1 / -1;">
+                            <label>Nome Completo *</label>
+                            <input type="text" id="nome" placeholder="Digite o nome completo do vendedor" required>
                         </div>
                     </div>
-
-                    <!-- Aba: Endereço -->
-                    <div id="tab-endereco" class="tab-content">
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label>CEP</label>
-                                <input type="text" id="cep" placeholder="00000-000" maxlength="9">
-                            </div>
-                            <div class="form-group">
-                                <button type="button" class="btn" onclick="buscarCEP()" style="margin-top: 28px;">🔍 Buscar CEP</button>
-                            </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>CPF</label>
+                            <input type="text" id="cpf" placeholder="000.000.000-00" maxlength="14">
                         </div>
-                        
-                        <div class="form-row">
-                            <div class="form-group" style="grid-column: 1 / -1;">
-                                <label>Endereço</label>
-                                <input type="text" id="endereco" placeholder="Rua, Avenida, etc.">
-                            </div>
-                        </div>
-                        
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label>Complemento</label>
-                                <input type="text" id="complemento" placeholder="Apto, Bloco, etc.">
-                            </div>
-                        </div>
-                        
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label>Cidade</label>
-                                <input type="text" id="cidade" placeholder="Cidade">
-                            </div>
-                            <div class="form-group">
-                                <label>UF</label>
-                                <input type="text" id="uf" placeholder="SP" maxlength="2" style="text-transform: uppercase;">
-                            </div>
+                        <div class="form-group">
+                            <label>Telefone *</label>
+                            <input type="text" id="fone" placeholder="(00) 00000-0000" maxlength="15" required>
                         </div>
                     </div>
+                    <div class="form-row">
+                        <div class="form-group" style="grid-column: 1 / -1;">
+                            <label>E-mail *</label>
+                            <input type="email" id="email" placeholder="vendedor@email.com" required>
+                        </div>
+                    </div>
+                </div>
 
-                    <!-- Aba: Comercial -->
-                    <div id="tab-comercial" class="tab-content">
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label>Comissão (%)</label>
-                                <input type="number" id="comissao" placeholder="0.00" step="0.01" min="0" max="100">
-                                <small style="color: #666; font-size: 12px;">Percentual de comissão nas vendas</small>
-                            </div>
-                            <div class="form-group">
-                                <label>Meta de Vendas (R$)</label>
-                                <input type="number" id="meta_vendas" placeholder="0.00" step="0.01" min="0">
-                                <small style="color: #666; font-size: 12px;">Meta mensal em reais</small>
-                            </div>
+                <!-- Aba: Endereço -->
+                <div id="tab-endereco" class="tab-content">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>CEP</label>
+                            <input type="text" id="cep" placeholder="00000-000" maxlength="9">
                         </div>
-                        
-                        <div class="form-row">
-                            <div class="form-group" style="grid-column: 1 / -1;">
-                                <label>Observações</label>
-                                <textarea id="observacoes" rows="4" placeholder="Observações gerais sobre o vendedor"></textarea>
-                            </div>
+                        <div class="form-group" style="display: flex; align-items: flex-end;">
+                            <button type="button" class="btn-submit" onclick="buscarCEP()" style="padding: 9px 18px; font-size: 13px;">
+                                🔍 Buscar CEP
+                            </button>
                         </div>
-                        
-                        <div class="form-group" style="margin-top: 20px;">
-                            <label style="display: flex; align-items: center; cursor: pointer;">
-                                <input type="checkbox" id="ativo" checked style="margin-right: 10px; width: 18px; height: 18px; cursor: pointer;">
-                                <span style="font-size: 16px;">Vendedor Ativo</span>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group" style="grid-column: 1 / -1;">
+                            <label>Endereço</label>
+                            <input type="text" id="endereco" placeholder="Rua, Avenida, etc.">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Complemento</label>
+                            <input type="text" id="complemento" placeholder="Apto, Bloco, etc.">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Cidade</label>
+                            <input type="text" id="cidade" placeholder="Cidade">
+                        </div>
+                        <div class="form-group">
+                            <label>UF</label>
+                            <input type="text" id="uf" placeholder="SP" maxlength="2" style="text-transform: uppercase;">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Aba: Comercial -->
+                <div id="tab-comercial" class="tab-content">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Comissão (%)</label>
+                            <input type="number" id="comissao" placeholder="0.00" step="0.01" min="0" max="100">
+                            <small style="color: #64748b; font-size: 12px; margin-top: 4px;">Percentual de comissão nas vendas</small>
+                        </div>
+                        <div class="form-group">
+                            <label>Meta de Vendas (R$)</label>
+                            <input type="number" id="meta_vendas" placeholder="0.00" step="0.01" min="0">
+                            <small style="color: #64748b; font-size: 12px; margin-top: 4px;">Meta mensal em reais</small>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group" style="grid-column: 1 / -1;">
+                            <label>Observações</label>
+                            <textarea id="observacoes" rows="4" placeholder="Observações gerais sobre o vendedor"></textarea>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; margin-top: 8px;">
+                                <input type="checkbox" id="ativo" checked style="width: 18px; height: 18px; cursor: pointer; accent-color: #2563eb;">
+                                <span style="font-size: 15px; font-weight: 600; color: #334155;">Vendedor Ativo</span>
                             </label>
                         </div>
                     </div>
-                </form>
-            </div>
-            
-            <div class="modal-footer">
-                <button type="button" class="btn btn-cancel" onclick="fecharModal()">Cancelar</button>
-                <button type="submit" class="btn" form="vendedorForm">💾 Salvar</button>
-            </div>
+                </div>
+
+                <div class="form-buttons">
+                    <button type="button" class="btn-cancel" onclick="fecharModal()">Cancelar</button>
+                    <button type="submit" class="btn-submit">💾 Salvar Vendedor</button>
+                </div>
+
+            </form>
         </div>
     </div>
+</div>
 
-    <!-- Modal de Visualização Detalhada -->
-    <div id="modalDetalhes" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 class="form-title">📄 Detalhes do Vendedor</h2>
-                <span class="close" onclick="fecharModalDetalhes()">&times;</span>
-            </div>
-            
-            <div class="modal-body">
-                <div id="detalhesConteudo"></div>
-            </div>
-            
-            <div class="modal-footer">
-                <button type="button" class="btn btn-cancel" onclick="fecharModalDetalhes()">Fechar</button>
-                <button type="button" class="btn" onclick="imprimirDetalhes()">🖨️ Imprimir</button>
-            </div>
+<!-- ============================================================
+     MODAL DE VISUALIZAÇÃO DETALHADA
+     ============================================================ -->
+<div id="modalDetalhes" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="form-title">📄 Detalhes do Vendedor</h2>
+            <span class="close" onclick="fecharModalDetalhes()">&times;</span>
+        </div>
+
+        <div class="modal-body">
+            <div id="detalhesConteudo"></div>
+        </div>
+
+        <div class="form-buttons" style="padding: 16px 24px; border-top: 2px solid #e2e8f0; margin-top: 0;">
+            <button type="button" class="btn-cancel" onclick="fecharModalDetalhes()">Fechar</button>
+            <button type="button" class="btn-submit" onclick="imprimirDetalhes()">🖨️ Imprimir</button>
         </div>
     </div>
+</div>
 
-    <script src="js/vendedores.js"></script>
+<!-- ============================================================
+     MODAL DE AVISO
+     ============================================================ -->
+<div id="modalAviso">
+    <div class="modal-box">
+        <div class="modal-box-header">
+            <span class="modal-box-titulo">ℹ️ Informação</span>
+            <span class="modal-box-fechar" onclick="closeMessage()">&times;</span>
+        </div>
+        <p class="modal-box-mensagem" id="mensagemAviso"></p>
+        <button class="modal-box-ok" onclick="closeMessage()">OK</button>
+    </div>
+</div>
+
+<script src="js/vendedores.js"></script>
+
+<script>
+    /* ============================================================
+       DROPDOWNS FLUTUANTES
+       ============================================================ */
+    const IDS_DROPS = ['dropFiltros', 'dropOrdenacao', 'dropRelatorios'];
+
+    /**
+     * Fecha todos os dropdowns flutuantes.
+     */
+    function fecharDropdowns() {
+        IDS_DROPS.forEach(id => {
+            document.getElementById(id).classList.remove('visivel');
+        });
+    }
+
+    /**
+     * Abre/fecha o dropdown especificado, posicionando-o
+     * na mesma altura do botão que o acionou.
+     */
+    function toggleDrop(idDrop, btnEl) {
+        const drop   = document.getElementById(idDrop);
+        const aberto = drop.classList.contains('visivel');
+
+        fecharDropdowns(); // fecha qualquer outro aberto
+
+        if (aberto) return; // clique duplo = fecha
+
+        // Posiciona verticalmente alinhado ao botão
+        const rect   = btnEl.getBoundingClientRect();
+        const maxTop = window.innerHeight - 180; // garante que caiba na tela
+        drop.style.top = Math.min(rect.top, maxTop) + 'px';
+        drop.classList.add('visivel');
+    }
+
+    // Fecha ao clicar fora da sidebar ou do dropdown
+    document.addEventListener('click', function (e) {
+        if (!e.target.closest('.sidebar-icones') &&
+            !e.target.closest('.dropdown-flutuante')) {
+            fecharDropdowns();
+        }
+    });
+
+    /* ============================================================
+       MODAL DE AVISO
+       ============================================================ */
+    function showMessage(msg) {
+        document.getElementById('mensagemAviso').textContent = msg;
+        document.getElementById('modalAviso').classList.add('visivel');
+    }
+
+    function closeMessage() {
+        document.getElementById('modalAviso').classList.remove('visivel');
+    }
+
+    document.getElementById('modalAviso').addEventListener('click', function (e) {
+        if (e.target === this) closeMessage();
+    });
+
+    console.log('✅ Vendedores | Sidebar ícones compacta | SIRIUS WEB');
+</script>
 </body>
 </html>

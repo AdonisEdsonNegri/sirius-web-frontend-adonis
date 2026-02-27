@@ -112,6 +112,35 @@ function saveAuth(token, usuario, empresas, parametros) {
     }
 }
 
+// =====================================================
+// UTILITÁRIOS GLOBAIS
+// Disponíveis em todas as páginas que incluem auth.js
+// =====================================================
+
+// Retorna o token JWT armazenado
+function obterToken() {
+    return localStorage.getItem('sirius_token');
+}
+
+// Retorna o ID da empresa ativa
+function obterEmpresaId() {
+    try {
+        const empresas = JSON.parse(localStorage.getItem('sirius_empresas') || '[]');
+        return empresas.length > 0 ? empresas[0].id : null;
+    } catch (e) {
+        return null;
+    }
+}
+
+// Verifica autenticação e redireciona se não estiver logado
+function verificarAutenticacao() {
+    const token = obterToken();
+    const empresaId = obterEmpresaId();
+    if (!token || !empresaId) {
+        window.location.href = 'index.html';
+    }
+}
+
 // Verificar se já está logado (apenas para página de login)
 function checkAuth() {
     const token = localStorage.getItem('sirius_token');

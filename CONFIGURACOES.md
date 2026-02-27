@@ -191,3 +191,26 @@ function selecionarPorIdx(idx) {
 
 *Atualizado em: fevereiro de 2026 — v1.1*
 *Projeto: SIRIUS WEB ERP Multi-Tenant*
+
+## Arquitetura JavaScript — Regras Obrigatórias
+
+### auth.js é o único arquivo incluído em TODAS as páginas
+Sempre incluir como primeiro script: `<script src="js/auth.js"></script>`
+
+### Funções globais disponíveis via auth.js
+Nunca redefinir essas funções em outros arquivos ou inline no HTML:
+- `obterToken()` — retorna o JWT do localStorage
+- `obterEmpresaId()` — retorna o ID da empresa ativa  
+- `verificarAutenticacao()` — redireciona para login se não autenticado
+- `logout()` — limpa sessão e redireciona para index.html
+- `showMessage(texto, tipo)` — exibe mensagem na tela
+
+### Checklist ao criar nova página HTML
+1. Verificar se TODOS os `getElementById()` chamados no JS têm o elemento 
+   correspondente no HTML — um ID ausente causa TypeError silencioso que 
+   trava toda a inicialização
+2. Abrir e fechar modais pelo mesmo método — se o JS abre com 
+   `style.display='block'`, fechar com `style.display='none'`
+3. Não duplicar funções que já estão em auth.js
+
+"Atualizado em 27/02/2026"

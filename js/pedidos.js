@@ -846,28 +846,6 @@ function mostrarMensagem(texto, tipo = 'success') {
 
 // =====================================================
 // UTILITÁRIOS
+// obterToken(), obterEmpresaId(), verificarAutenticacao()
+// e logout() estão definidos globalmente em auth.js
 // =====================================================
-function obterEmpresaId() {
-    const empresas = JSON.parse(localStorage.getItem('sirius_empresas') || '[]');
-    return empresas.length > 0 ? empresas[0].id : null;
-}
-
-function obterToken() {
-    return localStorage.getItem('sirius_token');
-}
-
-function verificarAutenticacao() {
-    const token = obterToken();
-    const empresaId = obterEmpresaId();
-
-    if (!token || !empresaId) {
-        window.location.href = 'index.html';
-    }
-}
-
-function logout() {
-    localStorage.removeItem('sirius_token');
-    localStorage.removeItem('sirius_usuario');
-    localStorage.removeItem('sirius_empresas');
-    window.location.href = 'index.html';
-}
