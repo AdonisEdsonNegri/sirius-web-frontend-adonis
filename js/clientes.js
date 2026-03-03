@@ -1113,11 +1113,11 @@ function mostrarMensagem(texto, tipo) {
     console.log(`📢 Mensagem (${tipo}):`, texto);
 }
 
-window.onclick = function(event) {
-    const modal = document.getElementById('modal');
-    if (event.target == modal) {
-        fecharModal();
-    }
-}
+// window.onclick = function(event) {
+//     const modal = document.getElementById('modal');
+//     if (event.target == modal) {
+//         fecharModal();
+//     }
+// }
 
 console.log('🚀 Clientes JS - VERSÃO FINAL CORRIGIDA - TODOS OS PROBLEMAS RESOLVIDOS ✅');

@@ -930,11 +930,11 @@ function siriusPrompt(mensagem, valorPadrao = '', titulo = 'Sirius Web') {
 }
 
 // Fechar modal ao clicar fora
-window.onclick = function(event) {
-    const modal = document.getElementById('modal');
-    if (event.target == modal) {
-        fecharModal();
-    }
-}
+// window.onclick = function(event) {
+//     const modal = document.getElementById('modal');
+//     if (event.target == modal) {
+//         fecharModal();
+//     }
+// }
 
 console.log('🚀 Produtos JS - VERSÃO CORRIGIDA COM ORDENAÇÃO FUNCIONANDO ✅');
