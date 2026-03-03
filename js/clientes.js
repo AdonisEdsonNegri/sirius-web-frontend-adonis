@@ -1112,7 +1112,7 @@ function mostrarMensagem(texto, tipo) {
     
     console.log(`📢 Mensagem (${tipo}):`, texto);
 }
-
+// TODO: remover trecho abaixo
 // window.onclick = function(event) {
 //     const modal = document.getElementById('modal');
 //     if (event.target == modal) {

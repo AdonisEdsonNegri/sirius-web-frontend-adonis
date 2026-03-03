@@ -928,7 +928,7 @@ function siriusPrompt(mensagem, valorPadrao = '', titulo = 'Sirius Web') {
         };
     });
 }
-
+// TODO: remover trecho abaixo
 // Fechar modal ao clicar fora
 // window.onclick = function(event) {
 //     const modal = document.getElementById('modal');
