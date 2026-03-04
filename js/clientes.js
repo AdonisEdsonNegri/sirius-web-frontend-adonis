@@ -321,7 +321,7 @@ function renderizarTabela(clientes) {
     }
     
     tbody.innerHTML = clientes.map(c => {
-        const statusBadge = c.ativo === 'S' ? '🟢 Ativo' : '🔴 Inativo';
+        const statusBadge = c.ativo === 'S' ? '🟢 Ativo' : '⚪ Inativo';
         const tipoBadge = c.tipo === 'F' ? '👤 PF' : '🏢 PJ';
         const documento = c.tipo === 'F' ? (c.cpf || '-') : (c.cnpj || '-');
         const clienteId = c.id_cliente || c.id;

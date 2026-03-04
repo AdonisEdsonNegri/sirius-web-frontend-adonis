@@ -191,7 +191,7 @@ function renderizarTabela(produtos) {
     tbody.innerHTML = produtos.map(p => {
         const estoqueBaixo = p.estoque_minimo > 0 && parseFloat(p.estoque_atual || 0) < parseFloat(p.estoque_minimo || 0);
         const statusClass = estoqueBaixo ? 'estoque-baixo' : '';
-        const statusBadge = p.ativo === 'S' ? '🟢 Ativo' : '🔴 Inativo';
+        const statusBadge = p.ativo === 'S' ? '🟢 Ativo' : '⚪ Inativo';
         
         return `
             <tr class="${statusClass}">
@@ -205,10 +205,10 @@ function renderizarTabela(produtos) {
                 <td style="white-space: nowrap;">
                     <button class="btn-small btn-edit" onclick="editarProduto(${p.id})" title="Editar">✏️</button>
                     <button class="btn-small btn-movimentacoes" onclick="window.location.href='produtos-movimentacoes.html?id=${p.id}'" title="Movimentações">📊</button>
-                    <button class="btn-small btn-delete"
+                    <button class="btn-small btn-ativo"
                             onclick="confirmarToggleStatus(${p.id}, '${p.descricao.replace(/'/g, "\\'")}', '${p.ativo}')"
                             title="${p.ativo === 'S' ? 'Inativar' : 'Ativar'}">
-                        ${p.ativo === 'S' ? '🔴' : '🟢'}
+                        ${p.ativo === 'S' ? '⚪' : '🟢'}
                     </button>
                 </td>
             </tr>
