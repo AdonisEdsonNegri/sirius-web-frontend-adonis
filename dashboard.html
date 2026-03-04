@@ -369,6 +369,22 @@
             border-color: rgba(37,99,235,0.45);
             color: #60a5fa;
         }
+        /* campo de intervalo ao lado do botão */
+        .periodo-input {
+            margin-left: 8px;
+            padding: 4px 8px;
+            background: var(--secundario);
+            border: 1px solid #94a3b8;
+            border-radius: 4px;
+            color: var(--texto);
+            font-size: 0.9rem;
+            width: 150px;
+        }
+        #intervaloConfirm {
+            margin-left: 4px;
+            padding: 6px 12px;
+            font-size: 0.9rem;
+        }
 
         /* ============================================================
            GRID DE KPI CARDS
@@ -754,6 +770,12 @@
             <button class="periodo-btn ativo" onclick="selecionarPeriodo(0, this)">Hoje</button>
             <button class="periodo-btn" onclick="selecionarPeriodo(6, this)">7 dias</button>
             <button class="periodo-btn" onclick="selecionarPeriodo(29, this)">30 dias</button>
+            <button class="periodo-btn" onclick="selecionarPeriodo('X', this)">Intervalo</button>
+            <!-- campo de inserção de dados exibido ao lado do botão 'Intervalo' -->
+            <input type="text" id="intervaloInput" class="periodo-input" placeholder="Digite intervalo" style="display:none;" />
+            <button id="intervaloConfirm" class="periodo-btn" style="display:none;" onclick="confirmarIntervalo()">
+              OK
+            </button>
         </div>
 
         <!-- KPI Cards -->
@@ -991,11 +1013,41 @@ function ocultarLoading() {
    ============================================================ */
 function selecionarPeriodo(dias, btn) {
     diasPeriodo = dias;
-    document.querySelectorAll('.periodo-btn').forEach(b => b.classList.remove('ativo'));
-    btn.classList.add('ativo');
-    const labels = { 0: 'Hoje', 6: 'Últimos 7 dias', 29: 'Últimos 30 dias' };
-    document.getElementById('grafSubtitulo').textContent = labels[dias] || '';
-    carregarDados();
+    const input = document.getElementById('intervaloInput');
+    const confirmBtn = document.getElementById('intervaloConfirm');
+    //TODO: Fazer um metodo para que possa pesquisar diversos intervalos sem ter que ficar clicando e clicando
+    if ((diasPeriodo == 'X')){
+        if (input) input.style.display = 'inline-block';
+        if (confirmBtn) confirmBtn.style.display = 'inline-block';
+    }else{
+        if (input) {
+            input.style.display = 'none';
+            input.value = '';
+        }
+        
+        if (confirmBtn) confirmBtn.style.display = 'none';
+        const labels = { 0: 'Hoje', 6: 'Últimos 7 dias', 29: 'Últimos 30 dias' };
+        document.getElementById('grafSubtitulo').textContent = labels[dias] || '';
+        carregarDados();
+    }
+    if (btn != 'na'){
+        document.querySelectorAll('.periodo-btn').forEach(b => b.classList.remove('ativo'));
+        btn.classList.add('ativo');
+    }
+}
+
+function confirmarIntervalo() {
+    const input = document.getElementById('intervaloInput');
+    if (!input) return;
+    const valor = input.value;
+    console.log(valor);
+    if (valor) {
+        if (valor.isNaN){
+            alert('Digite apenas números');
+        }
+    else
+    selecionarPeriodo(valor, 'na');
+    }
 }
 
 /* ============================================================
