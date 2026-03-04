@@ -741,8 +741,7 @@
         <!-- Boas-vindas -->
         <div class="boas-vindas">
             <div>
-                <div class="boas-vindas-texto" id="saudacao">Bom dia</div>
-                <div class="boas-vindas-empresa" id="nomeEmpresa">—</div>
+                <div class="boas-vindas-texto" id="nomeEmpresa">—</div>
             </div>
             <div class="badge-live">
                 <div class="badge-ponto"></div>
@@ -944,17 +943,6 @@
     }
     tick(); setInterval(tick, 1000);
 })();
-
-/* ============================================================
-   SAUDAÇÃO
-   ============================================================ */
-function saudacao() {
-    const h = new Date().getHours();
-    if (h < 12) return 'Bom dia';
-    if (h < 18) return 'Boa tarde';
-    return 'Boa noite';
-}
-document.getElementById('saudacao').textContent = saudacao();
 
 /* ============================================================
    ESTADO GLOBAL
