@@ -76,9 +76,18 @@
         /* ============================================================
            LAYOUT PRINCIPAL
            ============================================================ */
+        /* container que engloba sidebar + área principal */
+        .app-layout {
+            display: flex;
+            height: 100vh;
+            width: 100vw;
+        }
+
         .app {
             position: relative; z-index: 2;
-            height: 100vh; width: 100vw;
+            /* ao ficar dentro de .app-layout não podemos fixar largura/altura */
+            flex: 1;
+            width: auto;
             display: flex; flex-direction: column;
             overflow: hidden;
         }
@@ -213,6 +222,97 @@
         .dash-body::-webkit-scrollbar-track { background: transparent; }
         .dash-body::-webkit-scrollbar-thumb { background: rgba(37,99,235,0.35); border-radius: 4px; }
 
+        .sidebar-icones {
+            width: 80px;
+            min-width: 80px;
+            background: linear-gradient(180deg, #0a1628 0%, #0d1f3c 60%, #0a1628 100%);
+            border-right: 1px solid rgba(37, 99, 235, 0.25);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 16px 0 12px;
+            position: relative;
+            z-index: 10;
+            box-shadow: 4px 0 20px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Linha decorativa lateral */
+        .sidebar-icones::after {
+            content: '';
+            position: absolute;
+            top: 0; right: 0;
+            width: 2px;
+            height: 100%;
+            background: linear-gradient(180deg,
+                transparent 0%,
+                #2563eb 25%,
+                #00e5a0 50%,
+                #2563eb 75%,
+                transparent 100%
+            );
+            opacity: 0.5;
+        }
+
+        /* Logo do módulo no topo */
+        .sidebar-modulo-logo {
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, #2563eb, #1e40af);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            box-shadow: 0 0 16px rgba(37, 99, 235, 0.5);
+            margin-bottom: 10px;
+            flex-shrink: 0;
+        }
+
+        /* Divisor horizontal */
+        .sidebar-divisor {
+            width: 40px;
+            height: 1px;
+            background: rgba(255, 255, 255, 0.07);
+            margin: 6px 0;
+            flex-shrink: 0;
+        }
+
+        /* Empurra o botão Voltar para o rodapé */
+        .sidebar-spacer { flex: 1; }
+
+        /* ---- Botão de ação da sidebar ---- */
+        .sidebar-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            width: 64px;
+            padding: 10px 4px;
+            border-radius: 12px;
+            border: 1px solid transparent;
+            background: transparent;
+            color: #64748b;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            position: relative;
+            flex-shrink: 0;
+            margin-bottom: 2px;
+        }
+
+        .sidebar-btn:hover {
+            background: rgba(37, 99, 235, 0.14);
+            color: #93c5fd;
+            border-color: rgba(37, 99, 235, 0.25);
+        }
+
+        .sidebar-btn.ativo {
+            background: rgba(37, 99, 235, 0.20);
+            color: #60a5fa;
+            border-color: rgba(37, 99, 235, 0.35);
+        }
+        
         /* ============================================================
            LINHA DE BOAS-VINDAS
            ============================================================ */
@@ -268,6 +368,22 @@
             background: rgba(37,99,235,0.18);
             border-color: rgba(37,99,235,0.45);
             color: #60a5fa;
+        }
+        /* campo de intervalo ao lado do botão */
+        .periodo-input {
+            margin-left: 8px;
+            padding: 4px 8px;
+            background: var(--secundario);
+            border: 1px solid #94a3b8;
+            border-radius: 4px;
+            color: var(--texto);
+            font-size: 0.9rem;
+            width: 150px;
+        }
+        #intervaloConfirm {
+            margin-left: 4px;
+            padding: 6px 12px;
+            font-size: 0.9rem;
         }
 
         /* ============================================================
@@ -574,7 +690,31 @@
 <!-- ============================================================
      APP
      ============================================================ -->
-<div class="app">
+<div class="app-layout">
+
+    <!-- menu lateral -->
+    <aside class="sidebar-icones">
+
+        <!-- Ícone/logo do módulo -->
+        <div class="sidebar-modulo-logo" title="Dashboard">📋</div>
+
+        <div class="sidebar-divisor"></div>
+        <!-- Espaçador empurra Voltar para o rodapé -->
+        <div class="sidebar-spacer"></div>
+
+        <div class="sidebar-divisor"></div>
+
+        <!-- Voltar ao Menu Principal -->
+        <button class="sidebar-btn btn-voltar"
+                data-tooltip="Voltar ao Menu"
+                onclick="window.location.href='menu-principal.html'">
+            <span class="btn-icone">↩</span>
+            <span class="btn-label">Voltar</span>
+        </button>
+
+    </aside>
+
+    <div class="app">
 
     <!-- TOPBAR -->
     <header class="topbar">
@@ -585,14 +725,13 @@
                 <div class="logo-sub">ERP Multi-Tenant</div>
             </div>
         </a>
-
-        <nav class="topbar-nav">
+        <!-- <nav class="topbar-nav">
             <a href="dashboard.html"   class="nav-link ativo">Dashboard</a>
             <a href="pedidos.html"     class="nav-link">Pedidos</a>
             <a href="produtos.html"    class="nav-link">Produtos</a>
             <a href="clientes.html"    class="nav-link">Clientes</a>
             <a href="outros-modulos.html" class="nav-link">Outros Módulos</a>
-        </nav>
+        </nav> -->
 
         <div class="topbar-spacer"></div>
 
@@ -609,22 +748,16 @@
                     <div class="usuario-cargo">Usuário</div>
                 </div>
             </div>
-            <button class="btn-sair" onclick="logout()">↩ Sair</button>
+            <!--<button class="btn-sair" onclick="logout()">↩ Sair</button>-->
         </div>
     </header>
 
     <!-- CORPO -->
     <div class="dash-body">
-
         <!-- Boas-vindas -->
         <div class="boas-vindas">
             <div>
-                <div class="boas-vindas-texto" id="saudacao">Bom dia</div>
-                <div class="boas-vindas-empresa" id="nomeEmpresa">—</div>
-            </div>
-            <div class="badge-live">
-                <div class="badge-ponto"></div>
-                Ao vivo
+                <div class="boas-vindas-texto" id="nomeEmpresa">—</div>
             </div>
         </div>
 
@@ -633,6 +766,12 @@
             <button class="periodo-btn ativo" onclick="selecionarPeriodo(0, this)">Hoje</button>
             <button class="periodo-btn" onclick="selecionarPeriodo(6, this)">7 dias</button>
             <button class="periodo-btn" onclick="selecionarPeriodo(29, this)">30 dias</button>
+            <button class="periodo-btn" onclick="selecionarPeriodo('X', this)">Intervalo</button>
+            <!-- campo de inserção de dados exibido ao lado do botão 'Intervalo' -->
+            <input type="text" id="intervaloInput" class="periodo-input" placeholder="Digite intervalo" style="display:none;" />
+            <button id="intervaloConfirm" class="periodo-btn" style="display:none;" onclick="confirmarIntervalo()">
+              OK
+            </button>
         </div>
 
         <!-- KPI Cards -->
@@ -768,6 +907,8 @@
     </div><!-- /dash-body -->
 </div><!-- /app -->
 
+</div><!-- /.app-layout -->
+
 <script src="js/auth.js"></script>
 <script>
 /* ============================================================
@@ -822,17 +963,6 @@
 })();
 
 /* ============================================================
-   SAUDAÇÃO
-   ============================================================ */
-function saudacao() {
-    const h = new Date().getHours();
-    if (h < 12) return 'Bom dia';
-    if (h < 18) return 'Boa tarde';
-    return 'Boa noite';
-}
-document.getElementById('saudacao').textContent = saudacao();
-
-/* ============================================================
    ESTADO GLOBAL
    ============================================================ */
 let diasPeriodo = 0; // 0 = hoje, 6 = 7 dias, 29 = 30 dias
@@ -879,11 +1009,41 @@ function ocultarLoading() {
    ============================================================ */
 function selecionarPeriodo(dias, btn) {
     diasPeriodo = dias;
-    document.querySelectorAll('.periodo-btn').forEach(b => b.classList.remove('ativo'));
-    btn.classList.add('ativo');
-    const labels = { 0: 'Hoje', 6: 'Últimos 7 dias', 29: 'Últimos 30 dias' };
-    document.getElementById('grafSubtitulo').textContent = labels[dias] || '';
-    carregarDados();
+    const input = document.getElementById('intervaloInput');
+    const confirmBtn = document.getElementById('intervaloConfirm');
+    //TODO: Fazer um metodo para que possa pesquisar diversos intervalos sem ter que ficar clicando e clicando
+    if ((diasPeriodo == 'X')){
+        if (input) input.style.display = 'inline-block';
+        if (confirmBtn) confirmBtn.style.display = 'inline-block';
+    }else{
+        if (input) {
+            input.style.display = 'none';
+            input.value = '';
+        }
+        
+        if (confirmBtn) confirmBtn.style.display = 'none';
+        const labels = { 0: 'Hoje', 6: 'Últimos 7 dias', 29: 'Últimos 30 dias' };
+        document.getElementById('grafSubtitulo').textContent = labels[dias] || '';
+        carregarDados();
+    }
+    if (btn != 'na'){
+        document.querySelectorAll('.periodo-btn').forEach(b => b.classList.remove('ativo'));
+        btn.classList.add('ativo');
+    }
+}
+
+function confirmarIntervalo() {
+    const input = document.getElementById('intervaloInput');
+    if (!input) return;
+    const valor = input.value;
+    console.log(valor);
+    if (valor) {
+        if (valor.isNaN){
+            alert('Digite apenas números');
+        }
+    else
+    selecionarPeriodo(valor, 'na');
+    }
 }
 
 /* ============================================================
@@ -1089,9 +1249,9 @@ function renderizarFormasPgto(totalFat, pedidos) {
     // Mock das formas de pagamento (proporção típica)
     const formas = [
         { nome: 'Dinheiro',       icone: '💵', bg: 'rgba(16,185,129,0.15)',  cor: '#10b981', pct: 0.35 },
-        { nome: 'Cartão Débito',  icone: '💳', bg: 'rgba(37,99,235,0.15)',   cor: '#2563eb', pct: 0.28 },
-        { nome: 'Cartão Crédito', icone: '💎', bg: 'rgba(139,92,246,0.15)', cor: '#8b5cf6', pct: 0.22 },
-        { nome: 'PIX',            icone: '⚡', bg: 'rgba(14,165,233,0.15)',  cor: '#0ea5e9', pct: 0.15 },
+        { nome: 'Cartão Débito',  icone: '💰', bg: 'rgba(37,99,235,0.15)',   cor: '#2563eb', pct: 0.28 },
+        { nome: 'Cartão Crédito', icone: '💳', bg: 'rgba(139,92,246,0.15)', cor: '#8b5cf6', pct: 0.22 },
+        { nome: 'PIX',            icone: '💸', bg: 'rgba(14,165,233,0.15)',  cor: '#0ea5e9', pct: 0.15 },
     ];
 
     const html = formas.map(f => {

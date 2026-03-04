@@ -768,13 +768,13 @@
         const el = document.getElementById(id);
         if (el) el.style.display = 'none';
     }
-
+    // TODO: remover trecho abaixo
     // Fecha modal ao clicar fora do conteúdo
-    document.querySelectorAll('.modal').forEach(function(modal) {
-        modal.addEventListener('click', function(e) {
-            if (e.target === modal) fecharModal(modal.id);
-        });
-    });
+    // document.querySelectorAll('.modal').forEach(function(modal) {
+    //     modal.addEventListener('click', function(e) {
+    //         if (e.target === modal) fecharModal(modal.id);
+    //     });
+    // });
 
     /* ============================================================
        FUNÇÕES AUXILIARES QUE O pedidos.js PODE PRECISAR
